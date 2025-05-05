@@ -154,7 +154,7 @@ void drawCar(Car car)
 {   
     Texture2D textureCar = LoadTexture("minha_imagem.png");
     Rectangle rect = {car.pos.x, car.pos.y, car.width, car.height};
-    Vector2 origin = {car.width * 0.8, car.height / 2.0f};
+    Vector2 origin = {car.width * 0.2, car.height / 2.0f};
     DrawRectanglePro(rect, origin, car.angle * RAD2DEG, car.color);
     //DrawTexturePro
 }
