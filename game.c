@@ -77,7 +77,7 @@ bool isOnTrack(Vector2 pos) {
 }
 
 void setup() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Racer test");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C");
     SetTargetFPS(60);
 
     trackMask = LoadImage("pista_mask.png");
@@ -100,25 +100,8 @@ void setup() {
               0.025   // aceleraçao angular ( velocidade de rotacao)
     );
 
-    createCar((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
-              0,    // vel inicial do carro
-              0.1,  // aceleracao do carro
-              50,   // largura
-              20,   // altura
-              BLUE, // Cor
-              0.0,  // angulo inicial do carro
-              0.025 // aceleraçao angular ( velocidade de rotacao)
-    );
-
-    createCar((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
-              0,     // vel inicial do carro
-              0.1,   // aceleracao do carro
-              50,    // largura
-              20,    // altura
-              GREEN, // Cor
-              0.0,   // angulo inicial do carro
-              0.025  // aceleraçao angular ( velocidade de rotacao)
-    );
+    createCar((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0, 0.1, 50,
+              20, BLUE, 0.0, 0.025);
 }
 
 void draw() {
@@ -156,24 +139,6 @@ void draw() {
     if (IsKeyDown(KEY_S)) {
         if (players[1].vel <= MIN_TURN_SPEED) {
             reverseCar(&players[1]);
-        } else {
-            breakCar(&players[1]);
-        }
-    }
-
-    if (IsKeyDown(KEY_I)) {
-        accelerateCar(&players[2]);
-    }
-    if (IsKeyDown(KEY_J)) {
-        turnLeft(&players[2]);
-    }
-    if (IsKeyDown(KEY_L)) {
-        turnRight(&players[2]);
-    }
-
-    if (IsKeyDown(KEY_K)) {
-        if (players[2].vel <= MIN_TURN_SPEED) {
-            reverseCar(&players[2]);
         } else {
             breakCar(&players[1]);
         }
