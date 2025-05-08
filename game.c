@@ -61,24 +61,24 @@ void setup() {
     cars = LinkedList_create();
 
     Car* car1 = Car_create(
-              (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 7.0f}, // pos
+              (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 3.0f}, // pos
               0.0,     // Velocidade do arro
               0.1,    // aceleracao do carro
               50,     // largura
               20,     // altura
               ORANGE, // Cor
               0.0,    // angulo inicial do carro
-              0.025,   // aceleraçao angular ( velocidade de rotacao),
+              0.035,   // aceleraçao angular ( velocidade de rotacao),
               0.2,      // Velocidade mínima para fazer curva,
-              0.05, // Força de frenagem,
-              0.01, // Atrito com o chão inicial
+              0.07, // Força de frenagem,
+         //     0.01, // Atrito com o chão inicial
               1     // id do carro
     );
 
     LinkedList_addLast(cars, car1);
 
     Car* car2 = Car_create(
-          (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
+          (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 3.0f}, // pos
           0.0,    //velocidade do carro
           0.1,    // aceleracao do carro
           50,     // largura
@@ -88,7 +88,7 @@ void setup() {
           0.025,   // aceleraçao angular ( velocidade de rotacao),
           0.2,      // Velocidade mínima para fazer curva
           0.05, // Força de frenagem
-          0.01, // Atrito com o chão inicial
+    //      0.01, // Atrito com o chão inicial
           2     // id do carro
     );
 

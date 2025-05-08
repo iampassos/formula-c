@@ -23,7 +23,7 @@ void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_esca
     OUTSIDE_TRACK_DRAG = ouside_track_drag;
 }
 
-Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, float dragCoeficient, int id) {
+Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient,int id) {
     Car* car = (Car*)malloc(sizeof(Car));
     if (car == NULL) return NULL;
     car->pos = pos;
@@ -36,7 +36,7 @@ Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color c
     car->angularAcc = angularAcc;
     car->minTurnSpeed = minTurnSpeed;
     car->breakForce = 1 - breakCoeficient;
-    car->dragForce = 1 - dragCoeficient;
+    car->dragForce = 0;
     car->id = id;
     car->vel = 0;
     car->lapTime = -1.0f;

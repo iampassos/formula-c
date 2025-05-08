@@ -19,9 +19,9 @@ typedef struct {
     float dragForce;
 } Car;
 
-void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag);
+void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag, float ouside_track_drag);
 
-Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakForce, float dragForce, int id);
+Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakForce,int id);
 void Car_free(Car* car); // Libera a memória de um carro
 
 void Car_update(Car *car);       // Atualizar a posição do carro a cada frame
