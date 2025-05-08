@@ -6,6 +6,7 @@
 #define TRACK_DRAG 0.99
 #define LIGHT_ESCAPE_AREA_DRAG 0.95
 #define HARD_ESCAPE_AREA_DRAG 0.9
+#define OUTSIDE_TRACK_DRAG 0.8
 #define SCREEN_WIDTH GetScreenWidth()
 #define SCREEN_HEIGHT GetScreenHeight()
 
@@ -53,7 +54,7 @@ void setup() {
     trackBackground = LoadTextureFromImage(bgImage);    // converte em textura
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
 
-    Car_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG);
+    Car_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
 
     Car_setMask(trackMask,trackPixels);
 

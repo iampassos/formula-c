@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <math.h>
 
-float TRACK_DRAG = 0.01;
-float LIGHT_ESCAPE_AREA_DRAG = 0.05;
-float HARD_ESCAPE_AREA_DRAG = 0.1;
+float TRACK_DRAG = 0.99;
+float LIGHT_ESCAPE_AREA_DRAG = 0.95;
+float HARD_ESCAPE_AREA_DRAG = 0.9;
+float OUTSIDE_TRACK_DRAG = 0.8;
 
 Image Car_trackMask;
 Color *Car_trackPixels;
@@ -15,10 +16,11 @@ void Car_setMask (Image trackMask, Color *trackPixels){
     Car_trackPixels = trackPixels;
 }
 
-void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag){
+void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag, float ouside_track_drag){
     TRACK_DRAG = track_drag;
     LIGHT_ESCAPE_AREA_DRAG = light_escape_area_drag;
     HARD_ESCAPE_AREA_DRAG = hard_escape_area_drag;
+    OUTSIDE_TRACK_DRAG = ouside_track_drag;
 }
 
 Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, float dragCoeficient, int id) {
@@ -57,6 +59,10 @@ static bool isOnHardEscapeArea(Color color){
     return color.r == 163 && color.g == 73 && color.b == 164;
 }
 
+static bool isOutSideTrack(Color color){
+    return color.r == 255 && color.g == 255 && color.b == 255;
+}
+
 void Car_update(Car *car){
     Color floorColor = Car_getFloor(car,Car_trackMask,Car_trackPixels);
     if (isOnTrack(floorColor))
@@ -65,6 +71,8 @@ void Car_update(Car *car){
         car->dragForce = LIGHT_ESCAPE_AREA_DRAG;
     else if (isOnHardEscapeArea(floorColor))
         car->dragForce = HARD_ESCAPE_AREA_DRAG;
+    else if (isOutSideTrack(floorColor))
+        car->dragForce = OUTSIDE_TRACK_DRAG;
     car->vel *= car->dragForce;
     car->pos.x += cos(car->angle) * car->vel;
     car->pos.y += sin(car->angle) * car->vel;
