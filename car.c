@@ -114,7 +114,7 @@ void Car_reverse(Car *car){
 }
 
 Color Car_getFloor(Car* car, Image Car_trackMask, Color *Car_trackPixels) {
-    int x = (int)car->pos.x + cos(car->angle) * car->width * 0.5f;
+    int x = (int)car->pos.x + cos(car->angle) * car->width * 0.8f;
     int y = (int)car->pos.y + sin(car->angle) * car->height * 0.5f;
     if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
         return (Color){0, 0, 0};

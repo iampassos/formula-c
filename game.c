@@ -4,8 +4,8 @@
 
 #define BACKGROUND_COLOR (Color){186, 149, 127, 255}
 #define TRACK_DRAG 0.99
-#define LIGHT_ESCAPE_AREA_DRAG 0.95
-#define HARD_ESCAPE_AREA_DRAG 0.9
+#define LIGHT_ESCAPE_AREA_DRAG 0.96
+#define HARD_ESCAPE_AREA_DRAG 0.93
 #define OUTSIDE_TRACK_DRAG 0.8
 #define SCREEN_WIDTH GetScreenWidth()
 #define SCREEN_HEIGHT GetScreenHeight()
@@ -61,7 +61,7 @@ void setup() {
     cars = LinkedList_create();
 
     Car* car1 = Car_create(
-              (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
+              (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 7.0f}, // pos
               0.0,     // Velocidade do arro
               0.1,    // aceleracao do carro
               50,     // largura
