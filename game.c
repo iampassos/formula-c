@@ -1,6 +1,5 @@
-#include "raylib.h"
+#include "linkedList.h"
 #include <math.h>
-#include <stdlib.h>
 
 #define SCREEN_WIDTH GetScreenWidth()
 #define SCREEN_HEIGHT GetScreenHeight()
