@@ -1,7 +1,10 @@
 #include "linkedList.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 LinkedList* LinkedList_create(){
     LinkedList* list = (LinkedList*)malloc(sizeof(LinkedList));
+    if (list == NULL) return NULL;
     list->head = list->tail = NULL;
     list->length = 0;
     return list;
@@ -14,12 +17,27 @@ void LinkedList_free(LinkedList* list){
     while(cur != NULL){
         temp = cur;
         cur = cur->next;
+        Car_free(temp->car);
         free(temp);
     }
     free(list);
 }
 
-int LinkedList_addLast(LinkedList* list, Car car){
+void LinkedList_clear(LinkedList* list){
+    Node* cur = list->head;
+    Node* temp;
+
+    while(cur != NULL){
+        temp = cur;
+        cur = cur->next;
+        Car_free(temp->car);
+        free(temp);
+    }
+    list->head = list->tail = NULL;
+    list->length = 0;
+}
+
+int LinkedList_addLast(LinkedList* list, Car* car){
     Node* node = (Node*)malloc(sizeof(Node));
     if (node == NULL) return 0;
     node->car = car;
@@ -37,7 +55,7 @@ int LinkedList_addLast(LinkedList* list, Car car){
     return 1;
 }
 
-int LinkedList_addFirst(LinkedList* list, Car car){
+int LinkedList_addFirst(LinkedList* list, Car* car){
     Node* node = (Node*)malloc(sizeof(Node));
     if (node == NULL) return 0;
     node->car = car;
@@ -55,11 +73,11 @@ int LinkedList_addFirst(LinkedList* list, Car car){
     return 1;
 }
 
-Car LinkedList_removeLast(LinkedList* list){
-    if (list->tail == NULL) return (Car){0};
+Car* LinkedList_removeLast(LinkedList* list){
+    if (list->tail == NULL) return NULL;
 
     Node* last = list->tail;
-    Car car = last->car;
+    Car* car = last->car;
 
     list->tail = last->previous;
 
@@ -73,11 +91,11 @@ Car LinkedList_removeLast(LinkedList* list){
     return car;
 }
 
-Car LinkedList_removeFirst(LinkedList* list){
-    if (list->head == NULL) return (Car){0};
+Car* LinkedList_removeFirst(LinkedList* list){
+    if (list->head == NULL) return NULL;
 
     Node* first = list->head;
-    Car car = first->car;
+    Car* car = first->car;
 
     list->head = first->next;
 
@@ -91,15 +109,15 @@ Car LinkedList_removeFirst(LinkedList* list){
     return car;
 }
 
-Car LinkedList_removeId(LinkedList* list, int id){
+Car* LinkedList_removeId(LinkedList* list, int id){
     Node* cur = list->head;
 
-    while(cur != NULL && cur->car.id != id){
+    while(cur != NULL && cur->car->id != id){
         cur = cur->next;
     }
 
-    if (cur == NULL) return (Car){0};
-    Car car = cur->car;
+    if (cur == NULL) return NULL;
+    Car* car = cur->car;
 
     if (cur->previous == NULL){
         list->head = list->head->next;
@@ -118,6 +136,16 @@ Car LinkedList_removeId(LinkedList* list, int id){
     return car;
 }
 
+Car* LinkedList_peakFirst(LinkedList* list){
+    if (list->head == NULL) return NULL;
+    return list->head->car;
+}
+
+Car* LinkedList_peakLast(LinkedList* list){
+    if (list->tail == NULL) return NULL;
+    return list->tail->car;
+}
+
 int LinkedList_size(LinkedList* list){
     return list->length;
 }
@@ -126,7 +154,7 @@ void LinkedList_print(LinkedList* list){
     printf("{");
     Node* cur = list->head;
     while(cur != NULL){
-        printf("[%d]", cur->car.id);
+        printf("[%d]", cur->car->id);
         cur = cur->next;
         if (cur != NULL)
             printf("<->");
@@ -134,14 +162,14 @@ void LinkedList_print(LinkedList* list){
     printf("}\n");
 }
 
-Car LinkedList_search(LinkedList* list, int id){
+Car* LinkedList_search(LinkedList* list, int id){
     Node* cur = list->head;
 
-    while (cur != NULL && cur->car.id != id){
+    while (cur != NULL && cur->car->id != id){
         cur = cur->next;
     }
     
-    if (cur == NULL) return (Car){0};
+    if (cur == NULL) return NULL;
     return cur->car;
 }
 
@@ -158,10 +186,19 @@ void LinkedList_sort(LinkedList* list){
     while(cur != NULL){
         temp = cur->next;
         while(temp != NULL){
-            if (cur->car.lapTime > temp->car.lapTime)
+            if (cur->car->lapTime > temp->car->lapTime)
                 swap(cur, temp);
             temp = temp->next;
         }
+        cur = cur->next;
+    }
+}
+
+void LinkedList_forEach(LinkedList* list, void (*function)(Car*)){
+    Node* cur = list->head;
+
+    while(cur != NULL){
+        function(cur->car);
         cur = cur->next;
     }
 }
