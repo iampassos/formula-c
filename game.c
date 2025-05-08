@@ -1,5 +1,6 @@
 #include "linkedList.h"
 #include "car.h"
+#include "raylib.h"
 
 #define SCREEN_WIDTH GetScreenWidth()
 #define SCREEN_HEIGHT GetScreenHeight()
@@ -39,12 +40,12 @@ void setup() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C");
     SetTargetFPS(60);
 
-    trackMask = LoadImage("pista_mask.png");
+    trackMask = LoadImage("resources/masks/pista_mask.png");
     ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
     trackPixels = LoadImageColors(trackMask);
     trackTex = LoadTextureFromImage(trackMask);
 
-    Image bgImage = LoadImage("teste2.png");            // Pista exibida
+    Image bgImage = LoadImage("resources/maps/teste2.png");            // Pista exibida
     ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona
     trackBackground = LoadTextureFromImage(bgImage);    // converte em textura
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
@@ -53,6 +54,7 @@ void setup() {
 
     Car* car1 = Car_create(
               (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
+              0.0,     // Velocidade do arro
               0.1,    // aceleracao do carro
               50,     // largura
               20,     // altura
@@ -69,10 +71,11 @@ void setup() {
 
     Car* car2 = Car_create(
           (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, // pos
+          0.0,    //velocidade do carro
           0.1,    // aceleracao do carro
           50,     // largura
           20,     // altura
-          ORANGE, // Cor
+          BLUE, // Cor
           0.0,    // angulo inicial do carro
           0.025,   // aceleraçao angular ( velocidade de rotacao),
           0.2,      // Velocidade mínima para fazer curva
@@ -88,7 +91,7 @@ void draw() {
     ClearBackground(BACKGROUND_COLOR);
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
     
-    Car* player1 = LinkedList_peakFirst(cars);
+    Car* player1 = LinkedList_search(cars,1);
 
     Car_move(player1, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT);
 

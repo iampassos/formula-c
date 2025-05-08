@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <math.h>
 
-Car* Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, float dragCoeficient, int id) {
+Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, float dragCoeficient, int id) {
     Car* car = (Car*)malloc(sizeof(Car));
     if (car == NULL) return NULL;
     car->pos = pos;
+    car->vel = vel;
     car->acc = acc;
     car->width = width;
     car->height = height;

@@ -6,7 +6,7 @@ LDFLAGS = -lraylib -lm -lpthread -ldl -lX11
 all: game
 
 # Como compilar o código
-game: game.c
+game: game.c linkedList.c car.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Como limpar os arquivos compilados
