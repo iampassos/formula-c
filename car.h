@@ -40,4 +40,6 @@ void Car_move(Car* car, int up, int down, int right, int left); // Atualiza o ca
 
 void Car_info(Car* car); // Mostra as informações do carro no console (PARA DEBUG)
 
+void Car_setMask (Image mask, Color *maskPixel); // Definindo a mascara de pixel para carros lerem
+
 #endif

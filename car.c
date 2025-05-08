@@ -7,6 +7,14 @@ float TRACK_DRAG = 0.01;
 float LIGHT_ESCAPE_AREA_DRAG = 0.05;
 float HARD_ESCAPE_AREA_DRAG = 0.1;
 
+Image Car_trackMask;
+Color *Car_trackPixels;
+
+void Car_setMask (Image mask, Color *maskPixel){
+    Car_trackPixels=maskPixel;
+    Car_trackMask = mask;
+}
+
 void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag){
     TRACK_DRAG = track_drag;
     LIGHT_ESCAPE_AREA_DRAG = light_escape_area_drag;
@@ -41,7 +49,7 @@ static bool isOnTrack(Color color){
     return color.r == 127 && color.g == 127 && color.b == 127;
 }
 
-static static bool isOnLightEscapeArea(Color color){
+static bool isOnLightEscapeArea(Color color){
     return color.r == 255 && color.g == 127 && color.b == 39;
 }
 
@@ -50,7 +58,7 @@ static bool isOnHardEscapeArea(Color color){
 }
 
 void Car_update(Car *car){
-    Color floorColor = Car_getFloor(car);
+    Color floorColor = Car_getFloor(car,Car_trackMask,Car_trackPixels);
     if (isOnTrack(floorColor))
         car->dragForce = TRACK_DRAG;
     else if (isOnLightEscapeArea(floorColor))
@@ -97,12 +105,12 @@ void Car_reverse(Car *car){
     car->vel -= car->acc * 0.2;
 }
 
-Color Car_getFloor(Car* car, Image trackMask, Color *trackPixels) {
+Color Car_getFloor(Car* car, Image Car_trackMask, Color *Car_trackPixels) {
     int x = (int)car->pos.x;
     int y = (int)car->pos.y;
-    if (x < 0 || x >= trackMask.width || y < 0 || y >= trackMask.height)
+    if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
         return (Color){0, 0, 0};
-    return trackPixels[y * trackMask.width + x];
+    return Car_trackPixels[y * Car_trackMask.width + x];
 }
 
 void Car_move(Car* car, int up, int down, int right, int left){

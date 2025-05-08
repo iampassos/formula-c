@@ -3,15 +3,14 @@
 #include "raylib.h"
 
 #define BACKGROUND_COLOR (Color){186, 149, 127, 255}
-#define TRACK_DRAG 0.01
-#define LIGHT_ESCAPE_AREA_DRAG 0.05
-#define HARD_ESCAPE_AREA_DRAG 0.1
+#define TRACK_DRAG 0.99
+#define LIGHT_ESCAPE_AREA_DRAG 0.95
+#define HARD_ESCAPE_AREA_DRAG 0.9
+#define SCREEN_WIDTH GetScreenWidth()
+#define SCREEN_HEIGHT GetScreenHeight()
 
 void setup(); // Função para carregar o cenário e variáveis globais
 void draw();  // Função que é executada a cada frame
-
-int SCREEN_WIDTH = GetScreenWidth();
-int SCREEN_HEIGHT = GetScreenHeight();
 
 LinkedList* cars;
 
@@ -55,6 +54,8 @@ void setup() {
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
 
     Car_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG);
+
+    Car_setMask(trackMask,trackPixels);
 
     cars = LinkedList_create();
 
