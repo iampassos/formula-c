@@ -10,9 +10,9 @@ float HARD_ESCAPE_AREA_DRAG = 0.1;
 Image Car_trackMask;
 Color *Car_trackPixels;
 
-void Car_setMask (Image mask, Color *maskPixel){
-    Car_trackPixels=maskPixel;
-    Car_trackMask = mask;
+void Car_setMask (Image trackMask, Color *trackPixels){
+    Car_trackMask = trackMask;
+    Car_trackPixels = trackPixels;
 }
 
 void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag){
@@ -106,8 +106,8 @@ void Car_reverse(Car *car){
 }
 
 Color Car_getFloor(Car* car, Image Car_trackMask, Color *Car_trackPixels) {
-    int x = (int)car->pos.x;
-    int y = (int)car->pos.y;
+    int x = (int)car->pos.x + cos(car->angle) * car->width * 0.5f;
+    int y = (int)car->pos.y + sin(car->angle) * car->height * 0.5f;
     if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
         return (Color){0, 0, 0};
     return Car_trackPixels[y * Car_trackMask.width + x];
