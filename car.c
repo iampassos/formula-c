@@ -3,6 +3,16 @@
 #include <stdio.h>
 #include <math.h>
 
+float TRACK_DRAG = 0.01;
+float LIGHT_ESCAPE_AREA_DRAG = 0.05;
+float HARD_ESCAPE_AREA_DRAG = 0.1;
+
+void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag){
+    TRACK_DRAG = track_drag;
+    LIGHT_ESCAPE_AREA_DRAG = light_escape_area_drag;
+    HARD_ESCAPE_AREA_DRAG = hard_escape_area_drag;
+}
+
 Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, float dragCoeficient, int id) {
     Car* car = (Car*)malloc(sizeof(Car));
     if (car == NULL) return NULL;
@@ -27,7 +37,26 @@ void Car_free(Car* car){
     free(car);
 }
 
+static bool isOnTrack(Color color){
+    return color.r == 127 && color.g == 127 && color.b == 127;
+}
+
+static static bool isOnLightEscapeArea(Color color){
+    return color.r == 255 && color.g == 127 && color.b == 39;
+}
+
+static bool isOnHardEscapeArea(Color color){
+    return color.r == 163 && color.g == 73 && color.b == 164;
+}
+
 void Car_update(Car *car){
+    Color floorColor = Car_getFloor(car);
+    if (isOnTrack(floorColor))
+        car->dragForce = TRACK_DRAG;
+    else if (isOnLightEscapeArea(floorColor))
+        car->dragForce = LIGHT_ESCAPE_AREA_DRAG;
+    else if (isOnHardEscapeArea(floorColor))
+        car->dragForce = HARD_ESCAPE_AREA_DRAG;
     car->vel *= car->dragForce;
     car->pos.x += cos(car->angle) * car->vel;
     car->pos.y += sin(car->angle) * car->vel;
@@ -43,7 +72,7 @@ void Car_draw(Car *car){
     DrawRectanglePro(rect, origin, car->angle * RAD2DEG, car->color);
 }
 
-bool canTurn(Car* car) {
+static bool canTurn(Car* car) {
     return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
 }
 

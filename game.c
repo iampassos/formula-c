@@ -2,12 +2,16 @@
 #include "car.h"
 #include "raylib.h"
 
-#define SCREEN_WIDTH GetScreenWidth()
-#define SCREEN_HEIGHT GetScreenHeight()
 #define BACKGROUND_COLOR (Color){186, 149, 127, 255}
+#define TRACK_DRAG 0.01
+#define LIGHT_ESCAPE_AREA_DRAG 0.05
+#define HARD_ESCAPE_AREA_DRAG 0.1
 
 void setup(); // Função para carregar o cenário e variáveis globais
 void draw();  // Função que é executada a cada frame
+
+int SCREEN_WIDTH = GetScreenWidth();
+int SCREEN_HEIGHT = GetScreenHeight();
 
 LinkedList* cars;
 
@@ -40,15 +44,17 @@ void setup() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C");
     SetTargetFPS(60);
 
-    trackMask = LoadImage("resources/masks/pista_mask.png");
+    trackMask = LoadImage("resources/masks/pista_debug_mask.png");
     ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
     trackPixels = LoadImageColors(trackMask);
     trackTex = LoadTextureFromImage(trackMask);
 
-    Image bgImage = LoadImage("resources/maps/teste2.png");            // Pista exibida
+    Image bgImage = LoadImage("resources/masks/pista_debug_mask.png");    // Pista exibida
     ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona
     trackBackground = LoadTextureFromImage(bgImage);    // converte em textura
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
+
+    Car_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG);
 
     cars = LinkedList_create();
 
@@ -95,7 +101,7 @@ void draw() {
 
     Car_move(player1, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT);
 
-    Car* player2 = LinkedList_peakLast(cars);
+    Car* player2 = LinkedList_search(cars, 2);
 
     Car_move(player2, KEY_W, KEY_S, KEY_D, KEY_A);
 
