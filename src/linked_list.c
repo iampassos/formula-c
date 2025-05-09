@@ -203,7 +203,7 @@ void LinkedList_sort(LinkedList *list) {
     }
 }
 
-void LinkedList_forEach(LinkedList *list, void (*function)(Car *)) {
+void LinkedList_forEach(LinkedList *list, Car_function function) {
     Node *cur = list->head;
 
     while (cur != NULL) {

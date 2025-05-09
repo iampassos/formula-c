@@ -3,7 +3,7 @@
 
 #include "car.h"
 
-typedef void (*Car_function)(Car *) // Definindo uma função que possui apenas Car* car como variável
+typedef void (*Car_function)(Car *); // Definindo uma função que possui apenas Car* car como variável
 
 typedef struct Node {
     Car         *car;
@@ -40,6 +40,6 @@ void LinkedList_print(LinkedList *list); // Printa os carros da lista pelo ID
 void LinkedList_sort(LinkedList *list); // Ordena pelo tempo da volta
 
 void LinkedList_forEach(LinkedList *list,
-                        Car_function Car*); // Itera por cada carro e aplica uma função que possui apenas Car* car como variável
+                        Car_function function); // Itera por cada carro e aplica uma função que possui apenas Car* car como variável
 
 #endif
