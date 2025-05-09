@@ -3,7 +3,8 @@
 
 #include "car.h"
 
-typedef void (*Car_function)(Car *); // Definindo uma função que possui apenas Car* car como variável
+typedef void (*Car_function)(Car*); // Definindo uma função que possui apenas Car* car como variável
+typedef float (*Car_compare)(Car*, Car*); // Função de comparação que será usada no LinkedList_sort()
 
 typedef struct Node {
     Car         *car;
@@ -37,7 +38,7 @@ Car *LinkedList_search(LinkedList *list,
 int  LinkedList_size(LinkedList *list);  // Retorna o tamanho da lista
 void LinkedList_print(LinkedList *list); // Printa os carros da lista pelo ID
 
-void LinkedList_sort(LinkedList *list); // Ordena pelo tempo da volta
+void LinkedList_sort(LinkedList *list, Car_compare function); // Ordena pelo critério definido pela função Car_compare
 
 void LinkedList_forEach(LinkedList *list,
                         Car_function function); // Itera por cada carro e aplica uma função que possui apenas Car* car como variável

@@ -188,14 +188,14 @@ void swap(Node *a, Node *b) {
     b->car    = temp;
 }
 
-void LinkedList_sort(LinkedList *list) {
+void LinkedList_sort(LinkedList *list, Car_compare function) {
     Node *cur = list->head;
     Node *temp;
 
     while (cur != NULL) {
         temp = cur->next;
         while (temp != NULL) {
-            if (cur->car->lapTime > temp->car->lapTime)
+            if (function(cur->car, temp->car) < 0)
                 swap(cur, temp);
             temp = temp->next;
         }
