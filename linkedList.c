@@ -174,7 +174,7 @@ Car* LinkedList_search(LinkedList* list, int id){
 }
 
 void swap(Node* a, Node* b){
-    Car *temp = a->car;
+    Car* temp = a->car;
     a->car = b->car;
     b->car = temp;
 }

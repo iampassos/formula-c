@@ -29,7 +29,7 @@ Car* LinkedList_removeId(LinkedList* list, int id); // Remove um carro pelo id
 Car* LinkedList_peakFirst(LinkedList* list); // Retorna o primeiro carro da lista
 Car* LinkedList_peakLast(LinkedList* list); // Retorna o último carro da lista
 
-Car* LinkedList_search(LinkedList* list, int id); // Procura um carro e retorna (Caso não haja retorna um carro com id = 0)
+Car* LinkedList_search(LinkedList* list, int id); // Procura um carro e retorna (Caso não haja retorna NULL)
 
 int LinkedList_size(LinkedList* list); // Retorna o tamanho da lista
 void LinkedList_print(LinkedList* list); // Printa os carros da lista pelo ID

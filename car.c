@@ -3,31 +3,47 @@
 #include <stdio.h>
 #include <math.h>
 
-float TRACK_DRAG = 0.99;
-float LIGHT_ESCAPE_AREA_DRAG = 0.95;
-float HARD_ESCAPE_AREA_DRAG = 0.9;
-float OUTSIDE_TRACK_DRAG = 0.8;
+float TRACK_DRAG;
+float LIGHT_ESCAPE_AREA_DRAG;
+float HARD_ESCAPE_AREA_DRAG;
+float OUTSIDE_TRACK_DRAG;
+
+Color TRACK_COLOR;
+Color LIGHT_ESCAPE_AREA_COLOR;
+Color HARD_ESCAPE_AREA_COLOR;
+Color OUTSIDE_TRACK_COLOR;
 
 Image Car_trackMask;
 Color *Car_trackPixels;
 
-void Car_setMask (Image trackMask, Color *trackPixels){
-    Car_trackMask = trackMask;
-    Car_trackPixels = trackPixels;
-}
-
-void Car_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag, float ouside_track_drag){
+void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag, float ouside_track_drag){
     TRACK_DRAG = track_drag;
     LIGHT_ESCAPE_AREA_DRAG = light_escape_area_drag;
     HARD_ESCAPE_AREA_DRAG = hard_escape_area_drag;
     OUTSIDE_TRACK_DRAG = ouside_track_drag;
 }
 
-Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient,int id) {
+void Track_setMask(Image trackMask, Color *trackPixels){
+    Car_trackMask = trackMask;
+    Car_trackPixels = trackPixels;
+}
+
+void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside){
+    TRACK_COLOR = track;
+    LIGHT_ESCAPE_AREA_COLOR = light_escape;
+    HARD_ESCAPE_AREA_COLOR = hard_escape;
+    OUTSIDE_TRACK_COLOR = outside;
+}
+
+void Track_Unload(){
+    UnloadImage(Car_trackMask);
+    UnloadImageColors(Car_trackPixels);
+}
+
+Car* Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle, float angularAcc, float minTurnSpeed, float breakCoeficient, int id) {
     Car* car = (Car*)malloc(sizeof(Car));
     if (car == NULL) return NULL;
     car->pos = pos;
-    car->vel = vel;
     car->acc = acc;
     car->width = width;
     car->height = height;
@@ -45,22 +61,23 @@ Car* Car_create(Vector2 pos,float vel, float acc, int width, int height, Color c
 
 void Car_free(Car* car){
     free(car);
+    // Caso precise liberar mais memória
 }
 
 static bool isOnTrack(Color color){
-    return color.r == 127 && color.g == 127 && color.b == 127;
+    return color.r == TRACK_COLOR.r && color.g == TRACK_COLOR.g && color.b == TRACK_COLOR.b;
 }
 
 static bool isOnLightEscapeArea(Color color){
-    return color.r == 255 && color.g == 127 && color.b == 39;
+    return color.r == LIGHT_ESCAPE_AREA_COLOR.r && color.g == LIGHT_ESCAPE_AREA_COLOR.g && color.b == LIGHT_ESCAPE_AREA_COLOR.b;
 }
 
 static bool isOnHardEscapeArea(Color color){
-    return color.r == 163 && color.g == 73 && color.b == 164;
+    return color.r == HARD_ESCAPE_AREA_COLOR.r && color.g == HARD_ESCAPE_AREA_COLOR.g && color.b == HARD_ESCAPE_AREA_COLOR.b;
 }
 
 static bool isOutSideTrack(Color color){
-    return color.r == 255 && color.g == 255 && color.b == 255;
+    return color.r == OUTSIDE_TRACK_COLOR.r && color.g == OUTSIDE_TRACK_COLOR.g && color.b == OUTSIDE_TRACK_COLOR.b;
 }
 
 void Car_update(Car *car){
@@ -139,6 +156,14 @@ void Car_move(Car* car, int up, int down, int right, int left){
             Car_break(car);
         }
     }
+}
+
+void Car_setPos(Car* car, Vector2 newPos){
+    car->pos = newPos;
+}
+
+void Car_setAngle(Car* car, float angle){
+    car->angle = angle;
 }
 
 void Car_info(Car* car) {
