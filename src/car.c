@@ -18,10 +18,10 @@ Color *Car_trackPixels;
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
                    float ouside_track_drag) {
-    TRACK_DRAG             = track_drag;
-    LIGHT_ESCAPE_AREA_DRAG = light_escape_area_drag;
-    HARD_ESCAPE_AREA_DRAG  = hard_escape_area_drag;
-    OUTSIDE_TRACK_DRAG     = ouside_track_drag;
+    TRACK_DRAG             = 1 - track_drag;
+    LIGHT_ESCAPE_AREA_DRAG = 1 - light_escape_area_drag;
+    HARD_ESCAPE_AREA_DRAG  = 1 - hard_escape_area_drag;
+    OUTSIDE_TRACK_DRAG     = 1 - ouside_track_drag;
 }
 
 void Track_setMask(Image trackMask, Color *trackPixels) {
@@ -42,7 +42,7 @@ void Track_Unload() {
 }
 
 Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
-                float angularAcc, float minTurnSpeed, float breakCoeficient, int id) {
+                float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce, int id) {
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
@@ -55,10 +55,11 @@ Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, floa
     car->angularAcc   = angularAcc;
     car->minTurnSpeed = minTurnSpeed;
     car->breakForce   = 1 - breakCoeficient;
+    car->reverseForce = reverseForce;
     car->dragForce    = 0;
     car->id           = id;
     car->vel          = 0;
-    car->lapTime      = -1.0f;
+    car->lapTime      = 0;
     return car;
 }
 
@@ -133,7 +134,7 @@ void Car_break(Car *car) {
 }
 
 void Car_reverse(Car *car) {
-    car->vel -= car->acc * 0.2;
+    car->vel -= car->acc * car->reverseForce;
 }
 
 Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {

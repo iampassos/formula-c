@@ -17,6 +17,7 @@ typedef struct {
     float   minTurnSpeed;
     float   breakForce;
     float   dragForce;
+    float   reverseForce;
 } Car;
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
@@ -26,10 +27,10 @@ void Track_setMask(Image  mask,
 void Track_setColor(Color track, Color light_escape, Color hard_escape,
                     Color outside); // Definindo (rgb) para cada parte da pista
 
-void Track_Unload();
+void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
 Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
-                float angularAcc, float minTurnSpeed, float breakForce, int id);
+                float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce, int id);
 void Car_free(Car *car); // Libera a memória de um carro
 
 void Car_update(Car *car);     // Atualizar a posição do carro a cada frame

@@ -3,6 +3,8 @@
 
 #include "car.h"
 
+typedef void (*Car_function)(Car *) // Definindo uma função que possui apenas Car* car como variável
+
 typedef struct Node {
     Car         *car;
     struct Node *next;
@@ -18,12 +20,12 @@ typedef struct {
 LinkedList *LinkedList_create();               // Cria uma lista duplamente encadeada
 void        LinkedList_free(LinkedList *list); // Libera a memória da lista encadeada
 
-void LinkedList_clear(LinkedList *list);
+void LinkedList_clear(LinkedList *list);    // Limpa todos os elementos da lista encadeada
 
-int  LinkedList_addLast(LinkedList *list, Car *car);
-int  LinkedList_addFirst(LinkedList *list, Car *car);
-Car *LinkedList_removeLast(LinkedList *list);
-Car *LinkedList_removeFirst(LinkedList *list);
+int  LinkedList_addLast(LinkedList *list, Car *car); // Adiciona um carro no fim da lista encadeada
+int  LinkedList_addFirst(LinkedList *list, Car *car); // Adiciona um carro no começo da lista encadeada
+Car *LinkedList_removeLast(LinkedList *list); // Remove um carro no fim da lista encadeada
+Car *LinkedList_removeFirst(LinkedList *list); // Remove um carro no fim da lista encadeada
 Car *LinkedList_removeId(LinkedList *list, int id); // Remove um carro pelo id
 
 Car *LinkedList_peakFirst(LinkedList *list); // Retorna o primeiro carro da lista
@@ -38,6 +40,6 @@ void LinkedList_print(LinkedList *list); // Printa os carros da lista pelo ID
 void LinkedList_sort(LinkedList *list); // Ordena pelo tempo da volta
 
 void LinkedList_forEach(LinkedList *list,
-                        void (*function)(Car *)); // Itera por cada carro e aplica uma função
+                        Car_function Car*); // Itera por cada carro e aplica uma função que possui apenas Car* car como variável
 
 #endif
