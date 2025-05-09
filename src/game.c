@@ -2,7 +2,7 @@
 #include "linked_list.h"
 #include "raylib.h"
 
-#define BACKGROUND_COLOR (Color){186, 149, 127, 255}
+//#define BACKGROUND_COLOR (Color){186, 149, 127, 255}
 
 // Cores das partes da pista
 #define TRACK_COLOR (Color){127, 127, 127}
@@ -108,7 +108,7 @@ void cleanup() {
 }
 
 void draw() {
-    ClearBackground(BACKGROUND_COLOR);
+    //ClearBackground(BACKGROUND_COLOR);
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
 
     Car *player1 = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
