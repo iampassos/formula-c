@@ -3,11 +3,11 @@
 #include <stdlib.h>
 
 LinkedList *LinkedList_create() {
-    LinkedList *list = (LinkedList *)malloc(sizeof(LinkedList));
+    LinkedList *list = (LinkedList *) malloc(sizeof(LinkedList));
     if (list == NULL)
         return NULL;
     list->head = list->tail = NULL;
-    list->length = 0;
+    list->length            = 0;
     return list;
 }
 
@@ -17,7 +17,7 @@ void LinkedList_free(LinkedList *list) {
 
     while (cur != NULL) {
         temp = cur;
-        cur = cur->next;
+        cur  = cur->next;
         Car_free(temp->car);
         free(temp);
     }
@@ -30,20 +30,20 @@ void LinkedList_clear(LinkedList *list) {
 
     while (cur != NULL) {
         temp = cur;
-        cur = cur->next;
+        cur  = cur->next;
         Car_free(temp->car);
         free(temp);
     }
     list->head = list->tail = NULL;
-    list->length = 0;
+    list->length            = 0;
 }
 
 int LinkedList_addLast(LinkedList *list, Car *car) {
-    Node *node = (Node *)malloc(sizeof(Node));
+    Node *node = (Node *) malloc(sizeof(Node));
     if (node == NULL)
         return 0;
-    node->car = car;
-    node->next = NULL;
+    node->car      = car;
+    node->next     = NULL;
     node->previous = list->tail;
 
     if (list->tail == NULL) {
@@ -58,11 +58,11 @@ int LinkedList_addLast(LinkedList *list, Car *car) {
 }
 
 int LinkedList_addFirst(LinkedList *list, Car *car) {
-    Node *node = (Node *)malloc(sizeof(Node));
+    Node *node = (Node *) malloc(sizeof(Node));
     if (node == NULL)
         return 0;
-    node->car = car;
-    node->next = list->head;
+    node->car      = car;
+    node->next     = list->head;
     node->previous = NULL;
 
     if (list->head == NULL) {
@@ -81,7 +81,7 @@ Car *LinkedList_removeLast(LinkedList *list) {
         return NULL;
 
     Node *last = list->tail;
-    Car *car = last->car;
+    Car  *car  = last->car;
 
     list->tail = last->previous;
 
@@ -100,7 +100,7 @@ Car *LinkedList_removeFirst(LinkedList *list) {
         return NULL;
 
     Node *first = list->head;
-    Car *car = first->car;
+    Car  *car   = first->car;
 
     list->head = first->next;
 
@@ -154,7 +154,9 @@ Car *LinkedList_peakLast(LinkedList *list) {
     return list->tail->car;
 }
 
-int LinkedList_size(LinkedList *list) { return list->length; }
+int LinkedList_size(LinkedList *list) {
+    return list->length;
+}
 
 void LinkedList_print(LinkedList *list) {
     printf("{");
@@ -182,8 +184,8 @@ Car *LinkedList_search(LinkedList *list, int id) {
 
 void swap(Node *a, Node *b) {
     Car *temp = a->car;
-    a->car = b->car;
-    b->car = temp;
+    a->car    = b->car;
+    b->car    = temp;
 }
 
 void LinkedList_sort(LinkedList *list) {
