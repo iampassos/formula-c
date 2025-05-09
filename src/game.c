@@ -28,7 +28,6 @@ void draw();    // Função que é executada a cada frame
 LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 
 // Armazenam a imagem que vai ser colocada de plano de fundo
-Texture2D trackTex; // Acredito que essa variável seja inutil
 Texture2D trackBackground;
 
 int main() {
@@ -56,7 +55,7 @@ void setup() {
     trackMask = LoadImage("resources/masks/pista_debug_mask.png");
     ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
     trackPixels = LoadImageColors(trackMask);
-    trackTex    = LoadTextureFromImage(trackMask);
+    
 
     Image bgImage = LoadImage("resources/masks/pista_debug_mask.png"); // Pista exibida
     ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT);                // redimensiona
@@ -104,7 +103,6 @@ void setup() {
 void cleanup() {
     CloseWindow(); // Fechar a janela gráfica 2d
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
-    UnloadTexture(trackTex);
     Track_Unload(); // função que deve liberar o trackMask e trackPixels
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
 }
