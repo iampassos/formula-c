@@ -4,7 +4,7 @@
 #include "car.h"
 
 typedef void (*Car_function)(Car*); // Definindo uma função que possui apenas Car* car como variável
-typedef float (*Car_compare)(Car*, Car*); // Função de comparação que será usada no LinkedList_sort()
+typedef int (*Car_compare)(Car*, Car*); // Função de comparação que será usada no LinkedList_sort()
 
 typedef struct Node {
     Car         *car;

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 float TRACK_DRAG;
 float LIGHT_ESCAPE_AREA_DRAG;
@@ -12,6 +13,10 @@ Color TRACK_COLOR;
 Color LIGHT_ESCAPE_AREA_COLOR;
 Color HARD_ESCAPE_AREA_COLOR;
 Color OUTSIDE_TRACK_COLOR;
+
+Color RACE_START_COLOR;
+Color FIRST_CHECKPOINT_COLOR;
+Color SECOND_CHECKPOINT_COLOR;
 
 Image  Car_trackMask;
 Color *Car_trackPixels;
@@ -29,11 +34,14 @@ void Track_setMask(Image trackMask, Color *trackPixels) {
     Car_trackPixels = trackPixels;
 }
 
-void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside) {
+void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside, Color race_start, Color first_check, Color second_check) {
     TRACK_COLOR             = track;
     LIGHT_ESCAPE_AREA_COLOR = light_escape;
     HARD_ESCAPE_AREA_COLOR  = hard_escape;
     OUTSIDE_TRACK_COLOR     = outside;
+    RACE_START_COLOR        = race_start;
+    FIRST_CHECKPOINT_COLOR  = first_check;
+    SECOND_CHECKPOINT_COLOR = second_check;
 }
 
 void Track_Unload() {
@@ -58,8 +66,12 @@ Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, floa
     car->reverseForce = reverseForce;
     car->dragForce    = 0;
     car->id           = id;
+    car->lap          = -1;
     car->vel          = 0;
-    car->lapTime      = 0;
+    car->lapTime      = GetTime();
+    car->raceTime     = GetTime();
+    car->bestLapTime  = DBL_MAX;
+    car->checkpoint   = 2;
     return car;
 }
 
@@ -68,38 +80,74 @@ void Car_free(Car *car) {
     // Caso precise liberar mais memória
 }
 
+static bool equalsColor(Color a, Color b){
+    return a.r == b.r && a.g == b.g && a.b == b.b;
+}
+
+static int getCheckpoint(Color color){
+    if (equalsColor(color, RACE_START_COLOR)) return 0;
+    if (equalsColor(color, FIRST_CHECKPOINT_COLOR)) return 1;
+    if (equalsColor(color, SECOND_CHECKPOINT_COLOR)) return 2;
+    return -1;
+}
+
 static bool isOnTrack(Color color) {
-    return color.r == TRACK_COLOR.r && color.g == TRACK_COLOR.g && color.b == TRACK_COLOR.b;
+    return equalsColor(color, TRACK_COLOR);
 }
 
 static bool isOnLightEscapeArea(Color color) {
-    return color.r == LIGHT_ESCAPE_AREA_COLOR.r && color.g == LIGHT_ESCAPE_AREA_COLOR.g &&
-           color.b == LIGHT_ESCAPE_AREA_COLOR.b;
+    return equalsColor(color, LIGHT_ESCAPE_AREA_COLOR);
 }
 
 static bool isOnHardEscapeArea(Color color) {
-    return color.r == HARD_ESCAPE_AREA_COLOR.r && color.g == HARD_ESCAPE_AREA_COLOR.g &&
-           color.b == HARD_ESCAPE_AREA_COLOR.b;
+    return equalsColor(color, HARD_ESCAPE_AREA_COLOR);
 }
 
 static bool isOutSideTrack(Color color) {
-    return color.r == OUTSIDE_TRACK_COLOR.r && color.g == OUTSIDE_TRACK_COLOR.g &&
-           color.b == OUTSIDE_TRACK_COLOR.b;
+    return equalsColor(color, OUTSIDE_TRACK_COLOR);
+}
+
+static void Car_updateDragForce(Car *car, Color floorColor) {
+    if (isOnTrack(floorColor)){
+        car->dragForce = TRACK_DRAG;
+    }else if (isOnLightEscapeArea(floorColor)){
+        car->dragForce = LIGHT_ESCAPE_AREA_DRAG;
+    }else if (isOnHardEscapeArea(floorColor)){
+        car->dragForce = HARD_ESCAPE_AREA_DRAG;
+    }else if (isOutSideTrack(floorColor)){
+        car->dragForce = OUTSIDE_TRACK_DRAG;
+    }
+}
+
+static int Car_checkCheckpoint(Car *car, Color floorColor) {
+    int checkpoint = getCheckpoint(floorColor);
+    if (checkpoint >= 0 && ((car->checkpoint + 1) % 3 == checkpoint)) {
+        car->checkpoint = checkpoint;
+        if (checkpoint == 0) {
+            car->lap++;
+            car->lapTime = GetTime() - car->lapTime;
+            if (car->lapTime < car->bestLapTime)
+                car->bestLapTime = car->lapTime;
+            car->lapTime = GetTime();
+        }
+    }
+    return checkpoint;
+}
+
+static void Car_applyPhysics(Car *car) {
+    car->vel *= car->dragForce;
+    car->pos.x += cos(car->angle) * car->vel;
+    car->pos.y += sin(car->angle) * car->vel;
 }
 
 void Car_update(Car *car) {
     Color floorColor = Car_getFloor(car, Car_trackMask, Car_trackPixels);
-    if (isOnTrack(floorColor))
-        car->dragForce = TRACK_DRAG;
-    else if (isOnLightEscapeArea(floorColor))
-        car->dragForce = LIGHT_ESCAPE_AREA_DRAG;
-    else if (isOnHardEscapeArea(floorColor))
-        car->dragForce = HARD_ESCAPE_AREA_DRAG;
-    else if (isOutSideTrack(floorColor))
-        car->dragForce = OUTSIDE_TRACK_DRAG;
-    car->vel *= car->dragForce;
-    car->pos.x += cos(car->angle) * car->vel;
-    car->pos.y += sin(car->angle) * car->vel;
+
+    if (Car_checkCheckpoint(car, floorColor) == -1) {
+        Car_updateDragForce(car, floorColor);
+    }
+
+    Car_applyPhysics(car);
 }
 
 void Car_accelerate(Car *car) {

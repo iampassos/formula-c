@@ -5,7 +5,11 @@
 
 typedef struct {
     int     id;
-    float   lapTime;
+    int     lap;
+    double   lapTime;
+    double   bestLapTime;
+    double   raceTime;
+    int     checkpoint;
     Vector2 pos;
     float   vel;
     float   acc;
@@ -25,7 +29,7 @@ void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_es
 void Track_setMask(Image  mask,
                    Color *maskPixel); // Definindo a mascara de pixel para carros lerem
 void Track_setColor(Color track, Color light_escape, Color hard_escape,
-                    Color outside); // Definindo (rgb) para cada parte da pista
+                    Color outside, Color race_start, Color first_check, Color second_check); // Definindo (rgb) para cada parte da pista
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 

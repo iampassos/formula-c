@@ -10,6 +10,11 @@
 #define HARD_ESCAPE_AREA_COLOR (Color){163, 73, 164}
 #define OUTSIDE_TRACK_COLOR (Color){255, 255, 255}
 
+// Cores dos checkpoints
+#define RACE_START_COLOR (Color){0, 255, 0}
+#define FIRST_CHECKPOINT_COLOR (Color){0, 0, 255}
+#define SECOND_CHECKPOINT_COLOR (Color){255, 0, 0}
+
 // Forças de atrito do carro com as diferentes partes da pista
 #define TRACK_DRAG 0.01
 #define LIGHT_ESCAPE_AREA_DRAG 0.04
@@ -65,7 +70,7 @@ void setup() {
     Track_setMask(trackMask, trackPixels);
     Track_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
     Track_setColor(TRACK_COLOR, LIGHT_ESCAPE_AREA_COLOR, HARD_ESCAPE_AREA_COLOR,
-                   OUTSIDE_TRACK_COLOR);
+                   OUTSIDE_TRACK_COLOR, RACE_START_COLOR, FIRST_CHECKPOINT_COLOR, SECOND_CHECKPOINT_COLOR);
 
     cars = LinkedList_create();
 

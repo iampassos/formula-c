@@ -182,7 +182,7 @@ Car *LinkedList_search(LinkedList *list, int id) {
     return cur->car;
 }
 
-void swap(Node *a, Node *b) {
+static void swap(Node *a, Node *b) {
     Car *temp = a->car;
     a->car    = b->car;
     b->car    = temp;
