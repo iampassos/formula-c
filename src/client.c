@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "car.h"
 
+
 // Largura e altura da tela em pixels
 #define SCREEN_WIDTH GetScreenWidth()
 #define SCREEN_HEIGHT GetScreenHeight()
@@ -13,6 +14,11 @@
 #define LIGHT_ESCAPE_AREA_COLOR (Color){255, 127, 39}
 #define HARD_ESCAPE_AREA_COLOR (Color){163, 73, 164}
 #define OUTSIDE_TRACK_COLOR (Color){255, 255, 255}
+
+//posicao do checkpoint
+#define RACER_START_POINT (float) {4371,2537,2.66}
+#define FISRT_CHECKPOINT_POINT (float) {6700,8147,0}
+#define SECOND_CHECKPOINT_POINT (float) {11069,2257,2.17}
 
 // Cores dos checkpoints
 #define RACE_START_COLOR (Color){0, 255, 0}
