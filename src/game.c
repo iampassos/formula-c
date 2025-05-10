@@ -1,5 +1,6 @@
 #include "car.h"
 #include "linked_list.h"
+#include "camera.h"
 #include "raylib.h"
 
 // #define BACKGROUND_COLOR (Color){186, 149, 127, 255}
@@ -28,12 +29,11 @@
 void setup();   // Função para carregar o cenário e variáveis globais
 void cleanup(); // Função para liberar os recursos após o fim da execução do
                 // jogo
-void updateCameraTarget(Car *car); // Função que lida com a posição da camera
 void update();  // Função que é executada a cada frame para atualizar o estado do jogo
 void draw();    // Função que é executada a cada frame para desenhar o estado do jogo
 
 LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
-Camera2D    camera;
+Camera2D   *camera;
 
 // Armazenam a imagem que vai ser colocada de plano de fundo
 Texture2D trackBackground;
@@ -55,18 +55,19 @@ int main() {
 
 void setup() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C"); // Inicializando a tela gráfica 2d
-    SetTargetFPS(60);                                     // Definindo o frame rate em 60
+    SetTargetFPS(60);                    
+    
+    trackBackground = LoadTexture("resources/masks/interlagos_mask.png"); // converte em textura// Definindo o frame rate em 60
 
     // Carregando a imagem da máscara de pixels
     Track_setMask("resources/masks/interlagos_mask.png");
-
-    trackBackground = LoadTexture("resources/masks/interlagos_mask.png"); // converte em textura
-    
     Track_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
-
     Track_setDragColor(TRACK_COLOR, LIGHT_ESCAPE_AREA_COLOR, HARD_ESCAPE_AREA_COLOR,
                    OUTSIDE_TRACK_COLOR);
     Track_setCheckpointColor(RACE_START_COLOR, FIRST_CHECKPOINT_COLOR,SECOND_CHECKPOINT_COLOR);
+
+    Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
     cars = LinkedList_create();
 
@@ -90,35 +91,20 @@ void setup() {
 
     LinkedList_addCar(cars, car); // Adicionando o carro criado na lista encadeada
 
-    camera.target   = car->pos;
-    camera.offset   = (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
-    camera.rotation = 0.0f;
-    camera.zoom     = 0.5f;
+    camera = Camera_create(
+        car->pos,
+        (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+        0.0f,
+        0.5f
+    );
 }
 
 void cleanup() {
     CloseWindow();                  // Fechar a janela gráfica 2d
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
     Track_Unload();                 // função que deve liberar o trackMask e trackPixels
+    Camera_free(camera);
     LinkedList_free(cars);          // Libera a memória da lista encadeada de carros
-}
-
-void updateCameraTarget(Car *car) {
-    const int mapWidth = trackBackground.width;
-    const int mapHeight = trackBackground.height;
-
-    float halfW = SCREEN_WIDTH / (2.0f * camera.zoom);
-    float halfH = SCREEN_HEIGHT / (2.0f * camera.zoom);
-
-    float x = car->pos.x;
-    float y = car->pos.y;
-
-    if (x < halfW) x = halfW;
-    if (y < halfH) y = halfH;
-    if (x > mapWidth - halfW) x = mapWidth - halfW;
-    if (y > mapHeight - halfH) y = mapHeight - halfH;
-
-    camera.target = (Vector2){x, y};
 }
 
 void update() {
@@ -131,17 +117,17 @@ void update() {
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    updateCameraTarget(player); // Atualizando a posição da camera
+    Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }
 
 void draw() {
-    BeginMode2D(camera);
+    BeginMode2D(*camera);
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
 
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, player->pos.x-(SCREEN_WIDTH /2), player->pos.y-(SCREEN_HEIGHT / 2), 50, BLACK); // Mostrando as informações do carro com id 1
+    Car_showInfo(player, player->pos.x-(SCREEN_WIDTH / 2), player->pos.y-(SCREEN_HEIGHT / 2), 50, BLACK); // Mostrando as informações do carro com id 1
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
