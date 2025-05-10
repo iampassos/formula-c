@@ -35,6 +35,8 @@ void draw();    // Função que é executada a cada frame para desenhar o estado
 LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 Camera2D   *camera;
 
+Car* thisPlayer;
+
 // Armazenam a imagem que vai ser colocada de plano de fundo
 Texture2D trackBackground;
 
@@ -77,7 +79,7 @@ void setup() {
 
     cars = LinkedList_create();
 
-    Car *car = Car_create(
+    thisPlayer = Car_create(
         (Vector2){5400, 2000},     // pos
         2.66,                      // angulo inicial do carro
 
@@ -95,10 +97,10 @@ void setup() {
         1                          // id do carro
     );
 
-    LinkedList_addCar(cars, car); // Adicionando o carro criado na lista encadeada
+    LinkedList_addCar(cars, thisPlayer); // Adicionando o carro criado na lista encadeada
 
     camera = Camera_create(
-        car->pos,
+        thisPlayer->pos,
         (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
         0.0f,
         0.5f
@@ -114,16 +116,16 @@ void cleanup() {
 }
 
 void update() {
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+    //Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_move(player, KEY_W, KEY_S, KEY_D,
+    Car_move(thisPlayer, KEY_W, KEY_S, KEY_D,
              KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
 
     LinkedList_forEach(
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    Camera_updateTarget(camera, player); // Atualizando a posição da camera
+    Camera_updateTarget(camera, thisPlayer); // Atualizando a posição da camera
 }
 
 void draw() {
@@ -131,9 +133,7 @@ void draw() {
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
 
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
-
-    Car_showInfo(player, player->pos.x-(SCREEN_WIDTH / 2), player->pos.y-(SCREEN_HEIGHT / 2), 50, BLACK); // Mostrando as informações do carro com id 1
+    Car_showInfo(thisPlayer, thisPlayer->pos.x-(SCREEN_WIDTH / 2), thisPlayer->pos.y-(SCREEN_HEIGHT / 2), 50, BLACK); // Mostrando as informações do carro com id 1
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
