@@ -235,6 +235,7 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
         "ID: %d\n"
         "Lap: %d\n"
         "Start Lap Time: %.2f\n"
+        "Current Lap Time: %.2f\n"
         "Best Lap Time: %.2f\n"
         "Race Time: %.2f\n"
         "Checkpoint: %d\n"
@@ -251,6 +252,7 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
         car->id,
         car->lap,
         car->startLapTime,
+        GetTime()-car->startLapTime,
         car->bestLapTime,
         car->raceTime,
         car->checkpoint,

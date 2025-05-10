@@ -79,7 +79,7 @@ void setup() {
     cars = LinkedList_create();
 
     Car *car = Car_create((Vector2) {2500, 3600}, // pos
-                          0.2,                    // aceleracao do carro
+                          0.28,                    // aceleracao do carro
                           75,                     // largura
                           25,                     // altura
                           ORANGE,                 // Cor
@@ -109,7 +109,7 @@ void cleanup() {
 void update() {
     Car *player = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, 100, 100, 20, BLACK);
+    
 
     Car_move(player, KEY_W, KEY_S, KEY_D,
              KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
@@ -125,6 +125,10 @@ void draw() {
     BeginMode2D(camera);
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
+
+    Car *player = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
+
+    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 20, BLACK);
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
