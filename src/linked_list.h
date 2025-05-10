@@ -9,12 +9,10 @@ typedef int (*Car_compare)(Car*, Car*); // Função de comparação que será us
 typedef struct Node {
     Car         *car;
     struct Node *next;
-    struct Node *previous;
 } Node;
 
 typedef struct {
     Node *head;
-    Node *tail;
     int   length;
 } LinkedList;
 
@@ -23,7 +21,7 @@ void        LinkedList_free(LinkedList *list); // Libera a memória da lista enc
 
 void LinkedList_clear(LinkedList *list);    // Limpa todos os elementos da lista encadeada
 
-int  LinkedList_addFirst(LinkedList *list, Car *car); // Adiciona um carro no começo da lista encadeada
+int  LinkedList_addCar(LinkedList *list, Car *car); // Adiciona um carro no começo da lista encadeada
 
 Car *LinkedList_removeId(LinkedList *list, int id); // Remove um carro pelo id
 

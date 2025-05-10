@@ -154,7 +154,7 @@ static void Car_applyPhysics(Car *car) {
     car->pos.y += sin(car->angle) * car->vel;
 }
 
-Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {
+static Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {
     int x = (int) car->pos.x + cos(car->angle) * car->width * 0.8f;
     int y = (int) car->pos.y + sin(car->angle) * car->height * 0.5f;
     if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
@@ -172,38 +172,38 @@ void Car_update(Car *car) {
     Car_applyPhysics(car);
 }
 
-void Car_accelerate(Car *car) {
-    car->vel += car->acc;
-}
-
 void Car_draw(Car *car) {
     Rectangle rect   = {car->pos.x, car->pos.y, car->width, car->height};
     Vector2   origin = {car->width * 0.2f, car->height * 0.5f};
     DrawRectanglePro(rect, origin, car->angle * RAD2DEG, car->color);
 }
 
+static void Car_accelerate(Car *car) {
+    car->vel += car->acc;
+}
+
 static bool canTurn(Car *car) {
     return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
 }
 
-void Car_turn(Car *car, float angle) {
+static void Car_turn(Car *car, float angle) {
     if (canTurn(car))
         car->angle += angle;
 }
 
-void Car_turnLeft(Car *car) {
+static void Car_turnLeft(Car *car) {
     Car_turn(car, -car->angularAcc);
 }
 
-void Car_turnRight(Car *car) {
+static void Car_turnRight(Car *car) {
     Car_turn(car, car->angularAcc);
 }
 
-void Car_break(Car *car) {
+static void Car_break(Car *car) {
     car->vel *= car->breakForce;
 }
 
-void Car_reverse(Car *car) {
+static void Car_reverse(Car *car) {
     car->vel -= car->acc * car->reverseForce;
 }
 
@@ -227,11 +227,11 @@ void Car_move(Car *car, int up, int down, int right, int left) {
     }
 }
 
-void Car_setPos(Car *car, Vector2 newPos) {
+static void Car_setPos(Car *car, Vector2 newPos) {
     car->pos = newPos;
 }
 
-void Car_setAngle(Car *car, float angle) {
+static void Car_setAngle(Car *car, float angle) {
     car->angle = angle;
 }
 
