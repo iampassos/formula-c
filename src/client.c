@@ -36,11 +36,11 @@ void Client_Init() {
 
     SetTargetFPS(60);
 
-    Track_setMask("resources/masks/interlagos_mask.png");
+    Track_setMask("resources/masks/interlagos_maskV2.png");
     Track_setAreas(MAIN_TRACK_AREA, LIGHT_ESCAPE_AREA, HARD_ESCAPE_AREA, OUTSIDE_TRACK_AREA);
     Track_setCheckpoints(RACE_START_CHECKPOINT, FIRST_CHECKPOINT, SECOND_CHECKPOINT);
 
-    trackTexture = LoadTexture("resources/masks/interlagos_mask.png");
+    trackTexture = LoadTexture("resources/masks/interlagos_maskV2.png");
 
     Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     Camera_Background_setSize(trackTexture.width, trackTexture.height);
