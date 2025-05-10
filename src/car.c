@@ -26,37 +26,39 @@ static int IMAGE_HEIGHT;
 static Color *TRACK_PIXELS;
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
-                   float ouside_track_drag) {
+                   float ouside_track_drag) { // Definindo a força de atrito com as partes da pista
     TRACK_DRAG             = 1 - track_drag;
     LIGHT_ESCAPE_AREA_DRAG = 1 - light_escape_area_drag;
     HARD_ESCAPE_AREA_DRAG  = 1 - hard_escape_area_drag;
     OUTSIDE_TRACK_DRAG     = 1 - ouside_track_drag;
 }
 
-void Track_setMask(Image track_mask) {
+void Track_setMask(Image track_mask) { // Definindo a imagem da máscara de pixels
     IMAGE_WIDTH = track_mask.width;
     IMAGE_HEIGHT = track_mask.height;
     TRACK_PIXELS = LoadImageColors(track_mask);
 }
 
-void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside,
-                    Color race_start, Color first_check, Color second_check) {
+void Track_setDragColor(Color track, Color light_escape, Color hard_escape, Color outside) { // Definindo as cores de cada parte da pista e checkpoint
     TRACK_COLOR             = track;
     LIGHT_ESCAPE_AREA_COLOR = light_escape;
     HARD_ESCAPE_AREA_COLOR  = hard_escape;
     OUTSIDE_TRACK_COLOR     = outside;
+}
+
+void Track_setCheckpointColor(Color race_start, Color first_check, Color second_check){ // Definindo as cores dos checkpoints
     RACE_START_COLOR        = race_start;
     FIRST_CHECKPOINT_COLOR  = first_check;
     SECOND_CHECKPOINT_COLOR = second_check;
 }
 
-void Track_Unload() {
+void Track_Unload() { // Função para descarregar as variáveis associadas a pista
     UnloadImageColors(TRACK_PIXELS);
 }
 
 Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
                 float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce,
-                int id) {
+                int id) { // Função para criar um carro
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
@@ -81,11 +83,11 @@ Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, floa
     return car;
 }
 
-static bool equalsColor(Color a, Color b) {
+static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a outra
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-static int getCheckpoint(Color color) {
+static int getCheckpoint(Color color) { // Retorna o número int associado aql checkpoint
     if (equalsColor(color, RACE_START_COLOR))
         return 0;
     if (equalsColor(color, FIRST_CHECKPOINT_COLOR))
@@ -95,23 +97,23 @@ static int getCheckpoint(Color color) {
     return -1;
 }
 
-static bool isOnTrack(Color color) {
+static bool isOnTrack(Color color) { // Verifica se está na pista
     return equalsColor(color, TRACK_COLOR);
 }
 
-static bool isOnLightEscapeArea(Color color) {
+static bool isOnLightEscapeArea(Color color) { // Verifica se está na área de escape de menor atrito
     return equalsColor(color, LIGHT_ESCAPE_AREA_COLOR);
 }
 
-static bool isOnHardEscapeArea(Color color) {
+static bool isOnHardEscapeArea(Color color) { // Verifica se está na área de escape de maior atrito
     return equalsColor(color, HARD_ESCAPE_AREA_COLOR);
 }
 
-static bool isOutSideTrack(Color color) {
+static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
     return equalsColor(color, OUTSIDE_TRACK_COLOR);
 }
 
-static void Car_updateDragForce(Car *car, Color floorColor) {
+static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
     if (isOnTrack(floorColor)) {
         car->dragForce = TRACK_DRAG;
     } else if (isOnLightEscapeArea(floorColor)) {
@@ -123,7 +125,7 @@ static void Car_updateDragForce(Car *car, Color floorColor) {
     }
 }
 
-static int Car_checkCheckpoint(Car *car, Color floorColor) {
+static int Car_checkCheckpoint(Car *car, Color floorColor) { // Verifica se passou por um checkpoint e atualiza tempos do carro
     int checkpoint = getCheckpoint(floorColor);
     if (checkpoint < 0) return -1;
 
@@ -151,13 +153,13 @@ static int Car_checkCheckpoint(Car *car, Color floorColor) {
     return checkpoint;
 }
 
-static void Car_applyPhysics(Car *car) {
+static void Car_applyPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
     car->vel *= car->dragForce;
     car->pos.x += cos(car->angle) * car->vel;
     car->pos.y += sin(car->angle) * car->vel;
 }
 
-static Color Car_getFloor(Car *car) {
+static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int)(car->pos.x + cos(car->angle) * car->width * 0.8f);
     int y = (int)(car->pos.y + sin(car->angle) * car->height * 0.5f);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
@@ -165,40 +167,40 @@ static Color Car_getFloor(Car *car) {
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
-static void Car_accelerate(Car *car) {
+static void Car_accelerate(Car *car) { // Acelera o carro
     car->vel += car->acc;
 }
 
-static bool canTurn(Car *car) {
+static bool Car_canTurn(Car *car) { // Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
     return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
 }
 
-static void Car_turn(Car *car, float angle) {
-    if (canTurn(car))
+static void Car_turn(Car *car, float angle) { // Virar com um angulo
+    if (Car_canTurn(car))
         car->angle += angle;
 }
 
-static void Car_turnLeft(Car *car) {
+static void Car_turnLeft(Car *car) { // Virar para a esquerda
     Car_turn(car, -car->angularAcc);
 }
 
-static void Car_turnRight(Car *car) {
+static void Car_turnRight(Car *car) { // Virar para a direita
     Car_turn(car, car->angularAcc);
 }
 
-static void Car_break(Car *car) {
+static void Car_break(Car *car) { // Freiar
     car->vel *= car->breakForce;
 }
 
-static void Car_reverse(Car *car) {
+static void Car_reverse(Car *car) { // Marcha ré
     car->vel -= car->acc * car->reverseForce;
 }
 
 void Car_update(Car *car) {
-    Color floorColor = Car_getFloor(car);
+    Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
 
-    if (Car_checkCheckpoint(car, floorColor) == -1) {
-        Car_updateDragForce(car, floorColor);
+    if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
+        Car_updateDragForce(car, floorColor); // Atualiza a força de atrito
     }
 
     Car_applyPhysics(car);
@@ -216,7 +218,7 @@ void Car_free(Car *car) {
     // Caso precise liberar mais memória
 }
 
-void Car_move(Car *car, int up, int down, int right, int left) {
+void Car_move(Car *car, int up, int down, int right, int left) { // Atualiza as propriedades do carro de acordo com o input do player
     if (IsKeyDown(up)) {
         Car_accelerate(car);
     }

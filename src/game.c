@@ -57,15 +57,11 @@ void setup() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C"); // Inicializando a tela gráfica 2d
     SetTargetFPS(60);                                     // Definindo o frame rate em 60
 
-    // trackMask = LoadImage("resources/masks/pista_debug_mask.png");
+    // Carregando a imagem da máscara de pixels
     Image trackMask = LoadImage("resources/masks/interlagos_mask.png");
-    // ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
-
     Track_setMask(trackMask);
-    
     UnloadImage(trackMask);
 
-    // Image bgImage = LoadImage("resources/masks/pista_debug_mask.png"); // Pista exibida
     Image bgImage = LoadImage("resources/masks/interlagos_mask.png"); // Pista exibida
     // ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT);         // redimensiona
     trackBackground = LoadTextureFromImage(bgImage); // converte em textura
@@ -73,9 +69,10 @@ void setup() {
 
     
     Track_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
-    Track_setColor(TRACK_COLOR, LIGHT_ESCAPE_AREA_COLOR, HARD_ESCAPE_AREA_COLOR,
-                   OUTSIDE_TRACK_COLOR, RACE_START_COLOR, FIRST_CHECKPOINT_COLOR,
-                   SECOND_CHECKPOINT_COLOR);
+
+    Track_setDragColor(TRACK_COLOR, LIGHT_ESCAPE_AREA_COLOR, HARD_ESCAPE_AREA_COLOR,
+                   OUTSIDE_TRACK_COLOR);
+    Track_setCheckpointColor(RACE_START_COLOR, FIRST_CHECKPOINT_COLOR,SECOND_CHECKPOINT_COLOR);
 
     cars = LinkedList_create();
 
@@ -136,7 +133,7 @@ void update() {
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
     camera.target = player->pos;
-    //updateCameraTarget(player);
+    //updateCameraTarget(player); // Colocar essa linha de código para testar
 }
 
 void draw() {
@@ -146,7 +143,7 @@ void draw() {
 
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 30, BLACK);
+    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 30, BLACK); // Mostrando as informações do carro com id 1
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
