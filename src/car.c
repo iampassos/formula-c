@@ -33,10 +33,12 @@ void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_es
     OUTSIDE_TRACK_DRAG     = 1 - ouside_track_drag;
 }
 
-void Track_setMask(Image track_mask) { // Definindo a imagem da máscara de pixels
-    IMAGE_WIDTH = track_mask.width;
-    IMAGE_HEIGHT = track_mask.height;
-    TRACK_PIXELS = LoadImageColors(track_mask);
+void Track_setMask(char* track_mask_path) { // Definindo a imagem da máscara de pixels
+    Image trackMask = LoadImage(track_mask_path);
+    IMAGE_WIDTH = trackMask.width;
+    IMAGE_HEIGHT = trackMask.height;
+    TRACK_PIXELS = LoadImageColors(trackMask);
+    UnloadImage(trackMask);
 }
 
 void Track_setDragColor(Color track, Color light_escape, Color hard_escape, Color outside) { // Definindo as cores de cada parte da pista e checkpoint
@@ -54,33 +56,6 @@ void Track_setCheckpointColor(Color race_start, Color first_check, Color second_
 
 void Track_Unload() { // Função para descarregar as variáveis associadas a pista
     UnloadImageColors(TRACK_PIXELS);
-}
-
-Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
-                float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce,
-                int id) { // Função para criar um carro
-    Car *car = (Car *) malloc(sizeof(Car));
-    if (car == NULL)
-        return NULL;
-    car->pos          = pos;
-    car->acc          = acc;
-    car->width        = width;
-    car->height       = height;
-    car->color        = color;
-    car->angle        = angle;
-    car->angularAcc   = angularAcc;
-    car->minTurnSpeed = minTurnSpeed;
-    car->breakForce   = 1 - breakCoeficient;
-    car->reverseForce = reverseForce;
-    car->dragForce    = 0;
-    car->id           = id;
-    car->lap          = -1;
-    car->vel          = 0;
-    car->startLapTime = GetTime();
-    car->raceTime     = GetTime();
-    car->bestLapTime  = -1;
-    car->checkpoint   = 2;
-    return car;
 }
 
 static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a outra
@@ -207,15 +182,56 @@ void Car_update(Car *car) {
 }
 
 void Car_draw(Car *car) {
-    Rectangle rect   = {car->pos.x, car->pos.y, car->width, car->height};
-    Vector2   origin = {car->width * 0.2f, car->height * 0.5f};
-    DrawRectanglePro(rect, origin, car->angle * RAD2DEG, car->color);
+    Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height};  // A imagem inteira
+    Rectangle destRec = {car->pos.x, car->pos.y, car->width, car->height};  // Tamanho e posição do carro
+    Vector2 origin = {car->width * 0.5f, car->height * 0.5f};  // Centro da imagem para rotação
+    DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG, WHITE);
 }
 
+Car *Car_create(             // Função para criar um carro
+    Vector2 pos,             // posição inicial 
+    float angle,             // orientação inicial 
+
+    float acc,               // aceleração
+    float reverseForce,      // força de ré
+    float breakCoeficient,   // coeficiente de frenagem
+
+    float angularAcc,        // aceleração angular
+    float minTurnSpeed,      // velocidade mínima para virar
+
+    int width,               // largura do carro
+    int height,              // altura do carro
+
+    const char *texturePath, // path da textura 
+    int id                   // identificador único 
+) { 
+    Car *car = (Car *) malloc(sizeof(Car));
+    if (car == NULL)
+        return NULL;
+    car->pos          = pos;
+    car->acc          = acc;
+    car->texture      = LoadTexture(texturePath);
+    car->width        = width;
+    car->height       = height;
+    car->angle        = angle;
+    car->angularAcc   = angularAcc;
+    car->minTurnSpeed = minTurnSpeed;
+    car->breakForce   = 1 - breakCoeficient;
+    car->reverseForce = reverseForce;
+    car->dragForce    = 0;
+    car->id           = id;
+    car->lap          = -1;
+    car->vel          = 0;
+    car->startLapTime = GetTime();
+    car->raceTime     = GetTime();
+    car->bestLapTime  = -1;
+    car->checkpoint   = 2;
+    return car;
+}
 
 void Car_free(Car *car) {
+    UnloadTexture(car->texture);
     free(car);
-    // Caso precise liberar mais memória
 }
 
 void Car_move(Car *car, int up, int down, int right, int left) { // Atualiza as propriedades do carro de acordo com o input do player

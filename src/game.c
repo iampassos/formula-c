@@ -58,15 +58,9 @@ void setup() {
     SetTargetFPS(60);                                     // Definindo o frame rate em 60
 
     // Carregando a imagem da máscara de pixels
-    Image trackMask = LoadImage("resources/masks/interlagos_mask.png");
-    Track_setMask(trackMask);
-    UnloadImage(trackMask);
+    Track_setMask("resources/masks/interlagos_mask.png");
 
-    Image bgImage = LoadImage("resources/masks/interlagos_mask.png"); // Pista exibida
-    // ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT);         // redimensiona
-    trackBackground = LoadTextureFromImage(bgImage); // converte em textura
-    UnloadImage(bgImage); // libera o recurso da imagem após virar textura
-
+    trackBackground = LoadTexture("resources/masks/interlagos_mask.png"); // converte em textura
     
     Track_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
 
@@ -76,17 +70,22 @@ void setup() {
 
     cars = LinkedList_create();
 
-    Car *car = Car_create((Vector2) {2500, 3600}, // pos
-                          0.28,                    // aceleracao do carro
-                          75,                     // largura
-                          25,                     // altura
-                          ORANGE,                 // Cor
-                          0.0,                    // angulo inicial do carro
-                          0.035,                  // aceleraçao angular ( velocidade de rotacao),
-                          0.2,                    // Velocidade mínima para fazer curva,
-                          0.03,                   // Força de frenagem,
-                          0.2,                    // Força da marcha ré
-                          1                       // id do carro
+    Car *car = Car_create(
+        (Vector2){5400, 2000},     // pos
+        2.66,                      // angulo inicial do carro
+
+        0.3,                       // aceleracao do carro
+        0.2,                       // força da marcha ré
+        0.02,                      // força de frenagem
+
+        0.035,                     // aceleração angular (velocidade de rotação)
+        0.2,                       // velocidade mínima para fazer curva
+
+        100,                       // largura
+        50,                        // altura
+
+        "resources/cars/carroazul.png", // path da textura
+        1                          // id do carro
     );
 
     LinkedList_addCar(cars, car); // Adicionando o carro criado na lista encadeada
@@ -132,7 +131,7 @@ void update() {
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    updateCameraTarget(player); // Colocar essa linha de código para testar
+    updateCameraTarget(player); // Atualizando a posição da camera
 }
 
 void draw() {
