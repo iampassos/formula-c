@@ -51,6 +51,8 @@ Car *Car_create(
     int id                   // identificador único 
 );
 
+Car* Car_createEmpty();
+
 void Car_free(Car *car); // Libera a memória de um carro
 
 void Car_update(Car *car);     // Atualizar a posição do carro a cada frame

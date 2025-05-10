@@ -229,6 +229,13 @@ Car *Car_create(             // Função para criar um carro
     return car;
 }
 
+Car* Car_createEmpty(){
+    Car *car = (Car *)calloc(1, sizeof(Car));
+    if (car == NULL)
+        return NULL;
+    return car;
+}
+
 void Car_free(Car *car) {
     UnloadTexture(car->texture);
     free(car);

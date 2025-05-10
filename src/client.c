@@ -2,6 +2,7 @@
 #include "client.h"
 #include "server.h"
 #include "raylib.h"
+#include <stdlib.h>
 
 // Largura e altura da tela em pixels
 #define SCREEN_WIDTH GetScreenWidth()
@@ -50,15 +51,44 @@ void Client_Init() {
     Camera_Background_setSize(trackTexture.width, trackTexture.height);
 
     Server_Init();  // Criar carros
-    player = Server_GetCarById(playerId);
+    player = Car_createEmpty();
+    *player = Server_GetCarById(playerId);
 
     camera = Camera_create(player->pos, (Vector2){SCREEN_WIDTH/2, SCREEN_HEIGHT/2}, 0, 0.5f);
 }
 
+Car_data_transfer Client_CarData(){
+    return (Car_data_transfer){
+        player->id,
+        player->lap,
+        player->startLapTime,
+        player->bestLapTime,
+        player->raceTime,
+        player->checkpoint,
+        player->pos,
+        player->vel,
+        player->angle,
+        player->dragForce
+    };
+}
+
 void Client_Update() {
+    Car_data_transfer serverCarData = Server_GetCarDataById(player->id);
+    player->id = serverCarData.id;
+    player->lap = serverCarData.lap;
+    player->startLapTime = serverCarData.startLapTime;
+    player->bestLapTime = serverCarData.bestLapTime;
+    player->raceTime = serverCarData.raceTime;
+    player->checkpoint = serverCarData.checkpoint;
+    player->pos = serverCarData.pos;
+    player->vel = serverCarData.vel;
+    player->angle = serverCarData.angle;
+    player->dragForce = serverCarData.dragForce;
+
     Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A);
-    Server_Update();
     Camera_updateTarget(camera, player);
+    Car_data_transfer carData = Client_CarData();
+    Server_UpdateCar(carData);
 }
 
 void Client_Draw() {
