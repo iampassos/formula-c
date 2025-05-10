@@ -97,7 +97,7 @@ void setup() {
     camera.rotation = 0.0f;
     camera.zoom     = 1.5f;
 
-    LinkedList_addLast(cars, car); // Adicionando o carro criado no fim da lista encadeada
+    LinkedList_addFirst(cars, car); // Adicionando o carro criado no fim da lista encadeada
 }
 
 void cleanup() {

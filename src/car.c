@@ -154,6 +154,14 @@ static void Car_applyPhysics(Car *car) {
     car->pos.y += sin(car->angle) * car->vel;
 }
 
+Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {
+    int x = (int) car->pos.x + cos(car->angle) * car->width * 0.8f;
+    int y = (int) car->pos.y + sin(car->angle) * car->height * 0.5f;
+    if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
+        return (Color) {0, 0, 0};
+    return Car_trackPixels[y * Car_trackMask.width + x];
+}
+
 void Car_update(Car *car) {
     Color floorColor = Car_getFloor(car, Car_trackMask, Car_trackPixels);
 
@@ -197,14 +205,6 @@ void Car_break(Car *car) {
 
 void Car_reverse(Car *car) {
     car->vel -= car->acc * car->reverseForce;
-}
-
-Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {
-    int x = (int) car->pos.x + cos(car->angle) * car->width * 0.8f;
-    int y = (int) car->pos.y + sin(car->angle) * car->height * 0.5f;
-    if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
-        return (Color) {0, 0, 0};
-    return Car_trackPixels[y * Car_trackMask.width + x];
 }
 
 void Car_move(Car *car, int up, int down, int right, int left) {
