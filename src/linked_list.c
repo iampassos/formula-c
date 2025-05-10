@@ -5,8 +5,8 @@ LinkedList *LinkedList_create() {
     LinkedList *list = (LinkedList *) malloc(sizeof(LinkedList));
     if (list == NULL)
         return NULL;
-    list->head = NULL;
-    list->length            = 0;
+    list->head   = NULL;
+    list->length = 0;
     return list;
 }
 
@@ -33,34 +33,35 @@ void LinkedList_clear(LinkedList *list) {
         Car_free(temp->car);
         free(temp);
     }
-    list->head = NULL;
-    list->length            = 0;
+    list->head   = NULL;
+    list->length = 0;
 }
 
 int LinkedList_addCar(LinkedList *list, Car *car) {
     Node *node = (Node *) malloc(sizeof(Node));
     if (node == NULL)
         return 0;
-    node->car      = car;
-    node->next     = list->head;
+    node->car  = car;
+    node->next = list->head;
     list->head = node;
     list->length++;
     return 1;
 }
 
 Car *LinkedList_removeCarById(LinkedList *list, int id) {
-    Node *cur = list->head;
+    Node *cur  = list->head;
     Node *last = NULL;
 
     while (cur != NULL && cur->car->id != id) {
         last = cur;
-        cur = cur->next;
+        cur  = cur->next;
     }
 
-    if (cur == NULL) return NULL;
-    Car* car = cur->car;
-    
-    if (last == NULL){
+    if (cur == NULL)
+        return NULL;
+    Car *car = cur->car;
+
+    if (last == NULL) {
         list->head = cur->next;
     } else {
         last->next = cur->next;

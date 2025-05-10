@@ -28,6 +28,6 @@ Car Server_GetCarById(int id);
 
 Car_data_transfer Server_GetCarDataById(int id);
 
-void Server_forEachCar(void (*function)(Car*));
+void Server_forEachCar(void (*function)(Car *));
 
 #endif

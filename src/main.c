@@ -2,7 +2,7 @@
 #include "server.h"
 
 int main() {
-    Server_Init(); 
+    Server_Init();
     Client_Init();
     while (!WindowShouldClose()) {
         Client_Update();
