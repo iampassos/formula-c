@@ -3,23 +3,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-float TRACK_DRAG;
-float LIGHT_ESCAPE_AREA_DRAG;
-float HARD_ESCAPE_AREA_DRAG;
-float OUTSIDE_TRACK_DRAG;
+// Forças de atrito do carro com as diferentes partes da pista
+static float TRACK_DRAG;
+static float LIGHT_ESCAPE_AREA_DRAG;
+static float HARD_ESCAPE_AREA_DRAG;
+static float OUTSIDE_TRACK_DRAG;
 
-Color TRACK_COLOR;
-Color LIGHT_ESCAPE_AREA_COLOR;
-Color HARD_ESCAPE_AREA_COLOR;
-Color OUTSIDE_TRACK_COLOR;
+// Cores das diferentes partes da pista
+static Color TRACK_COLOR;
+static Color LIGHT_ESCAPE_AREA_COLOR;
+static Color HARD_ESCAPE_AREA_COLOR;
+static Color OUTSIDE_TRACK_COLOR;
 
-Color RACE_START_COLOR;
-Color FIRST_CHECKPOINT_COLOR;
-Color SECOND_CHECKPOINT_COLOR;
+// Cores dos checkpoints
+static Color RACE_START_COLOR;
+static Color FIRST_CHECKPOINT_COLOR;
+static Color SECOND_CHECKPOINT_COLOR;
 
-int IMAGE_WIDTH;
-int IMAGE_HEIGHT;
-Color *TRACK_PIXELS;
+// Pixels da imagem da pista
+static int IMAGE_WIDTH;
+static int IMAGE_HEIGHT;
+static Color *TRACK_PIXELS;
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
                    float ouside_track_drag) {
@@ -132,6 +136,9 @@ static int Car_checkCheckpoint(Car *car, Color floorColor) {
 
             double now = GetTime();
             double lapTime = now - car->startLapTime;
+
+            if (car->lap == 0)
+                car->raceTime = now;
 
             if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
                 car->bestLapTime = lapTime;
@@ -254,7 +261,7 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
         car->startLapTime,
         GetTime()-car->startLapTime,
         car->bestLapTime,
-        car->raceTime,
+        GetTime()-car->raceTime,
         car->checkpoint,
         car->pos.x, car->pos.y,
         car->vel,
