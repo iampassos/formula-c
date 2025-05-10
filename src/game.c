@@ -28,6 +28,7 @@
 void setup();   // Função para carregar o cenário e variáveis globais
 void cleanup(); // Função para liberar os recursos após o fim da execução do
                 // jogo
+void updateCameraTarget(Car *car); // Função que lida com a posição da camera
 void update();  // Função que é executada a cada frame para atualizar o estado do jogo
 void draw();    // Função que é executada a cada frame para desenhar o estado do jogo
 
@@ -91,12 +92,12 @@ void setup() {
                           1                       // id do carro
     );
 
-    camera.target   = (Vector2) car->pos;
+    LinkedList_addCar(cars, car); // Adicionando o carro criado na lista encadeada
+
+    camera.target   = car->pos;
     camera.offset   = (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom     = 0.5f;
-
-    LinkedList_addCar(cars, car); // Adicionando o carro criado no fim da lista encadeada
 }
 
 void cleanup() {
@@ -106,10 +107,26 @@ void cleanup() {
     LinkedList_free(cars);          // Libera a memória da lista encadeada de carros
 }
 
-void update() {
-    Car *player = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
+void updateCameraTarget(Car *car) {
+    const int mapWidth = trackBackground.width;
+    const int mapHeight = trackBackground.height;
 
-    
+    float halfW = SCREEN_WIDTH / (2.0f * camera.zoom);
+    float halfH = SCREEN_HEIGHT / (2.0f * camera.zoom);
+
+    float x = car->pos.x;
+    float y = car->pos.y;
+
+    if (x < halfW) x = halfW;
+    if (y < halfH) y = halfH;
+    if (x > mapWidth - halfW) x = mapWidth - halfW;
+    if (y > mapHeight - halfH) y = mapHeight - halfH;
+
+    camera.target = (Vector2){x, y};
+}
+
+void update() {
+    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
     Car_move(player, KEY_W, KEY_S, KEY_D,
              KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
@@ -119,6 +136,7 @@ void update() {
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
     camera.target = player->pos;
+    //updateCameraTarget(player);
 }
 
 void draw() {
@@ -126,9 +144,9 @@ void draw() {
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
 
-    Car *player = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
+    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 20, BLACK);
+    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 30, BLACK);
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada

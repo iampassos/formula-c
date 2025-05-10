@@ -49,7 +49,7 @@ int LinkedList_addCar(LinkedList *list, Car *car) {
     return 1;
 }
 
-Car *LinkedList_removeId(LinkedList *list, int id) {
+Car *LinkedList_removeCarById(LinkedList *list, int id) {
     Node *cur = list->head;
     Node *last = NULL;
 
@@ -76,7 +76,7 @@ int LinkedList_size(LinkedList *list) {
     return list->length;
 }
 
-Car *LinkedList_search(LinkedList *list, int id) {
+Car *LinkedList_getCarById(LinkedList *list, int id) {
     Node *cur = list->head;
 
     while (cur != NULL && cur->car->id != id) {

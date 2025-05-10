@@ -23,9 +23,9 @@ void LinkedList_clear(LinkedList *list);    // Limpa todos os elementos da lista
 
 int  LinkedList_addCar(LinkedList *list, Car *car); // Adiciona um carro no começo da lista encadeada
 
-Car *LinkedList_removeId(LinkedList *list, int id); // Remove um carro pelo id
+Car *LinkedList_removeCarById(LinkedList *list, int id); // Remove um carro pelo id
 
-Car *LinkedList_search(LinkedList *list,
+Car *LinkedList_getCarById(LinkedList *list,
                        int         id); // Procura um carro e retorna (Caso não haja retorna NULL)
 
 int  LinkedList_size(LinkedList *list);  // Retorna o tamanho da lista
