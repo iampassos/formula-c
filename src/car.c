@@ -1,8 +1,8 @@
 #include "car.h"
+#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <float.h>
 
 float TRACK_DRAG;
 float LIGHT_ESCAPE_AREA_DRAG;
@@ -34,7 +34,8 @@ void Track_setMask(Image trackMask, Color *trackPixels) {
     Car_trackPixels = trackPixels;
 }
 
-void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside, Color race_start, Color first_check, Color second_check) {
+void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside,
+                    Color race_start, Color first_check, Color second_check) {
     TRACK_COLOR             = track;
     LIGHT_ESCAPE_AREA_COLOR = light_escape;
     HARD_ESCAPE_AREA_COLOR  = hard_escape;
@@ -50,7 +51,8 @@ void Track_Unload() {
 }
 
 Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
-                float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce, int id) {
+                float angularAcc, float minTurnSpeed, float breakCoeficient, float reverseForce,
+                int id) {
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
@@ -80,14 +82,17 @@ void Car_free(Car *car) {
     // Caso precise liberar mais memória
 }
 
-static bool equalsColor(Color a, Color b){
+static bool equalsColor(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-static int getCheckpoint(Color color){
-    if (equalsColor(color, RACE_START_COLOR)) return 0;
-    if (equalsColor(color, FIRST_CHECKPOINT_COLOR)) return 1;
-    if (equalsColor(color, SECOND_CHECKPOINT_COLOR)) return 2;
+static int getCheckpoint(Color color) {
+    if (equalsColor(color, RACE_START_COLOR))
+        return 0;
+    if (equalsColor(color, FIRST_CHECKPOINT_COLOR))
+        return 1;
+    if (equalsColor(color, SECOND_CHECKPOINT_COLOR))
+        return 2;
     return -1;
 }
 
@@ -108,13 +113,13 @@ static bool isOutSideTrack(Color color) {
 }
 
 static void Car_updateDragForce(Car *car, Color floorColor) {
-    if (isOnTrack(floorColor)){
+    if (isOnTrack(floorColor)) {
         car->dragForce = TRACK_DRAG;
-    }else if (isOnLightEscapeArea(floorColor)){
+    } else if (isOnLightEscapeArea(floorColor)) {
         car->dragForce = LIGHT_ESCAPE_AREA_DRAG;
-    }else if (isOnHardEscapeArea(floorColor)){
+    } else if (isOnHardEscapeArea(floorColor)) {
         car->dragForce = HARD_ESCAPE_AREA_DRAG;
-    }else if (isOutSideTrack(floorColor)){
+    } else if (isOutSideTrack(floorColor)) {
         car->dragForce = OUTSIDE_TRACK_DRAG;
     }
 }
