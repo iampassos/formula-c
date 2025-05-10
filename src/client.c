@@ -61,8 +61,8 @@ void Client_Init() {
         0.035,                     // aceleração angular (velocidade de rotação)
         0.2,                       // velocidade mínima para fazer curva
 
-        100,                       // largura
-        50,                        // altura
+        125,                       // largura
+        75,                        // altura
 
         "resources/cars/carroazul.png", // path da textura
         playerId                          // id do carro
