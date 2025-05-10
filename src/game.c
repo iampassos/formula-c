@@ -55,6 +55,12 @@ int main() {
 
 void setup() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C"); // Inicializando a tela gráfica 2d
+
+    Image icon = LoadImage("resources/logo/formula_c-logo.png");
+    ImageResize(&icon, 32, 32);
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+
     SetTargetFPS(60);                    
     
     trackBackground = LoadTexture("resources/masks/interlagos_mask.png"); // converte em textura// Definindo o frame rate em 60
