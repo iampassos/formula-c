@@ -57,7 +57,7 @@ void setup() {
     SetTargetFPS(60);                                     // Definindo o frame rate em 60
 
     // trackMask = LoadImage("resources/masks/pista_debug_mask.png");
-    Image trackMask = LoadImage("resources/maps/interlagos_mask.png");
+    Image trackMask = LoadImage("resources/masks/interlagos_mask.png");
     // ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     Track_setMask(trackMask);
@@ -65,7 +65,7 @@ void setup() {
     UnloadImage(trackMask);
 
     // Image bgImage = LoadImage("resources/masks/pista_debug_mask.png"); // Pista exibida
-    Image bgImage = LoadImage("resources/maps/interlagos.png"); // Pista exibida
+    Image bgImage = LoadImage("resources/masks/interlagos_mask.png"); // Pista exibida
     // ImageResize(&bgImage, SCREEN_WIDTH, SCREEN_HEIGHT);         // redimensiona
     trackBackground = LoadTextureFromImage(bgImage); // converte em textura
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
@@ -94,7 +94,7 @@ void setup() {
     camera.target   = (Vector2) car->pos;
     camera.offset   = (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
     camera.rotation = 0.0f;
-    camera.zoom     = 1.5f;
+    camera.zoom     = 0.5f;
 
     LinkedList_addCar(cars, car); // Adicionando o carro criado no fim da lista encadeada
 }
