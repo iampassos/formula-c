@@ -2,7 +2,7 @@
 #include "client.h"
 #include "server.h"
 #include "raylib.h"
-#include <stdlib.h>
+#include "car.h"
 
 // Largura e altura da tela em pixels
 #define SCREEN_WIDTH GetScreenWidth()
@@ -50,9 +50,25 @@ void Client_Init() {
     Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     Camera_Background_setSize(trackTexture.width, trackTexture.height);
 
-    Server_Init();  // Criar carros
-    player = Car_createEmpty();
-    *player = Server_GetCarById(playerId);
+    player = Car_create(
+        (Vector2){5400, 2000},     // pos
+        2.66,                      // angulo inicial do carro
+
+        0.3,                       // aceleracao do carro
+        0.2,                       // força da marcha ré
+        0.02,                      // força de frenagem
+
+        0.035,                     // aceleração angular (velocidade de rotação)
+        0.2,                       // velocidade mínima para fazer curva
+
+        100,                       // largura
+        50,                        // altura
+
+        "resources/cars/carroazul.png", // path da textura
+        playerId                          // id do carro
+    );
+
+    Server_addCar(*player);
 
     camera = Camera_create(player->pos, (Vector2){SCREEN_WIDTH/2, SCREEN_HEIGHT/2}, 0, 0.5f);
 }
@@ -107,7 +123,6 @@ void Client_Draw() {
 void Client_Cleanup() {
     UnloadTexture(trackTexture);
     Camera_free(camera);
-    Server_exit();
     Track_Unload();
     CloseWindow();
 }

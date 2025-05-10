@@ -3,7 +3,6 @@
 #define CLIENT_H
 
 #include "camera.h"
-#include "linked_list.h"
 
 void Client_Init();
 void Client_Update();

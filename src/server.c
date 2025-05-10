@@ -1,29 +1,19 @@
 // server.c
+#include "linked_list.h"
 #include "server.h"
-#include "client.h"
+#include "car.h"
+#include "raylib.h"
 
 static LinkedList* cars;
 
 void Server_Init() {
     cars = LinkedList_create();
-    Car* player = Car_create(
-        (Vector2){5400, 2000},     // pos
-        2.66,                      // angulo inicial do carro
+}
 
-        0.3,                       // aceleracao do carro
-        0.2,                       // força da marcha ré
-        0.02,                      // força de frenagem
-
-        0.035,                     // aceleração angular (velocidade de rotação)
-        0.2,                       // velocidade mínima para fazer curva
-
-        100,                       // largura
-        50,                        // altura
-
-        "resources/cars/carroazul.png", // path da textura
-        1                          // id do carro
-    );
-    LinkedList_addCar(cars, player);
+void Server_addCar(Car car){
+    Car* playerCar = Car_createEmpty();
+    *playerCar = car;
+    LinkedList_addCar(cars, playerCar);
 }
 
 void Server_UpdateCar(Car_data_transfer carData) {
@@ -39,7 +29,6 @@ void Server_UpdateCar(Car_data_transfer carData) {
     car->angle = carData.angle;
     car->dragForce = carData.dragForce;
     Car_update(car);
-    //LinkedList_forEach(cars, Car_update);
 }
 
 void Server_exit(){

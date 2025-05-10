@@ -2,7 +2,6 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "linked_list.h"
 #include "car.h"
 
 typedef struct {
@@ -19,6 +18,8 @@ typedef struct {
 } Car_data_transfer;
 
 void Server_Init();
+void Server_addCar(Car car);
+
 void Server_UpdateCar(Car_data_transfer carData);
 
 void Server_exit();
