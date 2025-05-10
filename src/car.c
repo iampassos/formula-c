@@ -1,5 +1,4 @@
 #include "car.h"
-#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,9 +69,9 @@ Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, floa
     car->id           = id;
     car->lap          = -1;
     car->vel          = 0;
-    car->lapTime      = GetTime();
+    car->startLapTime = GetTime();
     car->raceTime     = GetTime();
-    car->bestLapTime  = DBL_MAX;
+    car->bestLapTime  = -1;
     car->checkpoint   = 2;
     return car;
 }
@@ -126,16 +125,26 @@ static void Car_updateDragForce(Car *car, Color floorColor) {
 
 static int Car_checkCheckpoint(Car *car, Color floorColor) {
     int checkpoint = getCheckpoint(floorColor);
-    if (checkpoint >= 0 && ((car->checkpoint + 1) % 3 == checkpoint)) {
+    if (checkpoint < 0) return -1;
+
+    int nextExpected = (car->checkpoint + 1) % 3;
+    if (checkpoint == nextExpected) {
         car->checkpoint = checkpoint;
-        if (checkpoint == 0) {
+
+        if (checkpoint == 0) {  // completou a volta
             car->lap++;
-            car->lapTime = GetTime() - car->lapTime;
-            if (car->lapTime < car->bestLapTime)
-                car->bestLapTime = car->lapTime;
-            car->lapTime = GetTime();
+
+            double now = GetTime();
+            double lapTime = now - car->startLapTime;
+
+            if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
+                car->bestLapTime = lapTime;
+            }
+
+            car->startLapTime = now;
         }
     }
+
     return checkpoint;
 }
 
@@ -226,21 +235,41 @@ void Car_setAngle(Car *car, float angle) {
     car->angle = angle;
 }
 
-void Car_info(Car *car) {
-    printf("Carro id: %d\n"
-           "lapTime: %.2f\n"
-           "pos.x: %.2f, pos.y: %.2f\n"
-           "vel: %.2f\n"
-           "acc: %.2f\n"
-           "width: %d\n"
-           "height: %d\n"
-           "color: (r: %d, g: %d, b: %d, a: %d)\n"
-           "angle: %.2f\n"
-           "angularAcc: %.2f\n"
-           "minTurnSpeed: %.2f\n"
-           "breakForce: %.2f\n"
-           "dragForce: %.2f\n",
-           car->id, car->lapTime, car->pos.x, car->pos.y, car->vel, car->acc, car->width,
-           car->height, car->color.r, car->color.g, car->color.b, car->color.a, car->angle,
-           car->angularAcc, car->minTurnSpeed, car->breakForce, car->dragForce);
+void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
+    char car_info[1000];
+    snprintf(car_info, sizeof(car_info),
+        "ID: %d\n"
+        "Lap: %d\n"
+        "Start Lap Time: %.2f\n"
+        "Best Lap Time: %.2f\n"
+        "Race Time: %.2f\n"
+        "Checkpoint: %d\n"
+        "Position: (%.1f, %.1f)\n"
+        "Velocity: %.2f\n"
+        "Acceleration: %.2f\n"
+        "Size: %dx%d\n"
+        "Angle: %.2f\n"
+        "Angular Acceleration: %.2f\n"
+        "Min Turn Speed: %.2f\n"
+        "Brake Force: %.2f\n"
+        "Drag Force: %.2f\n"
+        "Reverse Force: %.2f",
+        car->id,
+        car->lap,
+        car->startLapTime,
+        car->bestLapTime,
+        car->raceTime,
+        car->checkpoint,
+        car->pos.x, car->pos.y,
+        car->vel,
+        car->acc,
+        car->width, car->height,
+        car->angle,
+        car->angularAcc,
+        car->minTurnSpeed,
+        car->breakForce,
+        car->dragForce,
+        car->reverseForce
+    );
+    DrawText(car_info, x, y, fontSize, fontColor);
 }

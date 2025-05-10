@@ -110,6 +110,8 @@ void cleanup() {
 void update() {
     Car *player = LinkedList_search(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
+    Car_showInfo(player, 100, 100, 20, BLACK);
+
     Car_move(player, KEY_W, KEY_S, KEY_D,
              KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
 
