@@ -17,8 +17,9 @@ Color RACE_START_COLOR;
 Color FIRST_CHECKPOINT_COLOR;
 Color SECOND_CHECKPOINT_COLOR;
 
-Image  Car_trackMask;
-Color *Car_trackPixels;
+int IMAGE_WIDTH;
+int IMAGE_HEIGHT;
+Color *TRACK_PIXELS;
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
                    float ouside_track_drag) {
@@ -28,9 +29,10 @@ void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_es
     OUTSIDE_TRACK_DRAG     = 1 - ouside_track_drag;
 }
 
-void Track_setMask(Image trackMask, Color *trackPixels) {
-    Car_trackMask   = trackMask;
-    Car_trackPixels = trackPixels;
+void Track_setMask(Image track_mask) {
+    IMAGE_WIDTH = track_mask.width;
+    IMAGE_HEIGHT = track_mask.height;
+    TRACK_PIXELS = LoadImageColors(track_mask);
 }
 
 void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside,
@@ -45,8 +47,7 @@ void Track_setColor(Color track, Color light_escape, Color hard_escape, Color ou
 }
 
 void Track_Unload() {
-    UnloadImage(Car_trackMask);
-    UnloadImageColors(Car_trackPixels);
+    UnloadImageColors(TRACK_PIXELS);
 }
 
 Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, float angle,
@@ -74,11 +75,6 @@ Car *Car_create(Vector2 pos, float acc, int width, int height, Color color, floa
     car->bestLapTime  = -1;
     car->checkpoint   = 2;
     return car;
-}
-
-void Car_free(Car *car) {
-    free(car);
-    // Caso precise liberar mais memória
 }
 
 static bool equalsColor(Color a, Color b) {
@@ -154,28 +150,12 @@ static void Car_applyPhysics(Car *car) {
     car->pos.y += sin(car->angle) * car->vel;
 }
 
-static Color Car_getFloor(Car *car, Image Car_trackMask, Color *Car_trackPixels) {
-    int x = (int) car->pos.x + cos(car->angle) * car->width * 0.8f;
-    int y = (int) car->pos.y + sin(car->angle) * car->height * 0.5f;
-    if (x < 0 || x >= Car_trackMask.width || y < 0 || y >= Car_trackMask.height)
+static Color Car_getFloor(Car *car) {
+    int x = (int)(car->pos.x + cos(car->angle) * car->width * 0.8f);
+    int y = (int)(car->pos.y + sin(car->angle) * car->height * 0.5f);
+    if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
         return (Color) {0, 0, 0};
-    return Car_trackPixels[y * Car_trackMask.width + x];
-}
-
-void Car_update(Car *car) {
-    Color floorColor = Car_getFloor(car, Car_trackMask, Car_trackPixels);
-
-    if (Car_checkCheckpoint(car, floorColor) == -1) {
-        Car_updateDragForce(car, floorColor);
-    }
-
-    Car_applyPhysics(car);
-}
-
-void Car_draw(Car *car) {
-    Rectangle rect   = {car->pos.x, car->pos.y, car->width, car->height};
-    Vector2   origin = {car->width * 0.2f, car->height * 0.5f};
-    DrawRectanglePro(rect, origin, car->angle * RAD2DEG, car->color);
+    return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
 static void Car_accelerate(Car *car) {
@@ -207,6 +187,28 @@ static void Car_reverse(Car *car) {
     car->vel -= car->acc * car->reverseForce;
 }
 
+void Car_update(Car *car) {
+    Color floorColor = Car_getFloor(car);
+
+    if (Car_checkCheckpoint(car, floorColor) == -1) {
+        Car_updateDragForce(car, floorColor);
+    }
+
+    Car_applyPhysics(car);
+}
+
+void Car_draw(Car *car) {
+    Rectangle rect   = {car->pos.x, car->pos.y, car->width, car->height};
+    Vector2   origin = {car->width * 0.2f, car->height * 0.5f};
+    DrawRectanglePro(rect, origin, car->angle * RAD2DEG, car->color);
+}
+
+
+void Car_free(Car *car) {
+    free(car);
+    // Caso precise liberar mais memória
+}
+
 void Car_move(Car *car, int up, int down, int right, int left) {
     if (IsKeyDown(up)) {
         Car_accelerate(car);
@@ -225,14 +227,6 @@ void Car_move(Car *car, int up, int down, int right, int left) {
             Car_break(car);
         }
     }
-}
-
-static void Car_setPos(Car *car, Vector2 newPos) {
-    car->pos = newPos;
-}
-
-static void Car_setAngle(Car *car, float angle) {
-    car->angle = angle;
 }
 
 void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {

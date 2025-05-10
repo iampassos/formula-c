@@ -26,8 +26,7 @@ typedef struct {
 
 void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
                    float ouside_track_drag); // Função que define as propriedades da pista
-void Track_setMask(Image  mask,
-                   Color *maskPixel); // Definindo a mascara de pixel para carros lerem
+void Track_setMask(Image track_mask); // Definindo a mascara de pixel para carros lerem
 void Track_setColor(Color track, Color light_escape, Color hard_escape, Color outside,
                     Color race_start, Color first_check,
                     Color second_check); // Definindo (rgb) para cada parte da pista

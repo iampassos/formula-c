@@ -53,17 +53,16 @@ int main() {
 }
 
 void setup() {
-    // Variáveis que serão enviadas para a biblioteca car.h processar a interação carro pista
-    Color *trackPixels;
-    Image  trackMask;
-
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Formula C"); // Inicializando a tela gráfica 2d
     SetTargetFPS(60);                                     // Definindo o frame rate em 60
 
     // trackMask = LoadImage("resources/masks/pista_debug_mask.png");
-    trackMask = LoadImage("resources/maps/interlagos.png");
+    Image trackMask = LoadImage("resources/maps/interlagos_mask.png");
     // ImageResize(&trackMask, SCREEN_WIDTH, SCREEN_HEIGHT);
-    trackPixels = LoadImageColors(trackMask);
+
+    Track_setMask(trackMask);
+    
+    UnloadImage(trackMask);
 
     // Image bgImage = LoadImage("resources/masks/pista_debug_mask.png"); // Pista exibida
     Image bgImage = LoadImage("resources/maps/interlagos.png"); // Pista exibida
@@ -71,7 +70,7 @@ void setup() {
     trackBackground = LoadTextureFromImage(bgImage); // converte em textura
     UnloadImage(bgImage); // libera o recurso da imagem após virar textura
 
-    Track_setMask(trackMask, trackPixels);
+    
     Track_setDrag(TRACK_DRAG, LIGHT_ESCAPE_AREA_DRAG, HARD_ESCAPE_AREA_DRAG, OUTSIDE_TRACK_DRAG);
     Track_setColor(TRACK_COLOR, LIGHT_ESCAPE_AREA_COLOR, HARD_ESCAPE_AREA_COLOR,
                    OUTSIDE_TRACK_COLOR, RACE_START_COLOR, FIRST_CHECKPOINT_COLOR,
@@ -119,7 +118,7 @@ void update() {
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    camera.target = (Vector2) player->pos;
+    camera.target = player->pos;
 }
 
 void draw() {
