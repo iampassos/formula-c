@@ -84,7 +84,7 @@ void setup() {
                           0.0,                    // angulo inicial do carro
                           0.035,                  // aceleraçao angular ( velocidade de rotacao),
                           0.2,                    // Velocidade mínima para fazer curva,
-                          0.07,                   // Força de frenagem,
+                          0.03,                   // Força de frenagem,
                           0.2,                    // Força da marcha ré
                           1                       // id do carro
     );
@@ -132,8 +132,7 @@ void update() {
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    camera.target = player->pos;
-    //updateCameraTarget(player); // Colocar essa linha de código para testar
+    updateCameraTarget(player); // Colocar essa linha de código para testar
 }
 
 void draw() {
@@ -143,7 +142,7 @@ void draw() {
 
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, player->pos.x-500, player->pos.y-500, 30, BLACK); // Mostrando as informações do carro com id 1
+    Car_showInfo(player, player->pos.x-(SCREEN_WIDTH /2), player->pos.y-(SCREEN_HEIGHT / 2), 50, BLACK); // Mostrando as informações do carro com id 1
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
