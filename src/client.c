@@ -3,6 +3,7 @@
 #include "car.h"
 #include "raylib.h"
 #include "server.h"
+#include <math.h>
 
 #define MAIN_TRACK_AREA (TrackArea){(Color) {127, 127, 127}, 0.01}
 #define LIGHT_ESCAPE_AREA (TrackArea){(Color) {255, 127, 39}, 0.04}
@@ -114,9 +115,9 @@ void Client_Draw() {
                  player->pos.y - GetScreenHeight() / 2, 50, BLACK);
     
     Server_forEachCar(Car_draw);
-    int x = (int) (player->pos.x + cos(player->angle) * player->width * 1.0f);
-    int y = (int) (player->pos.y + sin(player->angle) * player->height * 1.0f);
-    DrawCircle(x, y, 10, RED);
+    // int x = (int) (player->pos.x + cos(player->angle) * player->width * 0.5);
+    // int y = (int) (player->pos.y + sin(player->angle) * player->width * 0.5);
+    // DrawCircle(x, y, 10, RED);
 
     EndMode2D();
     EndDrawing();

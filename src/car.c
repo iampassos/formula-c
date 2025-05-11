@@ -118,8 +118,8 @@ static void Car_applyPhysics(Car *car) { // Atualiza a posição com base na vel
 }
 
 static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
-    int x = (int) (car->pos.x + cos(car->angle) * car->width * 0.5f);
-    int y = (int) (car->pos.y + sin(car->angle) * car->height * 0.5f);
+    int x = (int) (car->pos.x + cos(car->angle) * car->width * 0.4);
+    int y = (int) (car->pos.y + sin(car->angle) * car->width * 0.4);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
         return (Color) {0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
