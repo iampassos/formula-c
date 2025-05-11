@@ -3,11 +3,6 @@
 #include "car.h"
 #include "raylib.h"
 #include "server.h"
-#include <math.h>
-
-#define MAIN_TRACK_AREA (TrackArea){(Color) {127, 127, 127}, 0.01}
-#define LIGHT_ESCAPE_AREA (TrackArea){(Color) {255, 127, 39}, 0.04}
-#define HARD_ESCAPE_AREA (TrackArea){(Color) {163, 73, 164}, 0.07}
 
 // Areas da pista
 #define TRACK_AREAS (TrackArea[]){ \
