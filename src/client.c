@@ -10,9 +10,10 @@
 
 // Areas da pista
 #define TRACK_AREAS (TrackArea[]){ \
-    {(Color) {127, 127, 127}, 0.01}, \
-    {(Color) {255, 127, 39}, 0.04}, \
-    {(Color) {163, 73, 164}, 0.07} \
+    /* pista */    {(Color) {127, 127, 127}, 0.01}, \
+    /* fraca */    {(Color) {255, 127, 39}, 0.04}, \
+    /* forte */    {(Color) {163, 73, 164}, 0.07}, \
+    /* grama */    {(Color) {34, 177, 76}, 0.02} \
 }
 
 // Cor que representa fora da pista
@@ -46,7 +47,7 @@ void Client_Init() {
     SetTargetFPS(60);
 
     Track_setMask("resources/masks/interlagos_maskV2.png");
-    Track_setAreas(TRACK_AREAS, 3);
+    Track_setAreas(TRACK_AREAS, 4);
     Track_setCheckpoints(CHECKPOINTS, 3);
     Track_setOutsideColor(OUTSIDE_TRACK_COLOR);
 

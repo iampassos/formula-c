@@ -4,13 +4,15 @@
 #include <stdlib.h>
 
 // Areas da pista
-static TrackArea TRACK_AREAS[3];
+static TrackArea TRACK_AREAS[10];
+static int TRACK_AREA_SIZE;
 
 // Cor que representa a área fora da pista
 static Color OUTSIDE_AREA_COLOR;
 
 // Checkpoints
-static Checkpoint CHECKPOINTS[3];
+static Checkpoint CHECKPOINTS[10];
+static int CHECKPOINTS_SIZE;
 
 // Pixels da imagem da pista
 static int    IMAGE_WIDTH;
@@ -26,6 +28,7 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
 }
 
 void Track_setAreas(TrackArea areas[], int size) {
+    TRACK_AREA_SIZE=size;
     for (int i = 0; i < size; i++){
         areas[i].dragForce = 1 - areas[i].dragForce;
         TRACK_AREAS[i] = areas[i];
@@ -37,6 +40,7 @@ void Track_setOutsideColor(Color color) {
 }
 
 void Track_setCheckpoints(Checkpoint checkpoints[], int size) { // Definindo as cores dos checkpoints
+    CHECKPOINTS_SIZE=size;
     for (int i = 0; i < size; i++){
         CHECKPOINTS[i] = checkpoints[i];
     }
@@ -51,7 +55,7 @@ static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a ou
 }
 
 static int getCheckpoint(Color color) { // Retorna o número int associado aql checkpoint
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
         if (equalsColor(color, CHECKPOINTS[i].color))
             return i;
     }
@@ -63,7 +67,7 @@ static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
 }
 
 static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < TRACK_AREA_SIZE; i++) {
         if (equalsColor(floorColor, TRACK_AREAS[i].color)) {
             car->dragForce = TRACK_AREAS[i].dragForce;
         }
