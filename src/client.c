@@ -47,7 +47,7 @@ void Client_Init() {
     SetTargetFPS(60);
 
     Track_setMask("resources/masks/interlagos_maskV2.png");
-    Track_setAreas(TRACK_AREAS, 4);
+    Track_setAreas(TRACK_AREAS, sizeof(TRACK_AREAS)/sizeof(TrackArea));
     Track_setCheckpoints(CHECKPOINTS, 3);
     Track_setOutsideColor(OUTSIDE_TRACK_COLOR);
 
@@ -112,7 +112,11 @@ void Client_Draw() {
     DrawTexture(trackTexture, 0, 0, WHITE);
     Car_showInfo(player, player->pos.x - GetScreenWidth() / 2,
                  player->pos.y - GetScreenHeight() / 2, 50, BLACK);
+    
     Server_forEachCar(Car_draw);
+    int x = (int) (player->pos.x + cos(player->angle) * player->width * 1.0f);
+    int y = (int) (player->pos.y + sin(player->angle) * player->height * 1.0f);
+    DrawCircle(x, y, 10, RED);
 
     EndMode2D();
     EndDrawing();
