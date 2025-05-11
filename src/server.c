@@ -3,6 +3,7 @@
 #include "car.h"
 #include "linked_list.h"
 #include "raylib.h"
+#include <stdlib.h>
 
 static LinkedList *cars;
 
@@ -44,6 +45,17 @@ Car_data_transfer Server_GetCarDataById(int id) {
     return (Car_data_transfer) {car->id,       car->lap,        car->startLapTime, car->bestLapTime,
                                 car->raceTime, car->checkpoint, car->pos,          car->vel,
                                 car->angle,    car->dragForce};
+}
+
+Car_list_transfer Server_GetNearCars(int id){
+    int size = LinkedList_size(cars);
+    Car* arr = (Car*)malloc(sizeof(Car) * size);
+    Node* cur = cars->head;
+    for (int i = 0; i < size; i++){
+        arr[i] = *cur->car;
+        cur = cur->next;
+    }
+    return (Car_list_transfer){size, arr};
 }
 
 void Server_forEachCar(void (*function)(Car *)) {
