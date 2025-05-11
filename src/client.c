@@ -4,22 +4,31 @@
 #include "raylib.h"
 #include "server.h"
 
-// Areas da pista
 #define MAIN_TRACK_AREA (TrackArea){(Color) {127, 127, 127}, 0.01}
 #define LIGHT_ESCAPE_AREA (TrackArea){(Color) {255, 127, 39}, 0.04}
 #define HARD_ESCAPE_AREA (TrackArea){(Color) {163, 73, 164}, 0.07}
-#define OUTSIDE_TRACK_AREA (TrackArea){(Color) {255, 255, 255}, 0.2}
+
+// Areas da pista
+#define TRACK_AREAS (TrackArea[]){ \
+    {(Color) {127, 127, 127}, 0.01}, \
+    {(Color) {255, 127, 39}, 0.04}, \
+    {(Color) {163, 73, 164}, 0.07} \
+}
+
+// Cor que representa fora da pista
+#define OUTSIDE_TRACK_COLOR (Color) {255, 255, 255}
 
 // Checkpoints
-#define RACE_START_CHECKPOINT (Checkpoint){(Color) {0, 255, 0}, (Vector2) {4371, 2537}, 2.66}
-#define FIRST_CHECKPOINT (Checkpoint){(Color) {0, 0, 255}, (Vector2) {6700, 8147}, 0}
-#define SECOND_CHECKPOINT (Checkpoint){(Color) {255, 0, 0}, (Vector2) {11069, 2257}, 2.17}
+#define CHECKPOINTS (Checkpoint[]){ \
+    {(Color){0, 255, 0}, (Vector2){4371, 2537}, 2.66f}, \
+    {(Color){0, 0, 255}, (Vector2){6700, 8147}, 0.0f}, \
+    {(Color){255, 0, 0}, (Vector2){11069, 2257}, 2.17f} \
+}
 
 static Camera2D *camera;
 static Car      *player;
 static Texture2D trackTexture;
 static int       playerId = 1;
-
 
 static int SCREEN_WIDTH;
 static int SCREEN_HEIGHT;
@@ -37,8 +46,9 @@ void Client_Init() {
     SetTargetFPS(60);
 
     Track_setMask("resources/masks/interlagos_maskV2.png");
-    Track_setAreas(MAIN_TRACK_AREA, LIGHT_ESCAPE_AREA, HARD_ESCAPE_AREA, OUTSIDE_TRACK_AREA);
-    Track_setCheckpoints(RACE_START_CHECKPOINT, FIRST_CHECKPOINT, SECOND_CHECKPOINT);
+    Track_setAreas(TRACK_AREAS, 3);
+    Track_setCheckpoints(CHECKPOINTS, 3);
+    Track_setOutsideColor(OUTSIDE_TRACK_COLOR);
 
     trackTexture = LoadTexture("resources/masks/interlagos_maskV2.png");
 

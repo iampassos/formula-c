@@ -17,3 +17,5 @@ $(OUT): $(SRC)
 # Limpeza
 clean:
 	del /Q $(OUT)
+
+# mingw32-make -f MakeFileWindows && game.exe

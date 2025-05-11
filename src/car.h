@@ -3,10 +3,10 @@
 
 #include "raylib.h"
 
-typedef struct{
-    Color color;
+typedef struct {
+    Color   color;
     Vector2 pos;
-    float angle;
+    float   angle;
 } Checkpoint;
 
 typedef struct {
@@ -35,15 +35,11 @@ typedef struct {
     float     reverseForce;
 } Car;
 
-void Track_setDrag(float track_drag, float light_escape_area_drag, float hard_escape_area_drag,
-                   float ouside_track_drag); // Função que define as propriedades da pista
-void Track_setMask(char *track_mask_path);   // Definindo a mascara de pixel para carros lerem
-void Track_setDragColor(Color track, Color light_escape, Color hard_escape,
-                        Color outside); // Definindo (rgb) para cada parte da pista
-void Track_setAreas(TrackArea main, TrackArea light, TrackArea hard, TrackArea outside);
+void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
+void Track_setOutsideColor(Color color);
+void Track_setAreas(TrackArea areas[], int size);
 
-void Track_setCheckpoints(Checkpoint race_start, Checkpoint first_check,
-                              Checkpoint second_check); // Define as cores dos checkpoints
+void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
