@@ -5,14 +5,14 @@
 
 // Areas da pista
 static TrackArea TRACK_AREAS[10];
-static int TRACK_AREA_SIZE;
+static int       TRACK_AREA_SIZE;
 
 // Cor que representa a área fora da pista
 static Color OUTSIDE_AREA_COLOR;
 
 // Checkpoints
 static Checkpoint CHECKPOINTS[10];
-static int CHECKPOINTS_SIZE;
+static int        CHECKPOINTS_SIZE;
 
 // Pixels da imagem da pista
 static int    IMAGE_WIDTH;
@@ -28,10 +28,10 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
 }
 
 void Track_setAreas(TrackArea areas[], int size) {
-    TRACK_AREA_SIZE=size;
-    for (int i = 0; i < size; i++){
+    TRACK_AREA_SIZE = size;
+    for (int i = 0; i < size; i++) {
         areas[i].dragForce = 1 - areas[i].dragForce;
-        TRACK_AREAS[i] = areas[i];
+        TRACK_AREAS[i]     = areas[i];
     }
 }
 
@@ -39,9 +39,10 @@ void Track_setOutsideColor(Color color) {
     OUTSIDE_AREA_COLOR = color;
 }
 
-void Track_setCheckpoints(Checkpoint checkpoints[], int size) { // Definindo as cores dos checkpoints
-    CHECKPOINTS_SIZE=size;
-    for (int i = 0; i < size; i++){
+void Track_setCheckpoints(Checkpoint checkpoints[],
+                          int        size) { // Definindo as cores dos checkpoints
+    CHECKPOINTS_SIZE = size;
+    for (int i = 0; i < size; i++) {
         CHECKPOINTS[i] = checkpoints[i];
     }
 }
