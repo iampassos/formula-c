@@ -4,9 +4,9 @@
 #include "raylib.h"
 
 typedef struct {
-    char      text[100];
-    Rectangle rect;
-    int       hovered;
+    char    text[100];
+    Vector2 pos;
+    int     hovered;
 } Button;
 
 void setup_menu();
