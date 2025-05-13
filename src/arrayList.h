@@ -1,6 +1,8 @@
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 
+#include "raylib.h"
+
 typedef struct {
     Vector2 pos;
     float angle;
@@ -20,5 +22,7 @@ unsigned int ArrayList_length(ArrayList* arr);
 
 void ArrayList_clear(ArrayList* arr);
 void ArrayList_copy(ArrayList* a, ArrayList* b);
+
+GhostCarFrame ArrayList_get(ArrayList* arr, unsigned int idx);
 
 #endif

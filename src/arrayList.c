@@ -6,6 +6,7 @@ ArrayList* ArrayList_create(){
     arr->length = 0;
     arr->capacity = 32;
     arr->data = (GhostCarFrame*)malloc(sizeof(GhostCarFrame) * arr->capacity);
+    return arr;
 }
 
 void ArrayList_free(ArrayList* arr){
@@ -14,8 +15,8 @@ void ArrayList_free(ArrayList* arr){
 }
 
 void ArrayList_growth(ArrayList* arr){
-    arr->capacity = arr->capacity >> 1 + arr->capacity;
-    realloc(arr->data, sizeof(GhostCarFrame) * arr->capacity);
+    arr->capacity = (arr->capacity >> 1) + arr->capacity;
+    arr->data = realloc(arr->data, sizeof(GhostCarFrame) * arr->capacity);
 }
 
 void ArrayList_push(ArrayList* arr, GhostCarFrame car){
@@ -36,9 +37,15 @@ void ArrayList_copy(ArrayList* a, ArrayList* b){
     a->length = b->length;
     a->capacity = b->length;
 
-    realloc(a->data, sizeof(GhostCarFrame) * a->capacity);
+    a->data = realloc(a->data, sizeof(GhostCarFrame) * a->capacity);
 
     for (unsigned int i = 0; i < b->length; i++){
         a->data[i] = b->data[i];
     }
+}
+
+GhostCarFrame ArrayList_get(ArrayList* arr, unsigned int idx){
+    if (idx >= arr->length)
+        return (GhostCarFrame){0};
+    return arr->data[idx];
 }

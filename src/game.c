@@ -60,7 +60,7 @@ void setup_game(Mode mode) {
                              1                               // id do carro
     );
 
-    Car *ghostCar = Car_create(best_lap[0].pos, best_lap[0].angle, 0.3, 0.2, 0.02, 0.035, 0.2,
+    Car *ghostCar = Car_create((Vector2){0, 0}, 0, 0.3, 0.2, 0.02, 0.035, 0.2,
                                   125, 75, "resources/cars/carroazul.png", 99);
     LinkedList_addCar(cars, ghostCar);
 
@@ -113,8 +113,8 @@ void update_game() {
 
     if (replayFrameIdx < ArrayList_length(best_lap)) { // Replay
         GhostCarFrame frameData = ArrayList_get(best_lap, replayFrameIdx++);
-        ghost_car->pos   = frameData.pos;
-        ghost_car->angle = frameData.angle;
+        ghost->pos   = frameData.pos;
+        ghost->angle = frameData.angle;
     } 
 
     if (player->lap >= 0) { // Grava
@@ -145,11 +145,11 @@ void draw_game() {
 
     // Debug ghost car
     char stateText[1000];
-    sprintf(stateText, "Ghost car debug:\nRecording i: %d\nPlayback i: %d", best_lap_i,
-            best_lap_current);
+    sprintf(stateText, "Ghost car debug:\nRecording i: %d\nPlayback i: %d", 1,
+            1);
     DrawText(stateText, 10, 110, 20, BLACK);
 
     char stateText2[1000];
-    sprintf(stateText2, "Current lap debug:\nRecording i: %d", current_lap_i);
+    sprintf(stateText2, "Current lap debug:\nRecording i: %d", 1);
     DrawText(stateText2, 10, 200, 20, BLACK);
 }
