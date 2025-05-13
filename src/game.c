@@ -70,7 +70,10 @@ void setup_game(Mode mode) {
         LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
         camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
                                0.0f, 0.5f);
-        current_lap = malloc(sizeof(GhostCarFrame));
+        current_lap      = malloc(sizeof(GhostCarFrame));
+        best_lap_i       = 0;
+        best_lap_current = 0;
+        current_lap      = 0;
         break;
     case SPLITSCREEN:
         break;
