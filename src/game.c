@@ -22,7 +22,7 @@ static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 static Music music;
-static Music carSound;
+static Sound carSound;
 
 static void loadMap(Map map) {
     switch (map) {
@@ -44,9 +44,9 @@ static void loadMap(Map map) {
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
     music  = LoadMusicStream(musicPath);
-    carSound = LoadMusicStream(carSoundPath);
+    carSound = LoadSound(carSoundPath);
     PlayMusicStream(music);
-    PlayMusicStream(carSound);
+    PlaySound(carSound);
 }
 
 void loadSingleplayer() {
@@ -101,7 +101,7 @@ void cleanup_game() {
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
     UnloadMusicStream(music);
-    UnloadMusicStream(carSound);
+    UnloadSound(carSound);
 }
 
 static void updateGhostCar(Car *player) {
@@ -133,8 +133,11 @@ static void updateGhostCar(Car *player) {
 void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    SetMusicVolume(carSound, player->vel / 30.0f);
-    UpdateMusicStream(carSound);
+    if (!IsSoundPlaying(carSound)) {
+        PlaySound(carSound);
+    }
+
+    SetSoundPitch(carSound, player->vel / 30.0f);
     SetMusicVolume(music, 0.2);
     UpdateMusicStream(music);
 
