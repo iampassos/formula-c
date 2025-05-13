@@ -9,14 +9,17 @@
 #include "string.h"
 #include <raylib.h>
 
-Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
-LinkedList *cars;            // Variável para armazenar a lista encadeada dos carros da corrida
-Camera2D   *camera;
+static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
+static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
+static Camera2D   *camera;
 
-ArrayList *best_lap    = NULL;
-ArrayList *current_lap = NULL;
+static ArrayList *best_lap    = NULL;
+static ArrayList *current_lap = NULL;
 
-void load_map(Map map) {
+static int last_lap       = 0;
+static int replayFrameIdx = 0;
+
+static void load_map(Map map) {
     switch (map) {
     case INTERLAGOS:
         trackBackground =
@@ -36,40 +39,43 @@ void load_map(Map map) {
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 }
 
-void setup_game(Mode mode) {
-    load_map(INTERLAGOS);
-
-    cars             = LinkedList_create();
+void load_singleplayer(){
+    replayFrameIdx = 0;
+    last_lap       = 0;
     best_lap         = ArrayList_create();
     best_lap->length = -1;
     current_lap      = ArrayList_create();
+    Car *ghostCar    = Car_create((Vector2){0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
+                                  "resources/cars/carroazul.png", 99);
+    Car *player      = Car_create((Vector2){5400, 2000}, // pos
+                                  2.66,                  // angulo inicial do carro
 
-    Car *player = Car_create((Vector2) {5400, 2000}, // pos
-                             2.66,                   // angulo inicial do carro
+                                  0.3,  // aceleracao do carro
+                                  0.2,  // força da marcha ré
+                                  0.02, // força de frenagem
 
-                             0.3,  // aceleracao do carro
-                             0.2,  // força da marcha ré
-                             0.02, // força de frenagem
+                                  0.035, // aceleração angular (velocidade de rotação)
+                                  0.2,   // velocidade mínima para fazer curva
 
-                             0.035, // aceleração angular (velocidade de rotação)
-                             0.2,   // velocidade mínima para fazer curva
+                                  125, // largura
+                                  75,  // altura
 
-                             125, // largura
-                             75,  // altura
-
-                             "resources/cars/carroazul.png", // path da textura
-                             1                               // id do carro
-    );
-
-    Car *ghostCar = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
-                               "resources/cars/carroazul.png", 99);
+                                  "resources/cars/carroazul.png", // path da textura
+                                  1                               // id do carro
+         );
     LinkedList_addCar(cars, ghostCar);
+    LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
+    camera = Camera_create(player->pos, (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                           0.0f, 0.5f);
+}
+
+void setup_game(Mode mode) {
+    load_map(INTERLAGOS);
+    cars = LinkedList_create();
 
     switch (mode) {
     case SINGLEPLAYER:
-        LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
-        camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
-                               0.0f, 0.5f);
+        load_singleplayer();
         break;
     case SPLITSCREEN:
         break;
@@ -83,39 +89,25 @@ void cleanup_game() {
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
     ArrayList_free(best_lap);
     ArrayList_free(current_lap);
-    free(current_lap);
 }
 
-int last_lap       = -1;
-int replayFrameIdx = 0;
-
-void update_game() {
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
-    Car *ghost  = LinkedList_getCarById(cars, 99);
-
-    if (player->lap > last_lap && player->lap > 0) {
+static void update_ghost_car(Car *player) {
+    Car *ghost = LinkedList_getCarById(cars, 99);
+    if (player->lap > last_lap) {
         last_lap       = player->lap;
         replayFrameIdx = 0;
+        ArrayList_push(current_lap, (GhostCarFrame){(Vector2){0, 0}, 0});
         if (ArrayList_length(current_lap) < ArrayList_length(best_lap)) {
             ArrayList_copy(best_lap, current_lap);
         }
         ArrayList_clear(current_lap);
     }
 
-    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
-             KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
-
-    LinkedList_forEach(
-        cars,
-        Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
-
     if (last_lap >= 1) { // Replay
         if (replayFrameIdx < ArrayList_length(best_lap)) {
             GhostCarFrame frameData = ArrayList_get(best_lap, replayFrameIdx++);
             ghost->pos              = frameData.pos;
             ghost->angle            = frameData.angle;
-        } else {
-            ghost->pos = (Vector2) {0, 0};
         }
     }
 
@@ -123,6 +115,19 @@ void update_game() {
         GhostCarFrame frameData = {player->pos, player->angle};
         ArrayList_push(current_lap, frameData);
     }
+}
+
+void update_game() {
+    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+
+    update_ghost_car(player);
+
+    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
+             KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
+
+    LinkedList_forEach(
+        cars,
+        Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
     Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }

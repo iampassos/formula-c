@@ -23,7 +23,7 @@
     }
 
 void setup_game(Mode mode);
-void load_map(Map map);
+
 void cleanup_game();
 void update_game();
 void draw_game();
