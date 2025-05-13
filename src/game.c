@@ -137,7 +137,7 @@ void update_game() {
         PlaySound(carSound);
     }
 
-    SetSoundPitch(carSound, player->vel / 30.0f);
+    SetSoundPitch(carSound, 0.6 + player->vel / 13.0f);
     SetMusicVolume(music, 0.2);
     UpdateMusicStream(music);
 
