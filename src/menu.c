@@ -1,25 +1,28 @@
 #include "menu.h"
 #include "common.h"
 #include "game.h"
-#include <raylib.h>
+#include "raylib.h"
+#include <math.h>
 
-static char *textContent = "FORMULA C";
-static Color titleColor  = {0, 100, 255, 255};
+static char *textContent    = "FORMULA C";
+static char *backgroundPath = "resources/menu/f12024.png";
+
+static char *clickButtonSoundPath = "resources/sounds/click.mp3";
 
 static Button BUTTONS[] = {
     {"1 JOGADOR", {0, 0}, 0},
     {"2 JOGADORES", {0, 0}, 0},
 };
 
+static Sound     clickSound;
 static const int buttonsLen = sizeof(BUTTONS) / sizeof(Button);
-
-static Vector2 textBox = {0, 0};
-
-static int width;
-static int height;
-static int padding;
-static int buttonFontSize;
-static int titleFontSize;
+static Vector2   textBox    = {0, 0};
+static Texture2D background;
+static int       width;
+static int       height;
+static int       padding;
+static int       buttonFontSize;
+static int       titleFontSize;
 
 void setup_menu() {
     width   = SCREEN_WIDTH / 5;
@@ -39,20 +42,31 @@ void setup_menu() {
 
     textBox.x = (SCREEN_WIDTH - MeasureText(textContent, titleFontSize)) / 2.0f;
     textBox.y = (SCREEN_HEIGHT - dy * buttonsLen) / 2.0f;
+
+    Image img = LoadImage(backgroundPath);
+    ImageResize(&img, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona a imagem
+    background = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    clickSound = LoadSound(clickButtonSoundPath);
+}
+
+void cleanup_menu() {
+    UnloadSound(clickSound);
 }
 
 void DrawButton(Button btn) {
-    Rectangle rect      = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
-    Color     baseColor = btn.hovered ? GOLD : WHITE;
-    Color     textColor = BLACK;
-
-    DrawRectangleRounded((Rectangle) {rect.x + 4, rect.y + 4, rect.width, rect.height}, 0.3f, 10,
-                         GRAY);
+    Rectangle rect       = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
+    Color     baseColor  = btn.hovered ? GOLD : WHITE;
+    Color     textColor  = BLACK;
+    Rectangle shadowRect = (Rectangle) {rect.x + 6, rect.y + 6, rect.width, rect.height};
 
     float     scale  = btn.hovered ? 1.05f : 1.0f;
     Rectangle scaled = {rect.x - rect.width * (scale - 1) / 2,
                         rect.y - rect.height * (scale - 1) / 2, rect.width * scale,
                         rect.height * scale};
+
+    DrawRectangleRounded(shadowRect, 0.3f, 10, Fade(BLACK, 0.2f));
     DrawRectangleRounded(scaled, 0.3f, 10, baseColor);
 
     DrawText(btn.text, rect.x + (rect.width - MeasureText(btn.text, buttonFontSize)) / 2,
@@ -66,6 +80,7 @@ void update_menu() {
         mouse, (Rectangle) {BUTTONS[0].pos.x, BUTTONS[0].pos.y, width, height});
 
     if (BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        PlaySound(clickSound);
         setup_game(SINGLEPLAYER);
         state.screen = GAME;
     }
@@ -74,18 +89,28 @@ void update_menu() {
         mouse, (Rectangle) {BUTTONS[1].pos.x, BUTTONS[1].pos.y, width, height});
 
     if (BUTTONS[1].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        PlaySound(clickSound);
     }
 }
 
 void draw_menu() {
-    ClearBackground(BLACK);
+    // 1. Fundo
+    DrawTexture(background, 0, 0, WHITE);
+
+    // 2. Gradiente por cima (leve transparência)
     for (int i = 0; i < SCREEN_HEIGHT; i++) {
         Color grad = ColorLerp(BLACK, RED, (float) i / SCREEN_HEIGHT);
+        grad.a     = 100; // transparência
         DrawLine(0, i, SCREEN_WIDTH, i, grad);
     }
-    DrawText(textContent, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
-    DrawText(textContent, textBox.x, textBox.y, titleFontSize, titleColor);
 
+    // 3. Título com sombra e cor pulsante
+    float t          = sinf(GetTime()) * 0.5f + 0.5f; // varia de 0 a 1
+    Color pulseColor = ColorLerp(RED, BLUE, t);
+    DrawText(textContent, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
+    DrawText(textContent, textBox.x, textBox.y, titleFontSize, pulseColor);
+
+    // 4. Botões
     for (int i = 0; i < buttonsLen; i++) {
         DrawButton(BUTTONS[i]);
     }

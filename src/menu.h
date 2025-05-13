@@ -10,6 +10,7 @@ typedef struct {
 } Button;
 
 void setup_menu();
+void cleanup_menu();
 void update_menu();
 void draw_menu();
 

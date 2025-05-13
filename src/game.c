@@ -4,19 +4,18 @@
 #include "car.h"
 #include "common.h"
 #include "linked_list.h"
+#include "raylib.h"
 #include "raymath.h"
 #include "stdio.h"
-#include "string.h"
-#include <raylib.h>
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
 
-static ArrayList *best_lap    = NULL;
-static ArrayList *current_lap = NULL;
+static ArrayList *bestLap    = NULL;
+static ArrayList *currentLap = NULL;
 
-static int last_lap       = 0;
+static int lastLap       = 0;
 static int replayFrameIdx = 0;
 
 static void load_map(Map map) {
@@ -41,10 +40,10 @@ static void load_map(Map map) {
 
 void load_singleplayer() {
     replayFrameIdx   = 0;
-    last_lap         = 0;
-    best_lap         = ArrayList_create();
-    best_lap->length = -1;
-    current_lap      = ArrayList_create();
+    lastLap         = 0;
+    bestLap         = ArrayList_create();
+    bestLap->length = -1;
+    currentLap      = ArrayList_create();
     Car *ghostCar    = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
                                   "resources/cars/carroazul.png", WHITE, 1, 99);
     Car *player      = Car_create((Vector2) {5400, 2000}, // pos
@@ -88,25 +87,25 @@ void cleanup_game() {
     Track_Unload();                 // função que deve liberar o trackMask e trackPixels
     Camera_free(camera);
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
-    ArrayList_free(best_lap);
-    ArrayList_free(current_lap);
+    ArrayList_free(bestLap);
+    ArrayList_free(currentLap);
 }
 
 static void update_ghost_car(Car *player) {
     Car *ghost = LinkedList_getCarById(cars, 99);
-    if (player->lap > last_lap) {
-        last_lap       = player->lap;
+    if (player->lap > lastLap) {
+        lastLap       = player->lap;
         replayFrameIdx = 0;
-        ArrayList_push(current_lap, (GhostCarFrame) {(Vector2) {0, 0}, 0});
-        if (ArrayList_length(current_lap) < ArrayList_length(best_lap)) {
-            ArrayList_copy(best_lap, current_lap);
+        ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {0, 0}, 0});
+        if (ArrayList_length(currentLap) < ArrayList_length(bestLap)) {
+            ArrayList_copy(bestLap, currentLap);
         }
-        ArrayList_clear(current_lap);
+        ArrayList_clear(currentLap);
     }
 
-    if (last_lap >= 1) { // Replay
-        if (replayFrameIdx < ArrayList_length(best_lap)) {
-            GhostCarFrame frameData = ArrayList_get(best_lap, replayFrameIdx++);
+    if (lastLap >= 1) { // Replay
+        if (replayFrameIdx < ArrayList_length(bestLap)) {
+            GhostCarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
             ghost->pos              = Vector2Lerp(ghost->pos, frameData.pos, 0.1f);
             ghost->angle            = Lerp(ghost->angle, frameData.angle, 0.1f);
         }
@@ -114,7 +113,7 @@ static void update_ghost_car(Car *player) {
 
     if (player->lap >= 0) { // Grava
         GhostCarFrame frameData = {player->pos, player->angle};
-        ArrayList_push(current_lap, frameData);
+        ArrayList_push(currentLap, frameData);
     }
 }
 
@@ -154,10 +153,10 @@ void draw_game() {
     // Debug ghost car
     char stateText[1000];
     sprintf(stateText, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
-            ArrayList_length(best_lap), replayFrameIdx);
+            ArrayList_length(bestLap), replayFrameIdx);
     DrawText(stateText, 10, 110, 20, BLACK);
 
     char stateText2[1000];
-    sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(current_lap));
+    sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
     DrawText(stateText2, 10, 200, 20, BLACK);
 }

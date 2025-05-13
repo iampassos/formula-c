@@ -18,6 +18,7 @@ int main() {
     ImageResize(&icon, 32, 32);
     SetWindowIcon(icon);
     UnloadImage(icon);
+    InitAudioDevice();
 
     SetTargetFPS(60);
 
@@ -40,6 +41,9 @@ int main() {
         }
     }
 
+    cleanup_game();
+    cleanup_menu();
+    CloseAudioDevice();
     CloseWindow(); // Fechar a janela gráfica 2d
 
     return 0;
