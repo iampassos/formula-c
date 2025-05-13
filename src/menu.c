@@ -1,41 +1,63 @@
+#include "menu.h"
 #include "common.h"
 #include "game.h"
 
-int width  = 200;
-int height = 50;
+//static const int width = 200;
+static const int height = 50;
 
-Rectangle button_singleplayer = {0};
-int       is_sglplr_hovered   = 0;
+static void singleplayerAction() {
+    setup_game(SINGLEPLAYER);
+    state.screen = GAME;
+}
 
-Rectangle button_splitscreen     = {0};
-int       is_splitscreen_hovered = 0;
+static void splitscreenAction() {
+    return;
+}
 
-void update_menu() {
-    Vector2 mouse = GetMousePosition();
+static Button buttons[] = {
+    (Button){"1 Jogador", (Rectangle){300, 300, 100, 100}, 0, singleplayerAction},
+    (Button){"2 Jogadores", (Rectangle){300, 500, 100, 100}, 0, splitscreenAction},
+};
 
-    if (CheckCollisionPointRec(mouse, button_singleplayer)) {
-        is_sglplr_hovered = 1;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            setup_game(SINGLEPLAYER);
-            state.screen = GAME;
-        }
-    } else {
-        is_sglplr_hovered = 0;
-    }
+static const int buttonsLen = sizeof(buttons) / sizeof(Button);
 
-    if (CheckCollisionPointRec(mouse, button_splitscreen)) {
-        is_splitscreen_hovered = 1;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        }
-    } else {
-        is_splitscreen_hovered = 0;
+static Vector2 mousePos;
+
+void setup_menu(){
+    int y;
+    for (int i = 0; i < buttonsLen; i++){
+        y = SCREEN_HEIGHT * ((i + 1) / (float)(buttonsLen + 1));
+        buttons[i].rect.y = y;
+        buttons[i].rect.x = SCREEN_WIDTH / 2 - buttons[i].rect.width / 2;
     }
 }
 
-static void draw_button(Rectangle button, char *text, int hovered) {
-    DrawRectangleRec(button, hovered ? GOLD : WHITE);
-    DrawText(text, (button.x + ((button.width - MeasureText(text, 20)) / 2.0f)),
-             (button.y + ((button.height - 20) / 2.0f)), 20, BLACK);
+static void draw_button(Button btn) {
+    DrawRectangleRec(btn.rect, btn.hovered ? GOLD : WHITE);
+    DrawText(btn.text, (btn.rect.x + ((btn.rect.width - MeasureText(btn.text, 20)) / 2.0f)),
+             (btn.rect.y + ((btn.rect.height - 20) / 2.0f)), 20, BLACK);
+}
+
+static int button_action(Button *button) {
+    if (CheckCollisionPointRec(mousePos, button->rect)) {
+        button->hovered = 1;
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            button->action();
+            return 1;
+        }
+    } else
+        button->hovered = 0;
+
+    return 0;
+}
+
+void update_menu() {
+    mousePos = GetMousePosition();
+
+    for (int i = 0; i < buttonsLen; i++) {
+        if (button_action(buttons + i))
+            return;
+    }
 }
 
 void draw_menu() {
@@ -43,14 +65,9 @@ void draw_menu() {
 
     char *text = "FORMULA C";
     DrawText(text, (SCREEN_WIDTH - MeasureText(text, 20)) / 2.0f,
-             (SCREEN_HEIGHT / 2.0f) - (height * 2), 20, WHITE);
+             (SCREEN_HEIGHT / 4.0f) - (height * 2), 20, WHITE);
 
-    button_singleplayer = (Rectangle) {(SCREEN_WIDTH - width) / 2.0f,
-                                       (SCREEN_HEIGHT - height - 10) / 2.0f, width, height};
-
-    button_splitscreen = (Rectangle) {(SCREEN_WIDTH - width) / 2.0f,
-                                      (SCREEN_HEIGHT + height + 10) / 2.0f, width, height};
-
-    draw_button(button_singleplayer, "1 JOGADOR", is_sglplr_hovered);
-    draw_button(button_splitscreen, "2 JOGADORES", is_splitscreen_hovered);
+    for (int i = 0; i < buttonsLen; i++) {
+        draw_button(buttons[i]);
+    }
 }

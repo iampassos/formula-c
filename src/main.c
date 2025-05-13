@@ -21,6 +21,8 @@ int main() {
 
     SetTargetFPS(60);
 
+    setup_menu();
+
     while (!WindowShouldClose()) {
         switch (state.screen) {
         case MENU:
