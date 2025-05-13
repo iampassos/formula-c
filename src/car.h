@@ -25,6 +25,8 @@ typedef struct {
     float     vel;
     float     acc;
     Texture2D texture;
+    Color     color;
+    bool      ghost;
     int       width;
     int       height;
     float     angle;
@@ -57,6 +59,8 @@ Car *Car_create(Vector2 pos,   // posição inicial
                 int height, // altura do carro
 
                 const char *texturePath, // path da textura
+                Color color,
+                bool ghost,
                 int         id           // identificador único
 );
 

@@ -125,7 +125,7 @@ static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cos(car->angle) * car->width * 0.4);
     int y = (int) (car->pos.y + sin(car->angle) * car->width * 0.4);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
-        return (Color) {0, 0, 0};
+        return (Color){0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
@@ -160,22 +160,22 @@ static void Car_reverse(Car *car) { // Marcha ré
 }
 
 void Car_update(Car *car) {
-    if (car->id != 99) {
-        Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
+    if (car->ghost)
+        return;
+    Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
 
-        if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
-            Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
-        }
-
-        Car_applyPhysics(car);
+    if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
+        Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
     }
+
+    Car_applyPhysics(car);
 }
 
 void Car_draw(Car *car) {
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height}; // A imagem inteira
     Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
-                           car->height};                           // Tamanho e posição do carro
-    Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
+                           car->height};                        // Tamanho e posição do carro
+    Vector2   origin = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
                    car->id == 99 ? Fade(WHITE, 0.5f) : WHITE);
 }
@@ -195,7 +195,8 @@ Car *Car_create(   // Função para criar um carro
     int height, // altura do carro
 
     const char *texturePath, // path da textura
-    int         id           // identificador único
+    Color color, bool ghost,
+    int id // identificador único
 ) {
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
@@ -210,6 +211,8 @@ Car *Car_create(   // Função para criar um carro
     car->minTurnSpeed = minTurnSpeed;
     car->breakForce   = 1 - breakCoeficient;
     car->reverseForce = reverseForce;
+    car->color        = color;
+    car->ghost        = ghost;
     car->dragForce    = 0;
     car->id           = id;
     car->lap          = -1;

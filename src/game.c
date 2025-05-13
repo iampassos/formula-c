@@ -46,7 +46,7 @@ void load_singleplayer(){
     best_lap->length = -1;
     current_lap      = ArrayList_create();
     Car *ghostCar    = Car_create((Vector2){0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
-                                  "resources/cars/carroazul.png", 99);
+                                  "resources/cars/carroazul.png",WHITE, 1, 99);
     Car *player      = Car_create((Vector2){5400, 2000}, // pos
                                   2.66,                  // angulo inicial do carro
 
@@ -61,6 +61,8 @@ void load_singleplayer(){
                                   75,  // altura
 
                                   "resources/cars/carroazul.png", // path da textura
+                                  WHITE,
+                                  0,
                                   1                               // id do carro
          );
     LinkedList_addCar(cars, ghostCar);
