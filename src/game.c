@@ -3,10 +3,22 @@
 #include "car.h"
 #include "common.h"
 #include "linked_list.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 LinkedList *cars;            // Variável para armazenar a lista encadeada dos carros da corrida
 Camera2D   *camera;
+
+typedef struct {
+    Vector2 pos;
+    float   angle;
+} GhostCarFrame;
+
+GhostCarFrame *best_lap         = NULL;
+int            best_lap_i       = 0;
+int            best_lap_current = 0;
 
 void load_map(Map map) {
     switch (map) {
@@ -50,29 +62,67 @@ void setup_game(Mode mode) {
                              1                               // id do carro
     );
 
-    LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
-
-    camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
-                           0.5f);
+    switch (mode) {
+    case SINGLEPLAYER:
+        LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
+        camera   = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                                 0.0f, 0.5f);
+        best_lap = malloc(sizeof(GhostCarFrame));
+        break;
+    case SPLITSCREEN:
+        break;
+    }
 }
 
 void cleanup_game() {
-    CloseWindow();                  // Fechar a janela gráfica 2d
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
     Track_Unload();                 // função que deve liberar o trackMask e trackPixels
     Camera_free(camera);
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
+    free(best_lap);
 }
+
+int last_lap = -1;
 
 void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_move(player, KEY_W, KEY_S, KEY_D,
-             KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
+    if (last_lap != player->lap && player->lap >= 1) {
+        Car *ghost = LinkedList_getCarById(cars, 99);
+        if (ghost) {
+            ghost->pos   = best_lap[0].pos;
+            ghost->angle = best_lap[0].angle;
+        } else {
+            Texture2D car_texture = LoadTexture("resources/cars/carroazul.png");
+            LinkedList_addCar(cars, Car_create(best_lap[0].pos, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2,
+                                               125, 75, "resources/cars/carroazul.png", 99));
+        }
+        best_lap_current = 0;
+        last_lap         = player->lap;
+    }
+
+    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
+             KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
 
     LinkedList_forEach(
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
+
+    Car *ghost_car = LinkedList_getCarById(cars, 99);
+    if (ghost_car) {
+        if (best_lap_current < best_lap_i) {
+            ghost_car->pos   = best_lap[best_lap_current].pos;
+            ghost_car->angle = best_lap[best_lap_current].angle;
+            best_lap_current++;
+        } else {
+            ghost_car->pos = (Vector2) {0, 0};
+        }
+    } else if (player->lap >= 0) {
+        best_lap                   = realloc(best_lap, (best_lap_i + 1) * sizeof(GhostCarFrame));
+        best_lap[best_lap_i].pos   = player->pos;
+        best_lap[best_lap_i].angle = player->angle;
+        best_lap_i++;
+    }
 
     Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }
@@ -84,12 +134,20 @@ void draw_game() {
 
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    Car_showInfo(player, player->pos.x - (SCREEN_WIDTH / 2), player->pos.y - (SCREEN_HEIGHT / 2),
-                 50,
+    Car_showInfo(player, player->pos.x - (SCREEN_WIDTH / 2.0f),
+                 player->pos.y - (SCREEN_HEIGHT / 2.0f), 50,
                  BLACK); // Mostrando as informações do carro com id 1
 
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
 
     EndMode2D();
+
+    DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
+
+    // Debug ghost car
+    char stateText[1000];
+    sprintf(stateText, "Ghost car debug:\nRecording i: %d\nPlayback i: %d", best_lap_i,
+            best_lap_current);
+    DrawText(stateText, 10, 110, 20, BLACK);
 }

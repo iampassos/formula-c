@@ -38,5 +38,7 @@ int main() {
         }
     }
 
+    CloseWindow(); // Fechar a janela gráfica 2d
+
     return 0;
 }

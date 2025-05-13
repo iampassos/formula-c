@@ -1,5 +1,8 @@
 #include "car.h"
+#include "common.h"
+#include "menu.h"
 #include <math.h>
+#include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -157,13 +160,15 @@ static void Car_reverse(Car *car) { // Marcha ré
 }
 
 void Car_update(Car *car) {
-    Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
+    if (car->id != 99) {
+        Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
 
-    if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
-        Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
+        if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
+            Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
+        }
+
+        Car_applyPhysics(car);
     }
-
-    Car_applyPhysics(car);
 }
 
 void Car_draw(Car *car) {
@@ -171,7 +176,8 @@ void Car_draw(Car *car) {
     Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
                            car->height};                           // Tamanho e posição do carro
     Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
-    DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG, WHITE);
+    DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
+                   car->id == 99 ? Fade(WHITE, 0.5f) : WHITE);
 }
 
 Car *Car_create(   // Função para criar um carro
@@ -227,8 +233,8 @@ void Car_free(Car *car) {
     free(car);
 }
 
-void Car_move(Car *car, int up, int down, int right,
-              int left) { // Atualiza as propriedades do carro de acordo com o input do player
+void Car_move(Car *car, int up, int down, int right, int left,
+              int q) { // Atualiza as propriedades do carro de acordo com o input do player
     if (IsKeyDown(up)) {
         Car_accelerate(car);
     }
@@ -245,6 +251,11 @@ void Car_move(Car *car, int up, int down, int right,
         } else {
             Car_break(car);
         }
+    }
+
+    if (IsKeyDown(KEY_Q)) {
+        state.screen = MENU;
+        draw_menu();
     }
 }
 
