@@ -40,7 +40,7 @@ void setup_game(Mode mode) {
 
     cars = LinkedList_create();
     best_lap = ArrayList_create();
-    best_lap->length = 0xffffffff;
+    best_lap->length = 10000;
     current_lap = ArrayList_create();
 
     Car *player = Car_create((Vector2) {5400, 2000}, // pos
@@ -60,7 +60,7 @@ void setup_game(Mode mode) {
                              1                               // id do carro
     );
 
-    Car *ghostCar = Car_create((Vector2){0, 0}, 0, 0.3, 0.2, 0.02, 0.035, 0.2,
+    Car *ghostCar = Car_create((Vector2){5400, 2000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2,
                                   125, 75, "resources/cars/carroazul.png", 99);
     LinkedList_addCar(cars, ghostCar);
 
@@ -92,16 +92,13 @@ void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
     Car *ghost = LinkedList_getCarById(cars, 99);
 
-    if (last_lap > player->lap) {
+    if (player->lap > last_lap && player->lap > 0) {
         last_lap = player->lap;
+        replayFrameIdx = 0;
         if (ArrayList_length(current_lap) < ArrayList_length(best_lap)) {
             ArrayList_copy(best_lap, current_lap);
             ArrayList_clear(current_lap);
         }
-        
-        GhostCarFrame firstFrame = ArrayList_get(best_lap, 0);
-        ghost->pos   = firstFrame.pos;
-        ghost->angle = firstFrame.angle;
     }
 
     Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
@@ -111,7 +108,7 @@ void update_game() {
         cars,
         Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
 
-    if (replayFrameIdx < ArrayList_length(best_lap)) { // Replay
+    if (replayFrameIdx < ArrayList_length(best_lap) && last_lap >= 1) { // Replay
         GhostCarFrame frameData = ArrayList_get(best_lap, replayFrameIdx++);
         ghost->pos   = frameData.pos;
         ghost->angle = frameData.angle;
