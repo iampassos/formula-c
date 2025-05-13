@@ -37,8 +37,8 @@ void setup_menu() {
         y += dy;
     }
 
-    textBox.x = (SCREEN_WIDTH - MeasureText(textContent, titleFontSize)) / 2;
-    textBox.y = (SCREEN_HEIGHT - dy * buttonsLen ) / 2;
+    textBox.x = (SCREEN_WIDTH - MeasureText(textContent, titleFontSize)) / 2.0f;
+    textBox.y = (SCREEN_HEIGHT - dy * buttonsLen) / 2.0f;
 }
 
 void DrawButton(Button btn) {

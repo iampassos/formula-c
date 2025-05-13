@@ -4,8 +4,8 @@
 #include "car.h"
 #include "common.h"
 #include "linked_list.h"
+#include "raymath.h"
 #include "stdio.h"
-#include "stdlib.h"
 #include "string.h"
 #include <raylib.h>
 
@@ -39,16 +39,16 @@ static void load_map(Map map) {
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 }
 
-void load_singleplayer(){
-    replayFrameIdx = 0;
-    last_lap       = 0;
+void load_singleplayer() {
+    replayFrameIdx   = 0;
+    last_lap         = 0;
     best_lap         = ArrayList_create();
     best_lap->length = -1;
     current_lap      = ArrayList_create();
-    Car *ghostCar    = Car_create((Vector2){0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
-                                  "resources/cars/carroazul.png",WHITE, 1, 99);
-    Car *player      = Car_create((Vector2){5400, 2000}, // pos
-                                  2.66,                  // angulo inicial do carro
+    Car *ghostCar    = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
+                                  "resources/cars/carroazul.png", WHITE, 1, 99);
+    Car *player      = Car_create((Vector2) {5400, 2000}, // pos
+                                  2.66,                   // angulo inicial do carro
 
                                   0.3,  // aceleracao do carro
                                   0.2,  // força da marcha ré
@@ -61,14 +61,13 @@ void load_singleplayer(){
                                   75,  // altura
 
                                   "resources/cars/carroazul.png", // path da textura
-                                  WHITE,
-                                  0,
-                                  1                               // id do carro
+                                  WHITE, 0,
+                                  1 // id do carro
          );
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
-    camera = Camera_create(player->pos, (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
-                           0.0f, 0.5f);
+    camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
+                           0.5f);
 }
 
 void setup_game(Mode mode) {
@@ -98,7 +97,7 @@ static void update_ghost_car(Car *player) {
     if (player->lap > last_lap) {
         last_lap       = player->lap;
         replayFrameIdx = 0;
-        ArrayList_push(current_lap, (GhostCarFrame){(Vector2){0, 0}, 0});
+        ArrayList_push(current_lap, (GhostCarFrame) {(Vector2) {0, 0}, 0});
         if (ArrayList_length(current_lap) < ArrayList_length(best_lap)) {
             ArrayList_copy(best_lap, current_lap);
         }
@@ -108,8 +107,8 @@ static void update_ghost_car(Car *player) {
     if (last_lap >= 1) { // Replay
         if (replayFrameIdx < ArrayList_length(best_lap)) {
             GhostCarFrame frameData = ArrayList_get(best_lap, replayFrameIdx++);
-            ghost->pos              = frameData.pos;
-            ghost->angle            = frameData.angle;
+            ghost->pos              = Vector2Lerp(ghost->pos, frameData.pos, 0.1f);
+            ghost->angle            = Lerp(ghost->angle, frameData.angle, 0.1f);
         }
     }
 

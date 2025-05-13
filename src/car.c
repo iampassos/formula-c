@@ -125,7 +125,7 @@ static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cos(car->angle) * car->width * 0.4);
     int y = (int) (car->pos.y + sin(car->angle) * car->width * 0.4);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
-        return (Color){0, 0, 0};
+        return (Color) {0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
@@ -174,8 +174,8 @@ void Car_update(Car *car) {
 void Car_draw(Car *car) {
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height}; // A imagem inteira
     Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
-                           car->height};                        // Tamanho e posição do carro
-    Vector2   origin = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
+                           car->height};                           // Tamanho e posição do carro
+    Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
                    car->id == 99 ? Fade(WHITE, 0.5f) : WHITE);
 }
