@@ -9,6 +9,7 @@
 #include "stdio.h"
 
 static char *musicPath = "resources/sounds/game-music.mp3";
+static char *carSoundPath = "resources/sounds/car-sound.ogg";
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
@@ -21,8 +22,9 @@ static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 static Music music;
+static Music carSound;
 
-static void load_map(Map map) {
+static void loadMap(Map map) {
     switch (map) {
     case INTERLAGOS:
         trackBackground =
@@ -42,10 +44,12 @@ static void load_map(Map map) {
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
     music  = LoadMusicStream(musicPath);
+    carSound = LoadMusicStream(carSoundPath);
     PlayMusicStream(music);
+    PlayMusicStream(carSound);
 }
 
-void load_singleplayer() {
+void loadSingleplayer() {
     replayFrameIdx  = 0;
     lastLap         = 0;
     bestLap         = ArrayList_create();
@@ -77,12 +81,12 @@ void load_singleplayer() {
 }
 
 void setup_game(Mode mode) {
-    load_map(INTERLAGOS);
+    loadMap(INTERLAGOS);
     cars = LinkedList_create();
 
     switch (mode) {
     case SINGLEPLAYER:
-        load_singleplayer();
+        loadSingleplayer();
         break;
     case SPLITSCREEN:
         break;
@@ -97,6 +101,7 @@ void cleanup_game() {
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
     UnloadMusicStream(music);
+    UnloadMusicStream(carSound);
 }
 
 static void updateGhostCar(Car *player) {
@@ -128,7 +133,11 @@ static void updateGhostCar(Car *player) {
 void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
+    SetMusicVolume(carSound, player->vel / 30.0f);
+    UpdateMusicStream(carSound);
+    SetMusicVolume(music, 0.2);
     UpdateMusicStream(music);
+
     updateGhostCar(player);
 
     Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
