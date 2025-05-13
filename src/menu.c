@@ -8,7 +8,7 @@ static char *textContent    = "FORMULA C";
 static char *backgroundPath = "resources/menu/f12024.png";
 
 static char *clickButtonSoundPath = "resources/sounds/click.mp3";
-static char *menuMusicPath        = "resources/sounds/menu-music.mp3";
+static char *musicPath        = "resources/sounds/menu-music.mp3";
 
 static Button BUTTONS[] = {
     {"1 JOGADOR", {0, 0}, 0},
@@ -16,7 +16,7 @@ static Button BUTTONS[] = {
 };
 
 static Sound     clickSound;
-static Music     menuMusic;
+static Music     music;
 static const int buttonsLen = sizeof(BUTTONS) / sizeof(Button);
 static Vector2   textBox    = {0, 0};
 static Texture2D background;
@@ -51,14 +51,14 @@ void setup_menu() {
     UnloadImage(img);
 
     clickSound = LoadSound(clickButtonSoundPath);
-    menuMusic  = LoadMusicStream(menuMusicPath);
+    music  = LoadMusicStream(musicPath);
 
-    PlayMusicStream(menuMusic);
+    PlayMusicStream(music);
 }
 
 void cleanup_menu() {
     UnloadSound(clickSound);
-    UnloadMusicStream(menuMusic);
+    UnloadMusicStream(music);
 }
 
 void DrawButton(Button btn) {
@@ -98,8 +98,8 @@ void update_menu() {
         PlaySound(clickSound);
     }
 
-    // SetMusicVolume(menuMusic, 0.01f); // Se precisar abaixar o som da música
-    UpdateMusicStream(menuMusic);
+    // SetMusicVolume(music, 0.01f); // Se precisar abaixar o som da música
+    UpdateMusicStream(music);
 }
 
 void draw_menu() {

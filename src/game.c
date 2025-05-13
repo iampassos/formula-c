@@ -8,6 +8,8 @@
 #include "raymath.h"
 #include "stdio.h"
 
+static char *musicPath = "resources/sounds/game-music.mp3";
+
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
@@ -15,8 +17,10 @@ static Camera2D   *camera;
 static ArrayList *bestLap    = NULL;
 static ArrayList *currentLap = NULL;
 
-static int lastLap       = 0;
+static int lastLap        = 0;
 static int replayFrameIdx = 0;
+
+static Music music;
 
 static void load_map(Map map) {
     switch (map) {
@@ -36,33 +40,36 @@ static void load_map(Map map) {
 
     Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
+
+    music  = LoadMusicStream(musicPath);
+    PlayMusicStream(music);
 }
 
 void load_singleplayer() {
-    replayFrameIdx   = 0;
+    replayFrameIdx  = 0;
     lastLap         = 0;
     bestLap         = ArrayList_create();
     bestLap->length = -1;
     currentLap      = ArrayList_create();
-    Car *ghostCar    = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
-                                  "resources/cars/carroazul.png", WHITE, 1, 99);
-    Car *player      = Car_create((Vector2) {5400, 2000}, // pos
-                                  2.66,                   // angulo inicial do carro
+    Car *ghostCar   = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
+                                 "resources/cars/carroazul.png", WHITE, 1, 99);
+    Car *player     = Car_create((Vector2) {5400, 2000}, // pos
+                                 2.66,                   // angulo inicial do carro
 
-                                  0.3,  // aceleracao do carro
-                                  0.2,  // força da marcha ré
-                                  0.02, // força de frenagem
+                                 0.3,  // aceleracao do carro
+                                 0.2,  // força da marcha ré
+                                 0.02, // força de frenagem
 
-                                  0.035, // aceleração angular (velocidade de rotação)
-                                  0.2,   // velocidade mínima para fazer curva
+                                 0.035, // aceleração angular (velocidade de rotação)
+                                 0.2,   // velocidade mínima para fazer curva
 
-                                  125, // largura
-                                  75,  // altura
+                                 125, // largura
+                                 75,  // altura
 
-                                  "resources/cars/carroazul.png", // path da textura
-                                  WHITE, 0,
-                                  1 // id do carro
-         );
+                                 "resources/cars/carroazul.png", // path da textura
+                                 WHITE, 0,
+                                 1 // id do carro
+        );
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
@@ -89,12 +96,13 @@ void cleanup_game() {
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
+    UnloadMusicStream(music);
 }
 
-static void update_ghost_car(Car *player) {
+static void updateGhostCar(Car *player) {
     Car *ghost = LinkedList_getCarById(cars, 99);
     if (player->lap > lastLap) {
-        lastLap       = player->lap;
+        lastLap        = player->lap;
         replayFrameIdx = 0;
         ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {0, 0}, 0});
         if (ArrayList_length(currentLap) < ArrayList_length(bestLap)) {
@@ -120,7 +128,8 @@ static void update_ghost_car(Car *player) {
 void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    update_ghost_car(player);
+    UpdateMusicStream(music);
+    updateGhostCar(player);
 
     Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
              KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
