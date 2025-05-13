@@ -13,11 +13,9 @@ static Button buttons[] = {
 static const int buttonsLen = sizeof(buttons) / sizeof(Button);
 
 void setup_menu() {
-    int y;
     for (int i = 0; i < buttonsLen; i++) {
-        y                 = SCREEN_HEIGHT * ((i + 1) / (float) (buttonsLen + 1));
-        buttons[i].rect.y = y;
-        buttons[i].rect.x = SCREEN_WIDTH / 2.0f - buttons[i].rect.width / 2.0f;
+        buttons[i].rect.y = (SCREEN_HEIGHT + (i * height * 2.5f)) / 2.0f;
+        buttons[i].rect.x = (SCREEN_WIDTH - width) / 2.0f;
     }
 }
 
@@ -48,7 +46,7 @@ void draw_menu() {
 
     char *text = "FORMULA C";
     DrawText(text, (SCREEN_WIDTH - MeasureText(text, 20)) / 2.0f,
-             (SCREEN_HEIGHT / 4.0f) - (height * 2), 20, WHITE);
+             (SCREEN_HEIGHT / 2.0f) - (height * 2), 20, WHITE);
 
     for (int i = 0; i < buttonsLen; i++) {
         Button btn = buttons[i];
