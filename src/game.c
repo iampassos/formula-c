@@ -33,25 +33,25 @@ void Game_loadSingleplayer() {
     bestLap         = ArrayList_create();
     bestLap->length = -1;
     currentLap      = ArrayList_create();
-    Car *ghostCar   = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
-                                 "resources/cars/carroazul.png", WHITE, 1, 99);
-    Car *player     = Car_create(actualMap.startCarPos, // pos
-                                 actualMap.startAngle,  // angulo inicial do carro
+    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
+                               "resources/cars/carroazul.png", WHITE, 1, 99);
+    Car *player   = Car_create(actualMap.startCarPos, // pos
+                               actualMap.startAngle,  // angulo inicial do carro
 
-                                 0.3,  // aceleracao do carro
-                                 0.2,  // força da marcha ré
-                                 0.02, // força de frenagem
+                               0.3,  // aceleracao do carro
+                               0.2,  // força da marcha ré
+                               0.02, // força de frenagem
 
-                                 0.035, // aceleração angular (velocidade de rotação)
-                                 0.2,   // velocidade mínima para fazer curva
+                               0.035, // aceleração angular (velocidade de rotação)
+                               0.2,   // velocidade mínima para fazer curva
 
-                                 150, // largura
-                                 75,  // altura
+                               150, // largura
+                               75,  // altura
 
-                                 "resources/cars/carroazul.png", // path da textura
-                                 WHITE, 0,
-                                 1 // id do carro
-        );
+                               "resources/cars/carroazul.png", // path da textura
+                               WHITE, 0,
+                               1 // id do carro
+      );
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
@@ -88,11 +88,11 @@ void Game_loadMap(Map map) {
     actualMap       = map;
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
-    Image minimap = LoadImage(map.backgroundPath);              // Carrega a imagem do arquivo
-    minimapWidth = SCREEN_WIDTH / 4;
-    minimapHeigth =  SCREEN_HEIGHT / 4;
+    Image minimap = LoadImage(map.backgroundPath); // Carrega a imagem do arquivo
+    minimapWidth  = SCREEN_WIDTH / 4;
+    minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
-    trackHudBackground = LoadTextureFromImage(minimap);         // Converte a imagem em textura
+    trackHudBackground = LoadTextureFromImage(minimap); // Converte a imagem em textura
     UnloadImage(minimap);
 
     // Carregando a imagem da máscara de pixels
@@ -116,7 +116,7 @@ void Game_setup() {
 void Game_map_cleanup() {
     Track_Unload();
     LinkedList_clear(cars);
-    UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
+    UnloadTexture(trackBackground);    // Liberando a textura da imagem do plano de fundo
     UnloadTexture(trackHudBackground); // Liberando a textura da imagem do plano de fundo
     Camera_free(camera);
     ArrayList_free(bestLap);
@@ -149,9 +149,13 @@ void Game_update() {
     Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }
 
-void drawHud(Car* player) {
-    Car *ghost = LinkedList_getCarById(cars, 99);
-    DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
+static void drawHud() {
+    Car *ghost  = LinkedList_getCarById(cars, 99);
+    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+
+    // Mostrando as informações do carro com id 1
+    Car_showInfo(player, SCREEN_WIDTH - 400, 300, 20, BLACK);
+    DrawText("Pressione Q para voltar ao menu", SCREEN_WIDTH / 2, 10, 20, BLACK);
 
     // Debug ghost car
     char stateText[1000];
@@ -163,7 +167,7 @@ void drawHud(Car* player) {
     sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
     DrawText(stateText2, 10, 600, 20, BLACK);
 
-    DrawTexture(trackHudBackground, 0, 0, WHITE);
+    DrawTexture(trackHudBackground, 0, 0, (Color){255, 255, 255, 200});
     float xPlayerHud = trackHudBackground.width * player->pos.x / trackBackground.width;
     float yPlayerHud = trackHudBackground.height * player->pos.y / trackBackground.height;
 
@@ -179,18 +183,12 @@ void Game_draw() {
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
 
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
-
-    Car_showInfo(player, player->pos.x - (SCREEN_WIDTH / 2.0f),
-                 player->pos.y - (SCREEN_HEIGHT / 2.0f), 50,
-                 BLACK); // Mostrando as informações do carro com id 1
-
     LinkedList_forEach(
         cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
 
     EndMode2D();
 
-    drawHud(player);
+    drawHud();
 
     if (IsKeyDown(KEY_Q)) {
         Menu_reset();
