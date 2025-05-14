@@ -5,7 +5,6 @@
 #include "common.h"
 #include "linked_list.h"
 #include "raylib.h"
-#include "raymath.h"
 #include "stdio.h"
 
 static char *musicPath    = "resources/sounds/game-music.mp3";
@@ -55,7 +54,7 @@ void loadSingleplayer() {
     bestLap         = ArrayList_create();
     bestLap->length = -1;
     currentLap      = ArrayList_create();
-    Car *ghostCar   = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 125, 75,
+    Car *ghostCar   = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
                                  "resources/cars/carroazul.png", WHITE, 1, 99);
     Car *player     = Car_create((Vector2) {5400, 2000}, // pos
                                  2.66,                   // angulo inicial do carro
@@ -67,7 +66,7 @@ void loadSingleplayer() {
                                  0.035, // aceleração angular (velocidade de rotação)
                                  0.2,   // velocidade mínima para fazer curva
 
-                                 125, // largura
+                                 150, // largura
                                  75,  // altura
 
                                  "resources/cars/carroazul.png", // path da textura
@@ -104,7 +103,7 @@ void cleanup_game() {
     UnloadSound(carSound);
 }
 
-static void updateGhostCar(Car *player) {
+static void update_ghost_car(Car *player) {
     Car *ghost = LinkedList_getCarById(cars, 99);
     if (player->lap > lastLap) {
         lastLap        = player->lap;
@@ -141,7 +140,7 @@ void update_game() {
     SetMusicVolume(music, 0.2);
     UpdateMusicStream(music);
 
-    updateGhostCar(player);
+    update_ghost_car(player);
 
     Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
              KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
