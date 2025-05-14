@@ -8,7 +8,7 @@
 #include "raymath.h"
 #include "stdio.h"
 
-static char *musicPath = "resources/sounds/game-music.mp3";
+static char *musicPath    = "resources/sounds/game-music.mp3";
 static char *carSoundPath = "resources/sounds/car-sound.ogg";
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
@@ -43,7 +43,7 @@ static void loadMap(Map map) {
     Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
-    music  = LoadMusicStream(musicPath);
+    music    = LoadMusicStream(musicPath);
     carSound = LoadSound(carSoundPath);
     PlayMusicStream(music);
     PlaySound(carSound);
@@ -119,8 +119,8 @@ static void updateGhostCar(Car *player) {
     if (lastLap >= 1) { // Replay
         if (replayFrameIdx < ArrayList_length(bestLap)) {
             GhostCarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
-            ghost->pos              = Vector2Lerp(ghost->pos, frameData.pos, 0.1f);
-            ghost->angle            = Lerp(ghost->angle, frameData.angle, 0.1f);
+            ghost->pos              = frameData.pos;
+            ghost->angle            = frameData.angle;
         }
     }
 
