@@ -49,5 +49,7 @@ extern int       SELECTED_MAP_IDX;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;
+extern char      GAME_MODES[][100];
+extern int       TOTAL_GAME_MODES;
 
 #endif

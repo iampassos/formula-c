@@ -5,17 +5,13 @@
 #include <math.h>
 #include <string.h>
 
-static Button BUTTONS[] = {
-    {"1 JOGADOR"},
-    {"2 JOGADORES"},
-};
+static Button BUTTONS[10];
 
 static Button MAPS_BUTTONS[10];
 
 static Sound     clickSound;
 static Music     music;
-static const int buttonsLen = sizeof(BUTTONS) / sizeof(Button);
-static Vector2   textBox    = {0, 0};
+static Vector2   textBox;
 static Texture2D background;
 static int       width;
 static int       height;
@@ -43,6 +39,11 @@ void splitscreenButtonAction() {
 }
 
 void Menu_setup() {
+    BUTTONS[0].action      = singleplayerButtonAction;
+    BUTTONS[1].action      = splitscreenButtonAction;
+    MAPS_BUTTONS[0].action = interlagosMapButtonAction;
+    MAPS_BUTTONS[1].action = debugMapButtonAction;
+
     width   = SCREEN_WIDTH / 5;
     height  = SCREEN_HEIGHT / 10;
     padding = SCREEN_HEIGHT / 9;
@@ -51,8 +52,9 @@ void Menu_setup() {
     buttonFontSize = SCREEN_WIDTH / 40;
 
     int dy = padding + height;
-    int y  = (SCREEN_HEIGHT - dy * (buttonsLen - 1) + padding) / 2;
-    for (int i = 0; i < buttonsLen; i++) {
+    int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;
+    for (int i = 0; i < TOTAL_GAME_MODES; i++) {
+        strcpy(BUTTONS[i].text, GAME_MODES[i]);
         BUTTONS[i].pos.y = y;
         BUTTONS[i].pos.x = (SCREEN_WIDTH - width) / 2.0f;
         y += dy;
@@ -69,7 +71,7 @@ void Menu_setup() {
     }
 
     textBox.x = (SCREEN_WIDTH - MeasureText(gameName, titleFontSize)) / 2.0f;
-    textBox.y = (SCREEN_HEIGHT - dy * buttonsLen) / 2.0f;
+    textBox.y = (SCREEN_HEIGHT - dy * TOTAL_GAME_MODES) / 2.0f;
 
     Image img = LoadImage(backgroundPath);
     ImageResize(&img, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona a imagem
@@ -80,14 +82,10 @@ void Menu_setup() {
     music      = LoadMusicStream(menuMusicPath);
 
     PlayMusicStream(music);
-    BUTTONS[0].action      = singleplayerButtonAction;
-    BUTTONS[1].action      = splitscreenButtonAction;
-    MAPS_BUTTONS[0].action = interlagosMapButtonAction;
-    MAPS_BUTTONS[1].action = debugMapButtonAction;
 }
 
 void Menu_reset(){
-    for (int i = 0; i < buttonsLen; i++){
+    for (int i = 0; i < TOTAL_GAME_MODES; i++){
         BUTTONS[i].selected = false;
     }
 }
@@ -135,7 +133,7 @@ static bool pressedButton(Button *btn, Vector2 mousePos) {
 void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
-    for (int i = 0; i < buttonsLen; i++)
+    for (int i = 0; i < TOTAL_GAME_MODES; i++)
         pressedButton(BUTTONS + i, mouse);
 
     for (int i = 0; i < TOTAL_MAPS; i++) {
@@ -169,7 +167,7 @@ void Menu_draw() {
     DrawText(gameName, textBox.x, textBox.y, titleFontSize, pulseColor);
 
     // 4. Botões
-    for (int i = 0; i < buttonsLen; i++) {
+    for (int i = 0; i < TOTAL_GAME_MODES; i++) {
         drawButton(BUTTONS[i]);
     }
 

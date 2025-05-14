@@ -6,6 +6,10 @@ int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
 char *gameName       = "FORMULA C";
+char GAME_MODES[][100] = {
+    "1 Jogador",
+    "2 Jogadores"
+};
 char *backgroundPath = "resources/menu/f12024.png";
 
 float carVolume       = 0.2f;
@@ -38,6 +42,7 @@ TrackArea TRACK_AREAS[] = {/* pista */ {{127, 127, 127}, 0.99},
 
 int TOTAL_MAPS      = sizeof(maps) / sizeof(Map);
 int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
+int TOTAL_GAME_MODES = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
 int SELECTED_MAP_IDX = 0;
 
