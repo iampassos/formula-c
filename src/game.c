@@ -9,8 +9,12 @@
 #include "stdio.h"
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
+static Texture2D   trackHudBackground;
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
+
+static int minimapWidth;
+static int minimapHeigth;
 
 static ArrayList *bestLap    = NULL;
 static ArrayList *currentLap = NULL;
@@ -29,7 +33,7 @@ void Game_loadSingleplayer() {
     bestLap         = ArrayList_create();
     bestLap->length = -1;
     currentLap      = ArrayList_create();
-    Car *ghostCar   = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
+    Car *ghostCar   = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
                                  "resources/cars/carroazul.png", WHITE, 1, 99);
     Car *player     = Car_create(actualMap.startCarPos, // pos
                                  actualMap.startAngle,  // angulo inicial do carro
@@ -59,7 +63,7 @@ static void updateGhostCar(Car *player) {
     if (player->lap > lastLap) {
         lastLap        = player->lap;
         replayFrameIdx = 0;
-        ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {0, 0}, 0});
+        ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {-1000, -1000}, 0});
         if (ArrayList_length(currentLap) < ArrayList_length(bestLap)) {
             ArrayList_copy(bestLap, currentLap);
         }
@@ -84,6 +88,13 @@ void Game_loadMap(Map map) {
     actualMap       = map;
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
+    Image minimap = LoadImage(map.backgroundPath);              // Carrega a imagem do arquivo
+    minimapWidth = SCREEN_WIDTH / 4;
+    minimapHeigth =  SCREEN_HEIGHT / 4;
+    ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
+    trackHudBackground = LoadTextureFromImage(minimap);         // Converte a imagem em textura
+    UnloadImage(minimap);
+
     // Carregando a imagem da máscara de pixels
     Track_setMask(map.maskPath);
     Track_setCheckpoints(map.checkpoints);
@@ -106,6 +117,7 @@ void Game_map_cleanup() {
     Track_Unload();
     LinkedList_clear(cars);
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
+    UnloadTexture(trackHudBackground); // Liberando a textura da imagem do plano de fundo
     Camera_free(camera);
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
@@ -137,6 +149,31 @@ void Game_update() {
     Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }
 
+void drawHud(Car* player) {
+    Car *ghost = LinkedList_getCarById(cars, 99);
+    DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
+
+    // Debug ghost car
+    char stateText[1000];
+    sprintf(stateText, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
+            ArrayList_length(bestLap), replayFrameIdx);
+    DrawText(stateText, 10, 500, 20, BLACK);
+
+    char stateText2[1000];
+    sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
+    DrawText(stateText2, 10, 600, 20, BLACK);
+
+    DrawTexture(trackHudBackground, 0, 0, WHITE);
+    float xPlayerHud = trackHudBackground.width * player->pos.x / trackBackground.width;
+    float yPlayerHud = trackHudBackground.height * player->pos.y / trackBackground.height;
+
+    float xGhostHud = trackHudBackground.width * ghost->pos.x / trackBackground.width;
+    float yGhostHud = trackHudBackground.height * ghost->pos.y / trackBackground.height;
+
+    DrawCircle(xPlayerHud, yPlayerHud, 8, RED);
+    DrawCircle(xGhostHud, yGhostHud, 8, GREEN);
+}
+
 void Game_draw() {
     BeginMode2D(*camera);
 
@@ -153,17 +190,7 @@ void Game_draw() {
 
     EndMode2D();
 
-    DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
-
-    // Debug ghost car
-    char stateText[1000];
-    sprintf(stateText, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
-            ArrayList_length(bestLap), replayFrameIdx);
-    DrawText(stateText, 10, 110, 20, BLACK);
-
-    char stateText2[1000];
-    sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
-    DrawText(stateText2, 10, 200, 20, BLACK);
+    drawHud(player);
 
     if (IsKeyDown(KEY_Q)) {
         Menu_reset();
