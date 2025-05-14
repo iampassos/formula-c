@@ -4,7 +4,6 @@
 #include "common.h"
 #include "raylib.h"
 
-
 typedef struct {
     int       id;
     int       lap;

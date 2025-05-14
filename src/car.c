@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // Checkpoints
 static Checkpoint CHECKPOINTS[CHECKPOINTS_SIZE];
 
@@ -19,7 +18,7 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     Image trackMask = LoadImage(track_mask_path);
     IMAGE_WIDTH     = trackMask.width;
     IMAGE_HEIGHT    = trackMask.height;
-    TRACK_PIXELS = LoadImageColors(trackMask);
+    TRACK_PIXELS    = LoadImageColors(trackMask);
     UnloadImage(trackMask);
 }
 

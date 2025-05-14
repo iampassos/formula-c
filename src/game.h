@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "car.h"
 #include "common.h"
 
 void Game_loadSingleplayer();

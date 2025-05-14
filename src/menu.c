@@ -3,11 +3,14 @@
 #include "game.h"
 #include "raylib.h"
 #include <math.h>
+#include <string.h>
 
 static Button BUTTONS[] = {
-    {"1 JOGADOR", {0, 0}, 0},
-    {"2 JOGADORES", {0, 0}, 0},
+    {"1 JOGADOR"},
+    {"2 JOGADORES"},
 };
+
+static Button MAPS_BUTTONS[10];
 
 static Sound     clickSound;
 static Music     music;
@@ -36,6 +39,14 @@ void Menu_setup() {
         y += dy;
     }
 
+    int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
+    for (int i = 0; i < TOTAL_MAPS; i++) {
+        strcpy(MAPS_BUTTONS[i].text, maps[i].name);
+        MAPS_BUTTONS[i].pos.y = yMaps;
+        MAPS_BUTTONS[i].pos.x = SCREEN_WIDTH / 4.0f - width / 2.0f;
+        yMaps += dy;
+    }
+
     textBox.x = (SCREEN_WIDTH - MeasureText(gameName, titleFontSize)) / 2.0f;
     textBox.y = (SCREEN_HEIGHT - dy * buttonsLen) / 2.0f;
 
@@ -53,6 +64,7 @@ void Menu_setup() {
 void Menu_cleanup() {
     UnloadSound(clickSound);
     UnloadMusicStream(music);
+    UnloadTexture(background);
 }
 
 static void drawButton(Button btn) {
@@ -81,7 +93,7 @@ void Menu_update() {
 
     if (BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         PlaySound(clickSound);
-        Game_loadMap(maps[0]);
+        Game_loadMap(maps[SELECTED_MAP_IDX]);
         Game_loadSingleplayer();
         state.mode = SINGLEPLAYER;
         state.screen = GAME;
@@ -92,6 +104,22 @@ void Menu_update() {
 
     if (BUTTONS[1].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         PlaySound(clickSound);
+    }
+
+    MAPS_BUTTONS[0].hovered = CheckCollisionPointRec(
+        mouse, (Rectangle) {MAPS_BUTTONS[0].pos.x, MAPS_BUTTONS[0].pos.y, width, height});
+
+    if (MAPS_BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        PlaySound(clickSound);
+        SELECTED_MAP_IDX = 0;
+    }
+
+    MAPS_BUTTONS[1].hovered = CheckCollisionPointRec(
+        mouse, (Rectangle) {MAPS_BUTTONS[1].pos.x, MAPS_BUTTONS[1].pos.y, width, height});
+
+    if (MAPS_BUTTONS[1].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        PlaySound(clickSound);
+        SELECTED_MAP_IDX = 1;
     }
 
     SetMusicVolume(music, gameMusicVolume); // Se precisar abaixar o som da música
@@ -118,5 +146,9 @@ void Menu_draw() {
     // 4. Botões
     for (int i = 0; i < buttonsLen; i++) {
         drawButton(BUTTONS[i]);
+    }
+    
+    for (int i = 0; i < TOTAL_MAPS; i++) {
+        drawButton(MAPS_BUTTONS[i]);
     }
 }

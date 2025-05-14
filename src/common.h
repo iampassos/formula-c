@@ -11,6 +11,7 @@ typedef struct {
 } Checkpoint;
 
 typedef struct {
+    char      *name;
     char      *backgroundPath;
     char      *maskPath;
     Checkpoint checkpoints[CHECKPOINTS_SIZE];
@@ -43,6 +44,8 @@ extern char     *backgroundPath;
 extern char     *clickButtonSoundPath;
 extern char     *menuMusicPath;
 extern Map       maps[];
+extern int       TOTAL_MAPS;
+extern int       SELECTED_MAP_IDX;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;

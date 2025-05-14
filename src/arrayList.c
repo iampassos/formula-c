@@ -4,7 +4,7 @@
 ArrayList* ArrayList_create(){
     ArrayList* arr = (ArrayList*)malloc(sizeof(ArrayList));
     arr->length = 0;
-    arr->capacity = 32;
+    arr->capacity = 1024;
     arr->data = (GhostCarFrame*)malloc(sizeof(GhostCarFrame) * arr->capacity);
     return arr;
 }

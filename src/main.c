@@ -17,8 +17,15 @@ char *carSoundPath  = "resources/sounds/f1s.mp3";
 
 char *clickButtonSoundPath = "resources/sounds/click.mp3";
 
-Map maps[] = {{"resources/masks/interlagos_maskV2.png", // backgroundPath
+Map maps[] = {{"Interlagos",
+               "resources/masks/interlagos_maskV2.png", // backgroundPath
                "resources/masks/interlagos_maskV2.png", // maskPath
+               {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
+                {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
+                {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}},
+              {"Debug Map",
+               "resources/masks/pista_debug_mask.png",
+               "resources/masks/pista_debug_mask.png",
                {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
                 {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
                 {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}}};
@@ -29,7 +36,10 @@ TrackArea TRACK_AREAS[] = {/* pista */ {{127, 127, 127}, 0.99},
                            /* forte */ {{163, 73, 164}, 0.93},
                            /* grama */ {{34, 177, 76}, 0.98}};
 
-int TRACK_AREA_SIZE;
+int TOTAL_MAPS      = sizeof(maps) / sizeof(Map);
+int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
+
+int SELECTED_MAP_IDX = 0;
 
 // Cor que representa fora da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
@@ -37,7 +47,6 @@ Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 State state = {0};
 
 int main() {
-    TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
 
@@ -74,7 +83,7 @@ int main() {
 
     if (state.screen == MENU)
         Game_map_cleanup();
-        
+
     Game_cleanup();
     Menu_cleanup();
     CloseAudioDevice();
