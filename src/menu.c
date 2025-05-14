@@ -35,8 +35,7 @@ void debugMapButtonAction() {
 }
 
 void singleplayerButtonAction() {
-    Game_loadMap(MAPS[SELECTED_MAP_IDX]);
-    Game_loadSingleplayer();
+    Game_loadSingleplayer(MAPS[SELECTED_MAP_IDX]);
     state.mode   = SINGLEPLAYER;
     state.screen = GAME;
 }

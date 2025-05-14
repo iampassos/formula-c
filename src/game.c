@@ -27,7 +27,33 @@ static Music carSound;
 
 static Map actualMap;
 
-void Game_loadSingleplayer() {
+static void loadMap(Map map) {
+    actualMap       = map;
+    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
+
+    Image minimap = LoadImage(map.backgroundPath); // Carrega a imagem do arquivo
+    minimapWidth  = SCREEN_WIDTH / 4;
+    minimapHeigth = SCREEN_HEIGHT / 4;
+    ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
+    trackHudBackground = LoadTextureFromImage(minimap); // Converte a imagem em textura
+    UnloadImage(minimap);
+
+    // Carregando a imagem da máscara de pixels
+    Track_setMask(map.maskPath);
+    Track_setCheckpoints(map.checkpoints);
+
+    Camera_Background_setSize(trackBackground.width, trackBackground.height);
+
+    music    = LoadMusicStream(GAME_MUSIC_PATH);
+    carSound = LoadMusicStream(CAR_SOUND_PATH);
+    SetMusicVolume(carSound, CAR_VOLUME);
+    SetMusicVolume(music, GAME_MUSIC_VOLUME);
+    PlayMusicStream(music);
+    PlayMusicStream(carSound);
+}
+
+void Game_loadSingleplayer(Map map) {
+    loadMap(map);
     replayFrameIdx  = 0;
     lastLap         = 0;
     bestLap         = ArrayList_create();
@@ -82,31 +108,6 @@ static void updateGhostCar(Car *player) {
         GhostCarFrame frameData = {player->pos, player->angle};
         ArrayList_push(currentLap, frameData);
     }
-}
-
-void Game_loadMap(Map map) {
-    actualMap       = map;
-    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
-
-    Image minimap = LoadImage(map.backgroundPath); // Carrega a imagem do arquivo
-    minimapWidth  = SCREEN_WIDTH / 4;
-    minimapHeigth = SCREEN_HEIGHT / 4;
-    ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
-    trackHudBackground = LoadTextureFromImage(minimap); // Converte a imagem em textura
-    UnloadImage(minimap);
-
-    // Carregando a imagem da máscara de pixels
-    Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints);
-
-    Camera_Background_setSize(trackBackground.width, trackBackground.height);
-
-    music    = LoadMusicStream(GAME_MUSIC_PATH);
-    carSound = LoadMusicStream(CAR_SOUND_PATH);
-    SetMusicVolume(carSound, CAR_VOLUME);
-    SetMusicVolume(music, GAME_MUSIC_VOLUME);
-    PlayMusicStream(music);
-    PlayMusicStream(carSound);
 }
 
 void Game_setup() {

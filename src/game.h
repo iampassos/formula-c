@@ -5,7 +5,6 @@
 
 void Game_loadSingleplayer();
 
-void Game_loadMap(Map map);
 void Game_map_cleanup();
 
 void Game_setup();
