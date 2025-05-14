@@ -6,13 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Areas da pista
-static TrackArea TRACK_AREAS[10];
-static int       TRACK_AREA_SIZE;
-
-// Cor que representa a área fora da pista
-static Color OUTSIDE_AREA_COLOR;
-
 // Checkpoints
 static Checkpoint CHECKPOINTS[10];
 static int        CHECKPOINTS_SIZE;
@@ -28,18 +21,6 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     IMAGE_HEIGHT    = trackMask.height;
     TRACK_PIXELS    = LoadImageColors(trackMask);
     UnloadImage(trackMask);
-}
-
-void Track_setAreas(TrackArea areas[], int size) {
-    TRACK_AREA_SIZE = size;
-    for (int i = 0; i < size; i++) {
-        areas[i].dragForce = 1 - areas[i].dragForce;
-        TRACK_AREAS[i]     = areas[i];
-    }
-}
-
-void Track_setOutsideColor(Color color) {
-    OUTSIDE_AREA_COLOR = color;
 }
 
 void Track_setCheckpoints(Checkpoint checkpoints[],
@@ -67,7 +48,7 @@ static int getCheckpoint(Color color) { // Retorna o número int associado aql c
 }
 
 static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
-    return equalsColor(color, OUTSIDE_AREA_COLOR);
+    return equalsColor(color, OUTSIDE_TRACK_COLOR);
 }
 
 static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito

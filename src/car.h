@@ -2,17 +2,13 @@
 #define CAR_H
 
 #include "raylib.h"
+#include "common.h"
 
 typedef struct {
     Color   color;
     Vector2 pos;
     float   angle;
 } Checkpoint;
-
-typedef struct {
-    Color color;
-    float dragForce;
-} TrackArea;
 
 typedef struct {
     int       id;
@@ -38,8 +34,6 @@ typedef struct {
 } Car;
 
 void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
-void Track_setOutsideColor(Color color);
-void Track_setAreas(TrackArea areas[], int size);
 
 void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
 

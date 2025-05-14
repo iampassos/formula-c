@@ -4,12 +4,6 @@
 #include "raylib.h"
 #include <math.h>
 
-static char *textContent    = "FORMULA C";
-static char *backgroundPath = "resources/menu/f12024.png";
-
-static char *clickButtonSoundPath = "resources/sounds/click.mp3";
-static char *musicPath        = "resources/sounds/menu-music.mp3";
-
 static Button BUTTONS[] = {
     {"1 JOGADOR", {0, 0}, 0},
     {"2 JOGADORES", {0, 0}, 0},
@@ -42,7 +36,7 @@ void setup_menu() {
         y += dy;
     }
 
-    textBox.x = (SCREEN_WIDTH - MeasureText(textContent, titleFontSize)) / 2.0f;
+    textBox.x = (SCREEN_WIDTH - MeasureText(gameName, titleFontSize)) / 2.0f;
     textBox.y = (SCREEN_HEIGHT - dy * buttonsLen) / 2.0f;
 
     Image img = LoadImage(backgroundPath);
@@ -51,7 +45,7 @@ void setup_menu() {
     UnloadImage(img);
 
     clickSound = LoadSound(clickButtonSoundPath);
-    music  = LoadMusicStream(musicPath);
+    music      = LoadMusicStream(menuMusicPath);
 
     PlayMusicStream(music);
 }
@@ -87,7 +81,7 @@ void update_menu() {
 
     if (BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         PlaySound(clickSound);
-        setup_game(SINGLEPLAYER);
+        setup_game(SINGLEPLAYER, maps[0]);
         state.screen = GAME;
     }
 
@@ -98,7 +92,7 @@ void update_menu() {
         PlaySound(clickSound);
     }
 
-    // SetMusicVolume(music, 0.01f); // Se precisar abaixar o som da música
+    SetMusicVolume(music, gameMusicVolume); // Se precisar abaixar o som da música
     UpdateMusicStream(music);
 }
 
@@ -116,8 +110,8 @@ void draw_menu() {
     // 3. Título com sombra e cor pulsante
     float t          = sinf(GetTime()) * 0.5f + 0.5f; // varia de 0 a 1
     Color pulseColor = ColorLerp(RED, BLUE, t);
-    DrawText(textContent, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
-    DrawText(textContent, textBox.x, textBox.y, titleFontSize, pulseColor);
+    DrawText(gameName, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
+    DrawText(gameName, textBox.x, textBox.y, titleFontSize, pulseColor);
 
     // 4. Botões
     for (int i = 0; i < buttonsLen; i++) {

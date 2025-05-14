@@ -7,9 +7,6 @@
 #include "raylib.h"
 #include "stdio.h"
 
-static char *musicPath    = "resources/sounds/game-music.mp3";
-static char *carSoundPath = "resources/sounds/car-sound.ogg";
-
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
@@ -21,31 +18,23 @@ static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 static Music music;
-static Sound carSound;
+static Music carSound;
 
 static void loadMap(Map map) {
-    switch (map) {
-    case INTERLAGOS:
-        trackBackground =
-            LoadTexture("resources/masks/interlagos_maskV2.png"); // converte em textura// Definindo
-                                                                  // o frame rate em 60
-        // Carregando a imagem da máscara de pixels
-        Track_setMask("resources/masks/interlagos_maskV2.png");
-        Track_setAreas(TRACK_AREAS, 4);
-        Track_setCheckpoints(CHECKPOINTS, 3);
-        Track_setOutsideColor(OUTSIDE_TRACK_COLOR);
+    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
-        state.map = INTERLAGOS;
-        break;
-    }
+    // Carregando a imagem da máscara de pixels
+    Track_setMask(map.maskPath);
+    Track_setCheckpoints(CHECKPOINTS, 3);
 
-    Camera_Screen_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
-    music    = LoadMusicStream(musicPath);
-    carSound = LoadSound(carSoundPath);
+    music    = LoadMusicStream(gameMusicPath);
+    carSound = LoadMusicStream(carSoundPath);
+    SetMusicVolume(carSound, carVolume);
+    SetMusicVolume(music, gameMusicVolume);
     PlayMusicStream(music);
-    PlaySound(carSound);
+    PlayMusicStream(carSound);
 }
 
 void loadSingleplayer() {
@@ -79,8 +68,8 @@ void loadSingleplayer() {
                            0.5f);
 }
 
-void setup_game(Mode mode) {
-    loadMap(INTERLAGOS);
+void setup_game(Mode mode, Map map) {
+    loadMap(map);
     cars = LinkedList_create();
 
     switch (mode) {
@@ -100,7 +89,7 @@ void cleanup_game() {
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
     UnloadMusicStream(music);
-    UnloadSound(carSound);
+    UnloadMusicStream(carSound);
 }
 
 static void update_ghost_car(Car *player) {
@@ -132,13 +121,10 @@ static void update_ghost_car(Car *player) {
 void update_game() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
-    if (!IsSoundPlaying(carSound)) {
-        PlaySound(carSound);
-    }
-
-    SetSoundPitch(carSound, 0.6 + player->vel / 13.0f);
+    SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
     SetMusicVolume(music, 0.2);
     UpdateMusicStream(music);
+    UpdateMusicStream(carSound);
 
     update_ghost_car(player);
 

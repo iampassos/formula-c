@@ -5,9 +5,6 @@
 static int BACKGROUND_WIDTH;
 static int BACKGROUND_HEIGHT;
 
-static int SCREEN_WIDTH;
-static int SCREEN_HEIGHT;
-
 Camera2D *Camera_create(Vector2 target, Vector2 offset, float rotation, float zoom) {
     Camera2D *camera = (Camera2D *) malloc(sizeof(Camera2D));
     if (camera == NULL)
@@ -28,11 +25,6 @@ void Camera_free(Camera2D *camera) {
 void Camera_Background_setSize(int width, int height) {
     BACKGROUND_WIDTH  = width;
     BACKGROUND_HEIGHT = height;
-}
-
-void Camera_Screen_setSize(int width, int height) {
-    SCREEN_WIDTH  = width;
-    SCREEN_HEIGHT = height;
 }
 
 void Camera_updateTarget(Camera2D *camera, Car *car) {
