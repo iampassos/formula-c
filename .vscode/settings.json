@@ -6,6 +6,8 @@
         "utility": "c",
         "xtree": "c",
         "xutility": "c",
-        "xmemory": "c"
+        "xmemory": "c",
+        "raylib.h": "c",
+        "stdio.h": "c"
     }
 }

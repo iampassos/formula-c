@@ -20,7 +20,7 @@ static int       padding;
 static int       buttonFontSize;
 static int       titleFontSize;
 
-void setup_menu() {
+void Menu_setup() {
     width   = SCREEN_WIDTH / 5;
     height  = SCREEN_HEIGHT / 10;
     padding = SCREEN_HEIGHT / 9;
@@ -50,12 +50,12 @@ void setup_menu() {
     PlayMusicStream(music);
 }
 
-void cleanup_menu() {
+void Menu_cleanup() {
     UnloadSound(clickSound);
     UnloadMusicStream(music);
 }
 
-void DrawButton(Button btn) {
+static void drawButton(Button btn) {
     Rectangle rect       = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
     Color     baseColor  = btn.hovered ? GOLD : WHITE;
     Color     textColor  = BLACK;
@@ -73,7 +73,7 @@ void DrawButton(Button btn) {
              rect.y + (rect.height - buttonFontSize) / 2, buttonFontSize, textColor);
 }
 
-void update_menu() {
+void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
     BUTTONS[0].hovered = CheckCollisionPointRec(
@@ -81,7 +81,9 @@ void update_menu() {
 
     if (BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         PlaySound(clickSound);
-        setup_game(SINGLEPLAYER, maps[0]);
+        Game_loadMap(maps[0]);
+        Game_loadSingleplayer();
+        state.mode = SINGLEPLAYER;
         state.screen = GAME;
     }
 
@@ -96,7 +98,7 @@ void update_menu() {
     UpdateMusicStream(music);
 }
 
-void draw_menu() {
+void Menu_draw() {
     // 1. Fundo
     DrawTexture(background, 0, 0, WHITE);
 
@@ -115,6 +117,6 @@ void draw_menu() {
 
     // 4. Botões
     for (int i = 0; i < buttonsLen; i++) {
-        DrawButton(BUTTONS[i]);
+        drawButton(BUTTONS[i]);
     }
 }

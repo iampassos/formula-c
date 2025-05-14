@@ -1,10 +1,11 @@
 #include "car.h"
 #include "common.h"
-#include "menu.h"
+#include "game.h"
+#include "raylib.h"
 #include <math.h>
-#include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 
 // Checkpoints
 static Checkpoint CHECKPOINTS[CHECKPOINTS_SIZE];
@@ -18,12 +19,13 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     Image trackMask = LoadImage(track_mask_path);
     IMAGE_WIDTH     = trackMask.width;
     IMAGE_HEIGHT    = trackMask.height;
-    TRACK_PIXELS    = LoadImageColors(trackMask);
+    TRACK_PIXELS = LoadImageColors(trackMask);
     UnloadImage(trackMask);
 }
 
-void Track_setCheckpoints(Checkpoint checkpoints[CHECKPOINTS_SIZE]) { // Definindo as cores dos checkpoints
-    for (int i = 0; i < CHECKPOINTS_SIZE; i++){
+void Track_setCheckpoints(
+    Checkpoint checkpoints[CHECKPOINTS_SIZE]) { // Definindo as cores dos checkpoints
+    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
         CHECKPOINTS[i] = checkpoints[i];
     }
 }
@@ -202,20 +204,13 @@ Car *Car_create(   // Função para criar um carro
     return car;
 }
 
-Car *Car_createEmpty() {
-    Car *car = (Car *) calloc(1, sizeof(Car));
-    if (car == NULL)
-        return NULL;
-    return car;
-}
-
 void Car_free(Car *car) {
     UnloadTexture(car->texture);
     free(car);
 }
 
-void Car_move(Car *car, int up, int down, int right, int left,
-              int q) { // Atualiza as propriedades do carro de acordo com o input do player
+void Car_move(Car *car, int up, int down, int right,
+              int left) { // Atualiza as propriedades do carro de acordo com o input do player
     if (IsKeyDown(up)) {
         Car_accelerate(car);
     }
@@ -232,11 +227,6 @@ void Car_move(Car *car, int up, int down, int right, int left,
         } else {
             Car_break(car);
         }
-    }
-
-    if (IsKeyDown(KEY_Q)) {
-        state.screen = MENU;
-        draw_menu();
     }
 }
 

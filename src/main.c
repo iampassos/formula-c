@@ -52,27 +52,31 @@ int main() {
 
     SetTargetFPS(60);
 
-    setup_menu();
+    Menu_setup();
+    Game_setup();
 
     while (!WindowShouldClose()) {
         switch (state.screen) {
         case MENU:
-            update_menu();
+            Menu_update();
             BeginDrawing();
-            draw_menu();
+            Menu_draw();
             EndDrawing();
             break;
         case GAME:
-            update_game();
+            Game_update();
             BeginDrawing();
-            draw_game();
+            Game_draw();
             EndDrawing();
             break;
         }
     }
 
-    cleanup_game();
-    cleanup_menu();
+    if (state.screen == MENU)
+        Game_map_cleanup();
+        
+    Game_cleanup();
+    Menu_cleanup();
     CloseAudioDevice();
     CloseWindow(); // Fechar a janela gráfica 2d
 

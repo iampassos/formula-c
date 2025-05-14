@@ -9,9 +9,9 @@ typedef struct {
     int     hovered;
 } Button;
 
-void setup_menu();
-void cleanup_menu();
-void update_menu();
-void draw_menu();
+void Menu_setup();
+void Menu_cleanup();
+void Menu_update();
+void Menu_draw();
 
 #endif

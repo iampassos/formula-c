@@ -20,24 +20,7 @@ static int replayFrameIdx = 0;
 static Music music;
 static Music carSound;
 
-static void loadMap(Map map) {
-    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
-
-    // Carregando a imagem da máscara de pixels
-    Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints);
-
-    Camera_Background_setSize(trackBackground.width, trackBackground.height);
-
-    music    = LoadMusicStream(gameMusicPath);
-    carSound = LoadMusicStream(carSoundPath);
-    SetMusicVolume(carSound, carVolume);
-    SetMusicVolume(music, gameMusicVolume);
-    PlayMusicStream(music);
-    PlayMusicStream(carSound);
-}
-
-void loadSingleplayer() {
+void Game_loadSingleplayer() {
     replayFrameIdx  = 0;
     lastLap         = 0;
     bestLap         = ArrayList_create();
@@ -68,31 +51,7 @@ void loadSingleplayer() {
                            0.5f);
 }
 
-void setup_game(Mode mode, Map map) {
-    loadMap(map);
-    cars = LinkedList_create();
-
-    switch (mode) {
-    case SINGLEPLAYER:
-        loadSingleplayer();
-        break;
-    case SPLITSCREEN:
-        break;
-    }
-}
-
-void cleanup_game() {
-    UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
-    Track_Unload();                 // função que deve liberar o trackMask e trackPixels
-    Camera_free(camera);
-    LinkedList_free(cars); // Libera a memória da lista encadeada de carros
-    ArrayList_free(bestLap);
-    ArrayList_free(currentLap);
-    UnloadMusicStream(music);
-    UnloadMusicStream(carSound);
-}
-
-static void update_ghost_car(Car *player) {
+static void updateGhostCar(Car *player) {
     Car *ghost = LinkedList_getCarById(cars, 99);
     if (player->lap > lastLap) {
         lastLap        = player->lap;
@@ -118,7 +77,43 @@ static void update_ghost_car(Car *player) {
     }
 }
 
-void update_game() {
+void Game_loadMap(Map map) {
+    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
+
+    // Carregando a imagem da máscara de pixels
+    Track_setMask(map.maskPath);
+    Track_setCheckpoints(map.checkpoints);
+
+    Camera_Background_setSize(trackBackground.width, trackBackground.height);
+
+    music    = LoadMusicStream(gameMusicPath);
+    carSound = LoadMusicStream(carSoundPath);
+    SetMusicVolume(carSound, carVolume);
+    SetMusicVolume(music, gameMusicVolume);
+    PlayMusicStream(music);
+    PlayMusicStream(carSound);
+}
+
+void Game_setup() {
+    cars = LinkedList_create();
+}
+
+void Game_map_cleanup() {
+    Track_Unload();
+    LinkedList_clear(cars);
+    UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
+    Camera_free(camera);
+    ArrayList_free(bestLap);
+    ArrayList_free(currentLap);
+    UnloadMusicStream(music);
+    UnloadMusicStream(carSound);
+}
+
+void Game_cleanup() {
+    LinkedList_free(cars); // Libera a memória da lista encadeada de carros
+}
+
+void Game_update() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
     SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
@@ -126,10 +121,9 @@ void update_game() {
     UpdateMusicStream(music);
     UpdateMusicStream(carSound);
 
-    update_ghost_car(player);
+    updateGhostCar(player);
 
-    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A,
-             KEY_Q); // Movendo o carro do player 2 de acordo com essas teclas
+    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
 
     LinkedList_forEach(
         cars,
@@ -138,7 +132,7 @@ void update_game() {
     Camera_updateTarget(camera, player); // Atualizando a posição da camera
 }
 
-void draw_game() {
+void Game_draw() {
     BeginMode2D(*camera);
 
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
@@ -165,4 +159,9 @@ void draw_game() {
     char stateText2[1000];
     sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
     DrawText(stateText2, 10, 200, 20, BLACK);
+
+    if (IsKeyDown(KEY_Q)) {
+        state.screen = MENU;
+        Game_map_cleanup();
+    }
 }
