@@ -4,8 +4,10 @@
 #include "car.h"
 #include "common.h"
 #include "linked_list.h"
+#include "menu.h"
 #include "raylib.h"
 #include "stdio.h"
+
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
@@ -123,7 +125,8 @@ void Game_update() {
 
     updateGhostCar(player);
 
-    Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
+    Car_move(player, KEY_W, KEY_S, KEY_D,
+             KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
 
     LinkedList_forEach(
         cars,
@@ -161,6 +164,7 @@ void Game_draw() {
     DrawText(stateText2, 10, 200, 20, BLACK);
 
     if (IsKeyDown(KEY_Q)) {
+        Menu_reset();
         state.screen = MENU;
         Game_map_cleanup();
     }

@@ -6,10 +6,13 @@
 typedef struct {
     char    text[100];
     Vector2 pos;
-    int     hovered;
+    bool    hovered;
+    bool    selected;
+    void (*action)();
 } Button;
 
 void Menu_setup();
+void Menu_reset();
 void Menu_cleanup();
 void Menu_update();
 void Menu_draw();

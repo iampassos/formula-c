@@ -23,6 +23,25 @@ static int       padding;
 static int       buttonFontSize;
 static int       titleFontSize;
 
+void interlagosMapButtonAction() {
+    SELECTED_MAP_IDX = 0;
+}
+
+void debugMapButtonAction() {
+    SELECTED_MAP_IDX = 1;
+}
+
+void singleplayerButtonAction() {
+    Game_loadMap(maps[SELECTED_MAP_IDX]);
+    Game_loadSingleplayer();
+    state.mode   = SINGLEPLAYER;
+    state.screen = GAME;
+}
+
+void splitscreenButtonAction() {
+    return;
+}
+
 void Menu_setup() {
     width   = SCREEN_WIDTH / 5;
     height  = SCREEN_HEIGHT / 10;
@@ -42,6 +61,8 @@ void Menu_setup() {
     int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
     for (int i = 0; i < TOTAL_MAPS; i++) {
         strcpy(MAPS_BUTTONS[i].text, maps[i].name);
+        if (i == SELECTED_MAP_IDX)
+            MAPS_BUTTONS[i].selected = true;
         MAPS_BUTTONS[i].pos.y = yMaps;
         MAPS_BUTTONS[i].pos.x = SCREEN_WIDTH / 4.0f - width / 2.0f;
         yMaps += dy;
@@ -59,6 +80,16 @@ void Menu_setup() {
     music      = LoadMusicStream(menuMusicPath);
 
     PlayMusicStream(music);
+    BUTTONS[0].action      = singleplayerButtonAction;
+    BUTTONS[1].action      = splitscreenButtonAction;
+    MAPS_BUTTONS[0].action = interlagosMapButtonAction;
+    MAPS_BUTTONS[1].action = debugMapButtonAction;
+}
+
+void Menu_reset(){
+    for (int i = 0; i < buttonsLen; i++){
+        BUTTONS[i].selected = false;
+    }
 }
 
 void Menu_cleanup() {
@@ -68,8 +99,10 @@ void Menu_cleanup() {
 }
 
 static void drawButton(Button btn) {
-    Rectangle rect       = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
-    Color     baseColor  = btn.hovered ? GOLD : WHITE;
+    Rectangle rect      = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
+    Color     baseColor = btn.hovered ? GOLD : WHITE;
+    if (btn.selected)
+        baseColor = RED;
     Color     textColor  = BLACK;
     Rectangle shadowRect = (Rectangle) {rect.x + 6, rect.y + 6, rect.width, rect.height};
 
@@ -85,41 +118,33 @@ static void drawButton(Button btn) {
              rect.y + (rect.height - buttonFontSize) / 2, buttonFontSize, textColor);
 }
 
+static bool pressedButton(Button *btn, Vector2 mousePos) {
+    btn->hovered =
+        CheckCollisionPointRec(mousePos, (Rectangle) {btn->pos.x, btn->pos.y, width, height});
+
+    if (btn->hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        btn->selected = true;
+        PlaySound(clickSound);
+        btn->action();
+        return true;
+    }
+
+    return false;
+}
+
 void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
-    BUTTONS[0].hovered = CheckCollisionPointRec(
-        mouse, (Rectangle) {BUTTONS[0].pos.x, BUTTONS[0].pos.y, width, height});
+    for (int i = 0; i < buttonsLen; i++)
+        pressedButton(BUTTONS + i, mouse);
 
-    if (BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        PlaySound(clickSound);
-        Game_loadMap(maps[SELECTED_MAP_IDX]);
-        Game_loadSingleplayer();
-        state.mode = SINGLEPLAYER;
-        state.screen = GAME;
-    }
-
-    BUTTONS[1].hovered = CheckCollisionPointRec(
-        mouse, (Rectangle) {BUTTONS[1].pos.x, BUTTONS[1].pos.y, width, height});
-
-    if (BUTTONS[1].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        PlaySound(clickSound);
-    }
-
-    MAPS_BUTTONS[0].hovered = CheckCollisionPointRec(
-        mouse, (Rectangle) {MAPS_BUTTONS[0].pos.x, MAPS_BUTTONS[0].pos.y, width, height});
-
-    if (MAPS_BUTTONS[0].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        PlaySound(clickSound);
-        SELECTED_MAP_IDX = 0;
-    }
-
-    MAPS_BUTTONS[1].hovered = CheckCollisionPointRec(
-        mouse, (Rectangle) {MAPS_BUTTONS[1].pos.x, MAPS_BUTTONS[1].pos.y, width, height});
-
-    if (MAPS_BUTTONS[1].hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        PlaySound(clickSound);
-        SELECTED_MAP_IDX = 1;
+    for (int i = 0; i < TOTAL_MAPS; i++) {
+        if (pressedButton(MAPS_BUTTONS + i, mouse)) {
+            for (int j = 0; j < TOTAL_MAPS; j++) {
+                if (j != i)
+                    MAPS_BUTTONS[j].selected = false;
+            }
+        }
     }
 
     SetMusicVolume(music, gameMusicVolume); // Se precisar abaixar o som da música
@@ -147,7 +172,7 @@ void Menu_draw() {
     for (int i = 0; i < buttonsLen; i++) {
         drawButton(BUTTONS[i]);
     }
-    
+
     for (int i = 0; i < TOTAL_MAPS; i++) {
         drawButton(MAPS_BUTTONS[i]);
     }
