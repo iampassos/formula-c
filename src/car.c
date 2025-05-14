@@ -7,8 +7,7 @@
 #include <stdlib.h>
 
 // Checkpoints
-static Checkpoint CHECKPOINTS[10];
-static int        CHECKPOINTS_SIZE;
+static Checkpoint CHECKPOINTS[CHECKPOINTS_SIZE];
 
 // Pixels da imagem da pista
 static int    IMAGE_WIDTH;
@@ -23,10 +22,8 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     UnloadImage(trackMask);
 }
 
-void Track_setCheckpoints(Checkpoint checkpoints[],
-                          int        size) { // Definindo as cores dos checkpoints
-    CHECKPOINTS_SIZE = size;
-    for (int i = 0; i < size; i++) {
+void Track_setCheckpoints(Checkpoint checkpoints[CHECKPOINTS_SIZE]) { // Definindo as cores dos checkpoints
+    for (int i = 0; i < CHECKPOINTS_SIZE; i++){
         CHECKPOINTS[i] = checkpoints[i];
     }
 }

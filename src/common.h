@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include "raylib.h"
+#define CHECKPOINTS_SIZE 3
 
 typedef struct {
     Color   color;
@@ -12,7 +13,7 @@ typedef struct {
 typedef struct {
     char      *backgroundPath;
     char      *maskPath;
-    Checkpoint checkpoints[3];
+    Checkpoint checkpoints[CHECKPOINTS_SIZE];
 } Map;
 
 typedef struct {

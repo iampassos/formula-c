@@ -25,7 +25,7 @@ static void loadMap(Map map) {
 
     // Carregando a imagem da máscara de pixels
     Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints, 3);
+    Track_setCheckpoints(map.checkpoints);
 
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 

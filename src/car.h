@@ -29,7 +29,7 @@ typedef struct {
 
 void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
 
-void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
+void Track_setCheckpoints(Checkpoint checkpoints[CHECKPOINTS_SIZE]); // Define as cores dos checkpoints
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 

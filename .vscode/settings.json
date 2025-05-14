@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "*.dbclient-js": "javascript",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "xtree": "c",
+        "xutility": "c",
+        "xmemory": "c"
     }
 }
