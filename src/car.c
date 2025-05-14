@@ -192,7 +192,7 @@ Car *Car_create(   // Função para criar um carro
     car->reverseForce = reverseForce;
     car->color        = color;
     car->ghost        = ghost;
-    car->dragForce    = 0;
+    car->dragForce    = 1;
     car->id           = id;
     car->lap          = -1;
     car->vel          = 0;

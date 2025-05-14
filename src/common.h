@@ -14,6 +14,8 @@ typedef struct {
     char      *name;
     char      *backgroundPath;
     char      *maskPath;
+    Vector2    startCarPos;
+    float      startAngle;
     Checkpoint checkpoints[CHECKPOINTS_SIZE];
 } Map;
 
@@ -34,22 +36,22 @@ typedef struct {
 extern State state;
 
 // Configurações de tela
-extern int    SCREEN_WIDTH;
-extern int    SCREEN_HEIGHT;
+extern int SCREEN_WIDTH;
+extern int SCREEN_HEIGHT;
 
 // Informações do jogo
-extern char  *GAME_NAME;
-extern char   GAME_MODES[][100];
-extern int    TOTAL_GAME_MODES;
+extern char *GAME_NAME;
+extern char  GAME_MODES[][100];
+extern int   TOTAL_GAME_MODES;
 
 // Áudio
-extern char  *GAME_MUSIC_PATH;
-extern char  *MENU_MUSIC_PATH;
-extern char  *CAR_SOUND_PATH;
-extern char  *CLICK_BUTTON_SOUND_PATH;
-extern float  GAME_MUSIC_VOLUME;
-extern float  MENU_MUSIC_VOLUME;
-extern float  CAR_VOLUME;
+extern char *GAME_MUSIC_PATH;
+extern char *MENU_MUSIC_PATH;
+extern char *CAR_SOUND_PATH;
+extern char *CLICK_BUTTON_SOUND_PATH;
+extern float GAME_MUSIC_VOLUME;
+extern float MENU_MUSIC_VOLUME;
+extern float CAR_VOLUME;
 
 // Mapas e pistas
 extern Map       MAPS[];
@@ -60,6 +62,6 @@ extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;
 
 // Recursos visuais
-extern char     *BACKGROUND_PATH;
+extern char *BACKGROUND_PATH;
 
 #endif

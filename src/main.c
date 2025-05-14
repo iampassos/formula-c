@@ -28,6 +28,8 @@ char *BACKGROUND_PATH = "resources/menu/f12024.png";
 Map MAPS[] = {{"Interlagos",
                "resources/masks/interlagos_maskV2.png", // backgroundPath
                "resources/masks/interlagos_maskV2.png", // maskPath
+               {5400, 2000},
+               2.66,
                {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
                 {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
                 {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}},
@@ -35,6 +37,8 @@ Map MAPS[] = {{"Interlagos",
               {"Debug Map",
                "resources/masks/pista_debug_mask.png",
                "resources/masks/pista_debug_mask.png",
+               {6900, 2657},
+               0,
                {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
                 {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
                 {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}}};

@@ -8,7 +8,6 @@
 #include "raylib.h"
 #include "stdio.h"
 
-
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
@@ -22,6 +21,8 @@ static int replayFrameIdx = 0;
 static Music music;
 static Music carSound;
 
+static Map actualMap;
+
 void Game_loadSingleplayer() {
     replayFrameIdx  = 0;
     lastLap         = 0;
@@ -30,8 +31,8 @@ void Game_loadSingleplayer() {
     currentLap      = ArrayList_create();
     Car *ghostCar   = Car_create((Vector2) {0, 0}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
                                  "resources/cars/carroazul.png", WHITE, 1, 99);
-    Car *player     = Car_create((Vector2) {5400, 2000}, // pos
-                                 2.66,                   // angulo inicial do carro
+    Car *player     = Car_create(actualMap.startCarPos, // pos
+                                 actualMap.startAngle,  // angulo inicial do carro
 
                                  0.3,  // aceleracao do carro
                                  0.2,  // força da marcha ré
@@ -80,6 +81,7 @@ static void updateGhostCar(Car *player) {
 }
 
 void Game_loadMap(Map map) {
+    actualMap       = map;
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
     // Carregando a imagem da máscara de pixels

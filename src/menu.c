@@ -55,7 +55,7 @@ void Menu_setup() {
     height  = SCREEN_HEIGHT / 10;
     padding = SCREEN_HEIGHT / 9;
 
-    titleFontSize  = SCREEN_WIDTH / 25;
+    titleFontSize  = SCREEN_WIDTH / 20;
     buttonFontSize = SCREEN_WIDTH / 40;
 
     int dy = padding + height;
