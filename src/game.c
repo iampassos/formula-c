@@ -25,10 +25,7 @@ static int replayFrameIdx = 0;
 static Music music;
 static Music carSound;
 
-static Map actualMap;
-
 static void loadMap(Map map) {
-    actualMap       = map;
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
     Image minimap = LoadImage(map.backgroundPath); // Carrega a imagem do arquivo
@@ -52,7 +49,10 @@ static void loadMap(Map map) {
     PlayMusicStream(carSound);
 }
 
-void Game_loadSingleplayer(Map map) {
+void Game_loadSingleplayer() {
+    state.mode   = SINGLEPLAYER;
+    state.screen = GAME;
+    Map map = MAPS[SELECTED_MAP_IDX];
     loadMap(map);
     replayFrameIdx  = 0;
     lastLap         = 0;
@@ -61,8 +61,8 @@ void Game_loadSingleplayer(Map map) {
     currentLap      = ArrayList_create();
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
                                "resources/cars/carroazul.png", WHITE, 1, 99);
-    Car *player   = Car_create(actualMap.startCarPos, // pos
-                               actualMap.startAngle,  // angulo inicial do carro
+    Car *player   = Car_create(map.startCarPos, // pos
+                               map.startAngle,  // angulo inicial do carro
 
                                0.3,  // aceleracao do carro
                                0.2,  // força da marcha ré
@@ -82,6 +82,10 @@ void Game_loadSingleplayer(Map map) {
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
                            0.5f);
+}
+
+void Game_loadSplitscreen(){
+    return;
 }
 
 static void updateGhostCar(Car *player) {

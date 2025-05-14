@@ -4,6 +4,7 @@
 #include "common.h"
 
 void Game_loadSingleplayer();
+void Game_loadSplitscreen();
 
 void Game_map_cleanup();
 

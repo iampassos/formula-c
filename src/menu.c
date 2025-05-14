@@ -34,19 +34,9 @@ void debugMapButtonAction() {
     SELECTED_MAP_IDX = 1;
 }
 
-void singleplayerButtonAction() {
-    Game_loadSingleplayer(MAPS[SELECTED_MAP_IDX]);
-    state.mode   = SINGLEPLAYER;
-    state.screen = GAME;
-}
-
-void splitscreenButtonAction() {
-    return;
-}
-
 void Menu_setup() {
-    BUTTONS[0].action      = singleplayerButtonAction;
-    BUTTONS[1].action      = splitscreenButtonAction;
+    BUTTONS[0].action      = Game_loadSingleplayer;
+    BUTTONS[1].action      = Game_loadSplitscreen;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
     MAPS_BUTTONS[1].action = debugMapButtonAction;
 
