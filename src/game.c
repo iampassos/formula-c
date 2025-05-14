@@ -88,10 +88,10 @@ void Game_loadMap(Map map) {
 
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
-    music    = LoadMusicStream(gameMusicPath);
-    carSound = LoadMusicStream(carSoundPath);
-    SetMusicVolume(carSound, carVolume);
-    SetMusicVolume(music, gameMusicVolume);
+    music    = LoadMusicStream(GAME_MUSIC_PATH);
+    carSound = LoadMusicStream(CAR_SOUND_PATH);
+    SetMusicVolume(carSound, CAR_VOLUME);
+    SetMusicVolume(music, GAME_MUSIC_VOLUME);
     PlayMusicStream(music);
     PlayMusicStream(carSound);
 }

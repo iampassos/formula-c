@@ -5,19 +5,26 @@
 #include <math.h>
 #include <string.h>
 
+// Botões
 static Button BUTTONS[10];
-
 static Button MAPS_BUTTONS[10];
 
-static Sound     clickSound;
-static Music     music;
-static Vector2   textBox;
+// Áudio
+static Sound clickSound;
+static Music music;
+
+// Recursos visuais
 static Texture2D background;
-static int       width;
-static int       height;
-static int       padding;
-static int       buttonFontSize;
-static int       titleFontSize;
+static Vector2 textBox;
+
+// Dimensões e espaçamento
+static int width;
+static int height;
+static int padding;
+
+// Tamanhos de fonte
+static int buttonFontSize;
+static int titleFontSize;
 
 void interlagosMapButtonAction() {
     SELECTED_MAP_IDX = 0;
@@ -28,7 +35,7 @@ void debugMapButtonAction() {
 }
 
 void singleplayerButtonAction() {
-    Game_loadMap(maps[SELECTED_MAP_IDX]);
+    Game_loadMap(MAPS[SELECTED_MAP_IDX]);
     Game_loadSingleplayer();
     state.mode   = SINGLEPLAYER;
     state.screen = GAME;
@@ -62,7 +69,7 @@ void Menu_setup() {
 
     int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
     for (int i = 0; i < TOTAL_MAPS; i++) {
-        strcpy(MAPS_BUTTONS[i].text, maps[i].name);
+        strcpy(MAPS_BUTTONS[i].text, MAPS[i].name);
         if (i == SELECTED_MAP_IDX)
             MAPS_BUTTONS[i].selected = true;
         MAPS_BUTTONS[i].pos.y = yMaps;
@@ -70,16 +77,16 @@ void Menu_setup() {
         yMaps += dy;
     }
 
-    textBox.x = (SCREEN_WIDTH - MeasureText(gameName, titleFontSize)) / 2.0f;
+    textBox.x = (SCREEN_WIDTH - MeasureText(GAME_NAME, titleFontSize)) / 2.0f;
     textBox.y = (SCREEN_HEIGHT - dy * TOTAL_GAME_MODES) / 2.0f;
 
-    Image img = LoadImage(backgroundPath);
+    Image img = LoadImage(BACKGROUND_PATH);
     ImageResize(&img, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona a imagem
     background = LoadTextureFromImage(img);
     UnloadImage(img);
 
-    clickSound = LoadSound(clickButtonSoundPath);
-    music      = LoadMusicStream(menuMusicPath);
+    clickSound = LoadSound(CLICK_BUTTON_SOUND_PATH);
+    music      = LoadMusicStream(MENU_MUSIC_PATH);
 
     PlayMusicStream(music);
 }
@@ -145,7 +152,7 @@ void Menu_update() {
         }
     }
 
-    SetMusicVolume(music, gameMusicVolume); // Se precisar abaixar o som da música
+    SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
     UpdateMusicStream(music);
 }
 
@@ -163,8 +170,8 @@ void Menu_draw() {
     // 3. Título com sombra e cor pulsante
     float t          = sinf(GetTime()) * 0.5f + 0.5f; // varia de 0 a 1
     Color pulseColor = ColorLerp(RED, BLUE, t);
-    DrawText(gameName, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
-    DrawText(gameName, textBox.x, textBox.y, titleFontSize, pulseColor);
+    DrawText(GAME_NAME, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
+    DrawText(GAME_NAME, textBox.x, textBox.y, titleFontSize, pulseColor);
 
     // 4. Botões
     for (int i = 0; i < TOTAL_GAME_MODES; i++) {
