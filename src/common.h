@@ -4,8 +4,15 @@
 #include "raylib.h"
 
 typedef struct {
-    char *backgroundPath;
-    char *maskPath;
+    Color   color;
+    Vector2 pos;
+    float   angle;
+} Checkpoint;
+
+typedef struct {
+    char      *backgroundPath;
+    char      *maskPath;
+    Checkpoint checkpoints[3];
 } Map;
 
 typedef struct {

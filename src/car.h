@@ -5,12 +5,6 @@
 #include "common.h"
 
 typedef struct {
-    Color   color;
-    Vector2 pos;
-    float   angle;
-} Checkpoint;
-
-typedef struct {
     int       id;
     int       lap;
     double    startLapTime;
