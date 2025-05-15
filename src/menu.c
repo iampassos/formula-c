@@ -80,12 +80,6 @@ void Menu_setup() {
     PlayMusicStream(music);
 }
 
-void Menu_reset(){
-    for (int i = 0; i < TOTAL_GAME_MODES; i++){
-        BUTTONS[i].selected = false;
-    }
-}
-
 void Menu_cleanup() {
     UnloadSound(clickSound);
     UnloadMusicStream(music);
@@ -112,12 +106,12 @@ static void drawButton(Button btn) {
              rect.y + (rect.height - buttonFontSize) / 2, buttonFontSize, textColor);
 }
 
-static bool pressedButton(Button *btn, Vector2 mousePos) {
+static bool pressedButton(Button *btn, Vector2 mousePos, bool canSelect) {
     btn->hovered =
         CheckCollisionPointRec(mousePos, (Rectangle) {btn->pos.x, btn->pos.y, width, height});
 
     if (btn->hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        btn->selected = true;
+        btn->selected = canSelect && true;
         PlaySound(clickSound);
         btn->action();
         return true;
@@ -130,10 +124,10 @@ void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
     for (int i = 0; i < TOTAL_GAME_MODES; i++)
-        pressedButton(BUTTONS + i, mouse);
+        pressedButton(BUTTONS + i, mouse, false);
 
     for (int i = 0; i < TOTAL_MAPS; i++) {
-        if (pressedButton(MAPS_BUTTONS + i, mouse)) {
+        if (pressedButton(MAPS_BUTTONS + i, mouse, true)) {
             for (int j = 0; j < TOTAL_MAPS; j++) {
                 if (j != i)
                     MAPS_BUTTONS[j].selected = false;

@@ -255,7 +255,6 @@ void Game_draw() {
     drawHud();
 
     if (IsKeyDown(KEY_Q)) {
-        Menu_reset();
         state.screen = MENU;
         Game_mapCleanup();
     }

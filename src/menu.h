@@ -12,7 +12,6 @@ typedef struct {
 } Button;
 
 void Menu_setup();
-void Menu_reset();
 void Menu_cleanup();
 void Menu_update();
 void Menu_draw();
