@@ -4,10 +4,10 @@
 #include "car.h"
 #include "common.h"
 #include "linked_list.h"
-#include "menu.h"
 #include "raylib.h"
 #include "stdio.h"
 #include <math.h>
+#include <stdio.h>
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static Texture2D   trackHud;
@@ -50,16 +50,37 @@ static void loadMap(Map map) {
     PlayMusicStream(carSound);
 }
 
+static void update_best_lap() {
+    FILE *file = fopen("./data/best_lap.bin", "wb");
+    if (file != NULL) {
+        for (int i = 0; i < bestLap->length; i++) {
+            fwrite(&bestLap->data[i], sizeof(GhostCarFrame), 1, file);
+        }
+        fclose(file);
+    }
+}
+
+static void load_best_lap() {
+    FILE *file = fopen("./data/best_lap.bin", "rb");
+    if (file != NULL) {
+        GhostCarFrame buffer;
+        while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {
+            ArrayList_push(bestLap, buffer);
+        }
+        fclose(file);
+    }
+}
+
 void Game_loadSingleplayer() {
     state.mode   = SINGLEPLAYER;
     state.screen = GAME;
     Map map      = MAPS[SELECTED_MAP_IDX];
     loadMap(map);
-    replayFrameIdx  = 0;
-    lastLap         = 0;
-    bestLap         = ArrayList_create();
-    bestLap->length = -1;
-    currentLap      = ArrayList_create();
+    replayFrameIdx = 0;
+    lastLap        = 0;
+    bestLap        = ArrayList_create();
+    load_best_lap();
+    currentLap    = ArrayList_create();
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
                                CAR_IMAGE_PATH, WHITE, true, 99);
     Car *player   = Car_create(map.startCarPos, // pos
@@ -96,21 +117,24 @@ static void updateGhostCar(Car *player) {
         lastLap        = player->lap;
         replayFrameIdx = 0;
         ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {-1000, -1000}, 0});
-        if (ArrayList_length(currentLap) < ArrayList_length(bestLap)) {
+        printf("%d %d\n", ArrayList_length(currentLap), ArrayList_length(bestLap));
+        if (ArrayList_length(currentLap) < ArrayList_length(bestLap) ||
+            ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
+            update_best_lap();
         }
         ArrayList_clear(currentLap);
     }
 
-    if (lastLap >= 1) { // Replay
+    if (player->lap >= 0) {
+        // Replay
         if (replayFrameIdx < ArrayList_length(bestLap)) {
             GhostCarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
             ghost->pos              = frameData.pos;
             ghost->angle            = frameData.angle;
         }
-    }
 
-    if (player->lap >= 0) { // Grava
+        // Grava
         GhostCarFrame frameData = {player->pos, player->angle};
         ArrayList_push(currentLap, frameData);
     }
