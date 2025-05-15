@@ -63,5 +63,7 @@ extern Color     OUTSIDE_TRACK_COLOR;
 
 // Recursos visuais
 extern char *BACKGROUND_PATH;
+extern char *CAR_IMAGE_PATH;
+extern int  HUD_OPACITY;
 
 #endif

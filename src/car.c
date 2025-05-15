@@ -96,13 +96,13 @@ static int Car_checkCheckpoint(
 
 static void Car_applyPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
     car->vel *= car->dragForce;
-    car->pos.x += cos(car->angle) * car->vel;
-    car->pos.y += sin(car->angle) * car->vel;
+    car->pos.x += cosf(car->angle) * car->vel;
+    car->pos.y += sinf(car->angle) * car->vel;
 }
 
 static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
-    int x = (int) (car->pos.x + cos(car->angle) * car->width * 0.4);
-    int y = (int) (car->pos.y + sin(car->angle) * car->width * 0.4);
+    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4);
+    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
         return (Color) {0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
@@ -192,6 +192,7 @@ Car *Car_create(   // Função para criar um carro
     car->reverseForce = reverseForce;
     car->color        = color;
     car->ghost        = ghost;
+    car->maxVelocity  = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * acc;
     car->dragForce    = 1;
     car->id           = id;
     car->lap          = -1;
@@ -241,6 +242,7 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Checkpoint: %d\n"
              "Position: (%.1f, %.1f)\n"
              "Velocity: %.2f\n"
+             "Max velocity: %.2f\n"
              "Acceleration: %.2f\n"
              "Size: %dx%d\n"
              "Angle: %.2f\n"
@@ -250,7 +252,7 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Drag Force: %.2f\n"
              "Reverse Force: %.2f",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
-             GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel, car->acc,
+             GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel, car->maxVelocity, car->acc,
              car->width, car->height, car->angle, car->angularAcc, car->minTurnSpeed,
              car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);

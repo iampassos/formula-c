@@ -6,7 +6,7 @@
 void Game_loadSingleplayer();
 void Game_loadSplitscreen();
 
-void Game_map_cleanup();
+void Game_mapCleanup();
 
 void Game_setup();
 

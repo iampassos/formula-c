@@ -23,6 +23,8 @@ float MENU_MUSIC_VOLUME = 1.0f;
 
 // Recursos visuais
 char *BACKGROUND_PATH = "resources/menu/f12024.png";
+char *CAR_IMAGE_PATH  = "resources/cars/carroazul.png";
+int   HUD_OPACITY     = 200;
 
 // Mapas
 Map MAPS[] = {{"Interlagos",
@@ -97,9 +99,6 @@ int main() {
             break;
         }
     }
-
-    if (state.screen == MENU)
-        Game_map_cleanup();
 
     Game_cleanup();
     Menu_cleanup();

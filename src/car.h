@@ -25,6 +25,7 @@ typedef struct {
     float     breakForce;
     float     dragForce;
     float     reverseForce;
+    float     maxVelocity;
 } Car;
 
 void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
