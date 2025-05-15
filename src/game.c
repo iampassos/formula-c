@@ -120,7 +120,7 @@ void Game_setup() {
     cars = LinkedList_create();
 }
 
-void Game_mapCleanup() {
+static void mapCleanup() {
     Track_Unload();
     LinkedList_clear(cars);
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
@@ -135,7 +135,7 @@ void Game_mapCleanup() {
 void Game_cleanup() {
     // Se o usuário fechou o jogo em outra tela além do jogo, limpar a memoria do jogo
     if (state.screen != GAME)
-        Game_mapCleanup();
+        mapCleanup();
     LinkedList_free(cars); // Libera a memória da lista encadeada de carros
 }
 
@@ -256,6 +256,6 @@ void Game_draw() {
 
     if (IsKeyDown(KEY_Q)) {
         state.screen = MENU;
-        Game_mapCleanup();
+        mapCleanup();
     }
 }
