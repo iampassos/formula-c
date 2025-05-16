@@ -44,8 +44,8 @@ extern char *GAME_NAME;
 extern char  GAME_MODES[][100];
 extern int   TOTAL_GAME_MODES;
 
-// Dados do ghost car
-extern char *BEST_LAP_DATA_PATH;
+// Pasta de gravação dos arquivos dos carros fantasmas
+extern char *GHOST_CAR_DATA_PATH;
 
 // Áudio
 extern char *GAME_MUSIC_PATH;

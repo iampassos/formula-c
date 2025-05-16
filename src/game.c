@@ -8,11 +8,14 @@
 #include "stdio.h"
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static Texture2D   trackHud;
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
+
+static char ghostCarPath[100];
 
 static int minimapWidth;
 static int minimapHeigth;
@@ -27,6 +30,10 @@ static Music music;
 static Music carSound;
 
 static void loadMap(Map map) {
+    strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
+    strcat(ghostCarPath, map.name);
+    strcat(ghostCarPath, ".bin");
+
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
     Image minimap = LoadImage(map.minimapPath); // Carrega a imagem do arquivo
@@ -51,7 +58,7 @@ static void loadMap(Map map) {
 }
 
 static void update_best_lap() {
-    FILE *file = fopen(BEST_LAP_DATA_PATH, "wb");
+    FILE *file = fopen(ghostCarPath, "wb");
     if (file != NULL) {
         for (int i = 0; i < bestLap->length; i++) {
             fwrite(&bestLap->data[i], sizeof(GhostCarFrame), 1, file);
@@ -61,7 +68,7 @@ static void update_best_lap() {
 }
 
 static void load_best_lap() {
-    FILE *file = fopen(BEST_LAP_DATA_PATH, "rb");
+    FILE *file = fopen(ghostCarPath, "rb");
     if (file != NULL) {
         GhostCarFrame buffer;
         while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {

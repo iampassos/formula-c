@@ -11,8 +11,8 @@ char *GAME_NAME         = "FORMULA C";
 char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
-// Dados do ghost car
-char *BEST_LAP_DATA_PATH = "./data/best_lap.bin";
+// Pasta de gravação dos arquivos dos carros fantasmas
+char *GHOST_CAR_DATA_PATH = "data/";
 
 // Áudio
 char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
