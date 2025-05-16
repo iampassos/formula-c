@@ -34,9 +34,11 @@ static void loadMap(Map map) {
     strcat(ghostCarPath, map.name);
     strcat(ghostCarPath, ".bin");
 
-    trackBackground = LoadTexture(map.backgroundPath); // converte em textura
+    trackBackground =
+        LoadTexture(state.debug ? map.maskPath : map.backgroundPath); // converte em textura
 
-    Image minimap = LoadImage(map.minimapPath); // Carrega a imagem do arquivo
+    Image minimap =
+        LoadImage(state.debug ? map.maskPath : map.minimapPath); // Carrega a imagem do arquivo
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
@@ -81,7 +83,7 @@ static void load_best_lap() {
 void Game_loadSingleplayer() {
     state.mode   = SINGLEPLAYER;
     state.screen = GAME;
-    Map map      = MAPS[SELECTED_MAP_IDX];
+    Map map      = MAPS[state.map];
     loadMap(map);
     replayFrameIdx = 0;
     lastLap        = 0;
@@ -112,6 +114,11 @@ void Game_loadSingleplayer() {
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
                            0.5f);
+}
+
+void Game_loadDebug() {
+    state.debug = 1;
+    Game_loadSingleplayer();
 }
 
 void Game_loadSplitscreen() {
@@ -271,7 +278,9 @@ static void drawHud() {
 
     DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
 
-    drawDebugInfo(player, ghost);
+    if (state.debug) {
+        drawDebugInfo(player, ghost);
+    }
     drawMinimap(player, ghost);
     drawSpeedometer(player);
 }

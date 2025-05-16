@@ -15,7 +15,7 @@ static Music music;
 
 // Recursos visuais
 static Texture2D background;
-static Vector2 textBox;
+static Vector2   textBox;
 
 // Dimensões e espaçamento
 static int width;
@@ -27,18 +27,14 @@ static int buttonFontSize;
 static int titleFontSize;
 
 void interlagosMapButtonAction() {
-    SELECTED_MAP_IDX = 0;
-}
-
-void debugMapButtonAction() {
-    SELECTED_MAP_IDX = 1;
+    state.map = INTERLAGOS;
 }
 
 void Menu_setup() {
     BUTTONS[0].action      = Game_loadSingleplayer;
     BUTTONS[1].action      = Game_loadSplitscreen;
+    BUTTONS[2].action      = Game_loadDebug;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
-    MAPS_BUTTONS[1].action = debugMapButtonAction;
 
     width   = SCREEN_WIDTH / 5;
     height  = SCREEN_HEIGHT / 10;
@@ -59,7 +55,7 @@ void Menu_setup() {
     int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
     for (int i = 0; i < TOTAL_MAPS; i++) {
         strcpy(MAPS_BUTTONS[i].text, MAPS[i].name);
-        if (i == SELECTED_MAP_IDX)
+        if (i == state.map)
             MAPS_BUTTONS[i].selected = true;
         MAPS_BUTTONS[i].pos.y = yMaps;
         MAPS_BUTTONS[i].pos.x = SCREEN_WIDTH / 4.0f - width / 2.0f;

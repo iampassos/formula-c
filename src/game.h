@@ -8,6 +8,7 @@ void Game_cleanup();
 
 void Game_loadSingleplayer();
 void Game_loadSplitscreen();
+void Game_loadDebug();
 
 void Game_update();
 void Game_draw();
