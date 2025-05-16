@@ -15,6 +15,8 @@ static int    IMAGE_WIDTH;
 static int    IMAGE_HEIGHT;
 static Color *TRACK_PIXELS;
 
+static int getCheckpoint(Car *car);
+
 void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de pixels
     Image trackMask = LoadImage(track_mask_path);
     IMAGE_WIDTH     = trackMask.width;
@@ -37,21 +39,6 @@ void Track_Unload() { // Função para descarregar as variáveis associadas a pi
 
 static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a outra
     return a.r == b.r && a.g == b.g && a.b == b.b;
-}
-
-static float dist(Vector2 a, Vector2 b) {
-    float deltaX = b.x - a.x;
-    float deltaY = b.y - a.y;
-    return sqrtf(deltaX * deltaX + deltaY * deltaY);
-}
-
-static int getCheckpoint(Car *car) { // Retorna o número int associado aql checkpoint
-    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
-        if (car->pos.x)
-            if (dist(car->pos, CHECKPOINTS[i].pos) < 200)
-                return i;
-    }
-    return -1;
 }
 
 static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
@@ -145,6 +132,35 @@ static void Car_break(Car *car) { // Freiar
 
 static void Car_reverse(Car *car) { // Marcha ré
     car->vel -= car->acc * car->reverseForce;
+}
+
+static float dist(Vector2 a, Vector2 b) {
+    float deltaX = b.x - a.x;
+    float deltaY = b.y - a.y;
+    return sqrtf(deltaX * deltaX + deltaY * deltaY);
+}
+
+static int getCheckpoint(Car *car) {
+    float lower   = 999999;
+    float lower_i = -1;
+    Color color   = Car_getFloor(car);
+
+    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
+        float distance = dist(car->pos, CHECKPOINTS[i].pos);
+        if (distance < lower) {
+            lower   = distance;
+            lower_i = i;
+        }
+    }
+
+    if (equalsColor(color, (Color) {0, 255, 0}) || equalsColor(color, (Color) {0, 0, 255})) {
+        return lower_i;
+    }
+
+    car->closestCheckpoint         = lower_i;
+    car->closestCheckpointDistance = lower;
+
+    return -1;
 }
 
 void Car_update(Car *car) {
@@ -259,10 +275,13 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Min Turn Speed: %.2f\n"
              "Brake Force: %.2f\n"
              "Drag Force: %.2f\n"
-             "Reverse Force: %.2f",
+             "Reverse Force: %.2f\n"
+             "Closest Checkpoint i: %d\n"
+             "Closest Checkpoint Distance: %.2f\n",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
              GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel,
              car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularAcc,
-             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
+             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce,
+             car->closestCheckpoint, car->closestCheckpointDistance);
     DrawText(car_info, x, y, fontSize, fontColor);
 }
