@@ -26,14 +26,21 @@ static int padding;
 static int buttonFontSize;
 static int titleFontSize;
 
+static Button debugButton;
+
 void interlagosMapButtonAction() {
     state.map = INTERLAGOS;
 }
 
+void debugButtonAction() {
+    state.debug = 1;
+    Game_loadDebug();
+}
+
 void Menu_setup() {
+
     BUTTONS[0].action      = Game_loadSingleplayer;
     BUTTONS[1].action      = Game_loadSplitscreen;
-    BUTTONS[2].action      = Game_loadDebug;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
 
     width   = SCREEN_WIDTH / 5;
@@ -42,6 +49,9 @@ void Menu_setup() {
 
     titleFontSize  = SCREEN_WIDTH / 20;
     buttonFontSize = SCREEN_WIDTH / 40;
+
+    debugButton = (Button) {
+        "Debug", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, debugButtonAction};
 
     int dy = padding + height;
     int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;
@@ -131,6 +141,8 @@ void Menu_update() {
         }
     }
 
+    pressedButton(&debugButton, mouse, false);
+
     SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
     UpdateMusicStream(music);
 }
@@ -160,4 +172,6 @@ void Menu_draw() {
     for (int i = 0; i < TOTAL_MAPS; i++) {
         drawButton(MAPS_BUTTONS[i]);
     }
+
+    drawButton(debugButton);
 }

@@ -8,7 +8,7 @@ int SCREEN_HEIGHT = 0;
 
 // Informações do jogo
 char *GAME_NAME         = "FORMULA C";
-char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores", "Debug"};
+char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
 // Pasta de gravação dos arquivos dos carros fantasmas
