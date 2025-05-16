@@ -25,8 +25,8 @@ static void  applyDragForce(Car *car, Color floorColor);
 static void  applyMovementPhysics(Car *car);
 static Color getFloorColor(Car *car);
 static bool  canTurn(Car *car);
-static bool  isValidCheckpoint(Car *car, int nextExpected);
-static void  updateLapStatus(Car *car);
+static bool  isValidCheckpoint(Car *car, int nextExpected, Color floorColor);
+static void  updateLapStatus(Car *car, Color floorColor);
 static void  turn(Car *car, float angle);
 static void  turnLeft(Car *car);
 static void  turnRight(Car *car);
@@ -60,7 +60,7 @@ void Car_update(Car *car) {
         return;
     Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
 
-    updateLapStatus(car);
+    updateLapStatus(car, floorColor);
     applyDragForce(car, floorColor); // Atualiza a força de atrito
     applyMovementPhysics(car);
 
@@ -246,19 +246,18 @@ static float dist(Vector2 a, Vector2 b) {
     return sqrtf(deltaX * deltaX + deltaY * deltaY);
 }
 
-static bool isValidCheckpoint(Car *car, int nextExpected) {
-    Color color = getFloorColor(car);
-    if (!(equalsColor(color, RACE_START_COLOR) || equalsColor(color, CHECKPOINTS_COLOR)))
+static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor) {
+    if (!(equalsColor(floorColor, RACE_START_COLOR) || equalsColor(floorColor, CHECKPOINTS_COLOR)))
         return false;
 
     return dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
 }
 
 // Verifica se passou por um checkpoint e atualiza tempos do carro
-static void updateLapStatus(Car *car) {
+static void updateLapStatus(Car *car, Color floorColor) {
     int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
 
-    if (!isValidCheckpoint(car, nextExpected))
+    if (!isValidCheckpoint(car, nextExpected, floorColor))
         return;
 
     car->checkpoint = nextExpected;
