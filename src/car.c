@@ -17,6 +17,23 @@ static Color *TRACK_PIXELS;
 
 static float MIN_DIST_TO_DETECT;
 
+// Funções internas
+static bool  equalsColor(Color a, Color b);
+static float dist(Vector2 a, Vector2 b);
+static void  returnToLastCheckpoint(Car *car);
+static void  applyDragForce(Car *car, Color floorColor);
+static void  applyMovementPhysics(Car *car);
+static Color getFloorColor(Car *car);
+static bool  canTurn(Car *car);
+static bool  isValidCheckpoint(Car *car, int nextExpected);
+static bool  isOnCheckpoint(Car *car);
+static void  turn(Car *car, float angle);
+static void  turnLeft(Car *car);
+static void  turnRight(Car *car);
+static void  breakSpeed(Car *car);
+static void  reverse(Car *car);
+static void  accelerate(Car *car);
+
 void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de pixels
     Image trackMask = LoadImage(track_mask_path);
     IMAGE_WIDTH     = trackMask.width;
@@ -38,125 +55,18 @@ void Track_Unload() { // Função para descarregar as variáveis associadas a pi
     UnloadImageColors(TRACK_PIXELS);
 }
 
-static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a outra
-    return a.r == b.r && a.g == b.g && a.b == b.b;
-}
-
-static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
-    return equalsColor(color, OUTSIDE_TRACK_COLOR);
-}
-
-static void updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
-    for (int i = 0; i < TRACK_AREA_SIZE; i++) {
-        if (equalsColor(floorColor, TRACK_AREAS[i].color)) {
-            car->dragForce = TRACK_AREAS[i].dragForce;
-        }
-    }
-
-    if (isOutSideTrack(floorColor) && car->lap >= 0) {
-        car->vel       = 10;
-        car->dragForce = 1;
-        car->pos       = CHECKPOINTS[car->checkpoint].pos;
-        car->angle     = CHECKPOINTS[car->checkpoint].angle;
-    }
-}
-
-static void applyPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
-    car->vel *= car->dragForce;
-    car->pos.x += cosf(car->angle) * car->vel;
-    car->pos.y += sinf(car->angle) * car->vel;
-}
-
-static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
-    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4);
-    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4);
-    if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
-        return (Color) {0, 0, 0};
-    return TRACK_PIXELS[y * IMAGE_WIDTH + x];
-}
-
-static void accelerate(Car *car) { // Acelera o carro
-    car->vel += car->acc;
-}
-
-// Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
-static bool canTurn(Car *car) {
-    return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
-}
-
-static void Car_turn(Car *car, float angle) { // Virar com um angulo
-    if (canTurn(car))
-        car->angle += angle;
-}
-
-static void Car_turnLeft(Car *car) { // Virar para a esquerda
-    Car_turn(car, -car->angularAcc);
-}
-
-static void Car_turnRight(Car *car) { // Virar para a direita
-    Car_turn(car, car->angularAcc);
-}
-
-static void Car_break(Car *car) { // Freiar
-    car->vel *= car->breakForce;
-}
-
-static void Car_reverse(Car *car) { // Marcha ré
-    car->vel -= car->acc * car->reverseForce;
-}
-
-static float dist(Vector2 a, Vector2 b) {
-    float deltaX = b.x - a.x;
-    float deltaY = b.y - a.y;
-    return sqrtf(deltaX * deltaX + deltaY * deltaY);
-}
-
-static bool isValidCheckpoint(Car *car, int nextExpected) {
-    Color color = getFloorColor(car);
-    if (!(equalsColor(color, RACE_START_COLOR) || equalsColor(color, CHECKPOINTS_COLOR)))
-        return false;
-
-    return dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
-}
-
-// Verifica se passou por um checkpoint e atualiza tempos do carro
-static bool isOnCheckpoint(Car *car) {
-    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
-
-    if (!isValidCheckpoint(car, nextExpected))
-        return false;
-
-    car->checkpoint = nextExpected;
-
-    if (nextExpected == 0) { // completou a volta
-        car->lap++;
-
-        double now     = GetTime();
-        double lapTime = now - car->startLapTime;
-
-        if (car->lap == 0)
-            car->raceTime = now;
-
-        if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
-            car->bestLapTime = lapTime;
-        }
-
-        car->startLapTime = now;
-    }
-
-    return true;
-}
-
 void Car_update(Car *car) {
     if (car->ghost)
         return;
     Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
 
-    if (!isOnCheckpoint(car)) {           // Se não está passando por um checkpoint
-        updateDragForce(car, floorColor); // Atualiza a força de atrito
-    }
+    if (!isOnCheckpoint(car))            // Se não está passando por um checkpoint
+        applyDragForce(car, floorColor); // Atualiza a força de atrito
 
-    applyPhysics(car);
+    if (equalsColor(floorColor, OUTSIDE_TRACK_COLOR) && car->lap >= 0)
+        returnToLastCheckpoint(car);
+
+    applyMovementPhysics(car);
 }
 
 void Car_draw(Car *car) {
@@ -166,6 +76,28 @@ void Car_draw(Car *car) {
     Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
                    car->id == 99 ? Fade(WHITE, 0.5f) : WHITE);
+}
+
+// Atualiza as propriedades do carro de acordo com o input do player
+void Car_move(Car *car, int up, int down, int right,
+              int left) { 
+    if (IsKeyDown(up)) {
+        accelerate(car);
+    }
+    if (IsKeyDown(left)) {
+        turnLeft(car);
+    }
+    if (IsKeyDown(right)) {
+        turnRight(car);
+    }
+
+    if (IsKeyDown(down)) {
+        if (car->vel <= car->minTurnSpeed) {
+            reverse(car);
+        } else {
+            breakSpeed(car);
+        }
+    }
 }
 
 Car *Car_create(   // Função para criar um carro
@@ -218,27 +150,6 @@ void Car_free(Car *car) {
     free(car);
 }
 
-void Car_move(Car *car, int up, int down, int right,
-              int left) { // Atualiza as propriedades do carro de acordo com o input do player
-    if (IsKeyDown(up)) {
-        accelerate(car);
-    }
-    if (IsKeyDown(left)) {
-        Car_turnLeft(car);
-    }
-    if (IsKeyDown(right)) {
-        Car_turnRight(car);
-    }
-
-    if (IsKeyDown(down)) {
-        if (car->vel <= car->minTurnSpeed) {
-            Car_reverse(car);
-        } else {
-            Car_break(car);
-        }
-    }
-}
-
 void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
     char car_info[1000];
     snprintf(car_info, sizeof(car_info),
@@ -265,4 +176,110 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularAcc,
              car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);
+}
+
+static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a outra
+    return a.r == b.r && a.g == b.g && a.b == b.b;
+}
+
+static void returnToLastCheckpoint(Car *car) {
+    car->vel       = 10;
+    car->dragForce = 1;
+    car->pos       = CHECKPOINTS[car->checkpoint].pos;
+    car->angle     = CHECKPOINTS[car->checkpoint].angle;
+}
+
+static void applyDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
+    for (int i = 0; i < TRACK_AREA_SIZE; i++) {
+        if (equalsColor(floorColor, TRACK_AREAS[i].color)) {
+            car->dragForce = TRACK_AREAS[i].dragForce;
+        }
+    }
+}
+
+static void
+applyMovementPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
+    car->vel *= car->dragForce;
+    car->pos.x += cosf(car->angle) * car->vel;
+    car->pos.y += sinf(car->angle) * car->vel;
+}
+
+static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
+    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4);
+    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4);
+    if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
+        return (Color) {0, 0, 0};
+    return TRACK_PIXELS[y * IMAGE_WIDTH + x];
+}
+
+static void accelerate(Car *car) { // Acelera o carro
+    car->vel += car->acc;
+}
+
+// Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
+static bool canTurn(Car *car) {
+    return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
+}
+
+static void turn(Car *car, float angle) { // Virar com um angulo
+    if (canTurn(car))
+        car->angle += angle;
+}
+
+static void turnLeft(Car *car) { // Virar para a esquerda
+    turn(car, -car->angularAcc);
+}
+
+static void turnRight(Car *car) { // Virar para a direita
+    turn(car, car->angularAcc);
+}
+
+static void breakSpeed(Car *car) { // Freiar
+    car->vel *= car->breakForce;
+}
+
+static void reverse(Car *car) { // Marcha ré
+    car->vel -= car->acc * car->reverseForce;
+}
+
+static float dist(Vector2 a, Vector2 b) {
+    float deltaX = b.x - a.x;
+    float deltaY = b.y - a.y;
+    return sqrtf(deltaX * deltaX + deltaY * deltaY);
+}
+
+static bool isValidCheckpoint(Car *car, int nextExpected) {
+    Color color = getFloorColor(car);
+    if (!(equalsColor(color, RACE_START_COLOR) || equalsColor(color, CHECKPOINTS_COLOR)))
+        return false;
+
+    return dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
+}
+
+// Verifica se passou por um checkpoint e atualiza tempos do carro
+static bool isOnCheckpoint(Car *car) {
+    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
+
+    if (!isValidCheckpoint(car, nextExpected))
+        return false;
+
+    car->checkpoint = nextExpected;
+
+    if (nextExpected == 0) { // completou a volta
+        car->lap++;
+
+        double now     = GetTime();
+        double lapTime = now - car->startLapTime;
+
+        if (car->lap == 0)
+            car->raceTime = now;
+
+        if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
+            car->bestLapTime = lapTime;
+        }
+
+        car->startLapTime = now;
+    }
+
+    return true;
 }
