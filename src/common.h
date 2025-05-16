@@ -24,6 +24,8 @@ typedef struct {
     float dragForce;
 } TrackArea;
 
+typedef enum { INTERLAGOS } CurrentMap;
+
 typedef enum { SINGLEPLAYER, SPLITSCREEN } Mode;
 
 typedef enum { MENU, GAME } Screen;
@@ -31,9 +33,11 @@ typedef enum { MENU, GAME } Screen;
 typedef enum { FIRST_PERSON, THIRD_PERSON } CameraView;
 
 typedef struct {
-    Screen screen;
-    Mode   mode;
+    Screen     screen;
+    Mode       mode;
+    CurrentMap map;
     CameraView cameraView;
+    int        debug;
 } State;
 
 extern State state;
@@ -65,7 +69,6 @@ extern float CAR_VOLUME;
 // Mapas e pistas
 extern Map       MAPS[];
 extern int       TOTAL_MAPS;
-extern int       SELECTED_MAP_IDX;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;

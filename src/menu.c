@@ -15,7 +15,7 @@ static Music music;
 
 // Recursos visuais
 static Texture2D background;
-static Vector2 textBox;
+static Vector2   textBox;
 
 // Dimensões e espaçamento
 static int width;
@@ -26,19 +26,22 @@ static int padding;
 static int buttonFontSize;
 static int titleFontSize;
 
+static Button debugButton;
+
 void interlagosMapButtonAction() {
-    SELECTED_MAP_IDX = 0;
+    state.map = INTERLAGOS;
 }
 
-void debugMapButtonAction() {
-    SELECTED_MAP_IDX = 1;
+void debugButtonAction() {
+    state.debug = 1;
+    Game_loadDebug();
 }
 
 void Menu_setup() {
+
     BUTTONS[0].action      = Game_loadSingleplayer;
     BUTTONS[1].action      = Game_loadSplitscreen;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
-    MAPS_BUTTONS[1].action = debugMapButtonAction;
 
     width   = SCREEN_WIDTH / 5;
     height  = SCREEN_HEIGHT / 10;
@@ -46,6 +49,9 @@ void Menu_setup() {
 
     titleFontSize  = SCREEN_WIDTH / 20;
     buttonFontSize = SCREEN_WIDTH / 40;
+
+    debugButton = (Button) {
+        "Debug", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, debugButtonAction};
 
     int dy = padding + height;
     int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;
@@ -59,7 +65,7 @@ void Menu_setup() {
     int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
     for (int i = 0; i < TOTAL_MAPS; i++) {
         strcpy(MAPS_BUTTONS[i].text, MAPS[i].name);
-        if (i == SELECTED_MAP_IDX)
+        if (i == state.map)
             MAPS_BUTTONS[i].selected = true;
         MAPS_BUTTONS[i].pos.y = yMaps;
         MAPS_BUTTONS[i].pos.x = SCREEN_WIDTH / 4.0f - width / 2.0f;
@@ -135,6 +141,8 @@ void Menu_update() {
         }
     }
 
+    pressedButton(&debugButton, mouse, false);
+
     SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
     UpdateMusicStream(music);
 }
@@ -164,4 +172,6 @@ void Menu_draw() {
     for (int i = 0; i < TOTAL_MAPS; i++) {
         drawButton(MAPS_BUTTONS[i]);
     }
+
+    drawButton(debugButton);
 }
