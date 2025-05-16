@@ -39,7 +39,7 @@ static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a ou
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-static float dist(Vector2 a, Vector2 b){
+static float dist(Vector2 a, Vector2 b) {
     float deltaX = b.x - a.x;
     float deltaY = b.y - a.y;
     return sqrtf(deltaX * deltaX + deltaY * deltaY);
@@ -47,8 +47,9 @@ static float dist(Vector2 a, Vector2 b){
 
 static int getCheckpoint(Car *car) { // Retorna o número int associado aql checkpoint
     for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
-        if (dist(car->pos, CHECKPOINTS[i].pos) < 200)
-            return i;
+        if (car->pos.x)
+            if (dist(car->pos, CHECKPOINTS[i].pos) < 200)
+                return i;
     }
     return -1;
 }
@@ -151,8 +152,8 @@ void Car_update(Car *car) {
         return;
     Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
 
-    if (Car_checkCheckpoint(car) == -1) { // Se não está passando por um checkpoint
-        Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
+    if (Car_checkCheckpoint(car) == -1) {     // Se não está passando por um checkpoint
+        Car_updateDragForce(car, floorColor); // Atualiza a força de atrito
     }
 
     Car_applyPhysics(car);
