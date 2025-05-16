@@ -15,7 +15,7 @@ static int    IMAGE_WIDTH;
 static int    IMAGE_HEIGHT;
 static Color *TRACK_PIXELS;
 
-static int getCheckpoint(Car *car);
+static float MIN_DIST_TO_DETECT;
 
 void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de pixels
     Image trackMask = LoadImage(track_mask_path);
@@ -23,6 +23,7 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     IMAGE_HEIGHT    = trackMask.height;
     TRACK_PIXELS    = LoadImageColors(trackMask);
     UnloadImage(trackMask);
+    MIN_DIST_TO_DETECT = IMAGE_WIDTH / 30;
 }
 
 // Definindo as cores dos checkpoints
@@ -45,7 +46,7 @@ static bool isOutSideTrack(Color color) { // Verifica se está fora da pista
     return equalsColor(color, OUTSIDE_TRACK_COLOR);
 }
 
-static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
+static void updateDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
     for (int i = 0; i < TRACK_AREA_SIZE; i++) {
         if (equalsColor(floorColor, TRACK_AREAS[i].color)) {
             car->dragForce = TRACK_AREAS[i].dragForce;
@@ -60,43 +61,13 @@ static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a for�
     }
 }
 
-// Verifica se passou por um checkpoint e atualiza tempos do carro
-static int Car_checkCheckpoint(Car *car) {
-    int checkpoint = getCheckpoint(car);
-    if (checkpoint < 0)
-        return -1;
-
-    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
-    if (checkpoint == nextExpected) {
-        car->checkpoint = checkpoint;
-
-        if (checkpoint == 0) { // completou a volta
-            car->lap++;
-
-            double now     = GetTime();
-            double lapTime = now - car->startLapTime;
-
-            if (car->lap == 0)
-                car->raceTime = now;
-
-            if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
-                car->bestLapTime = lapTime;
-            }
-
-            car->startLapTime = now;
-        }
-    }
-
-    return checkpoint;
-}
-
-static void Car_applyPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
+static void applyPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
     car->vel *= car->dragForce;
     car->pos.x += cosf(car->angle) * car->vel;
     car->pos.y += sinf(car->angle) * car->vel;
 }
 
-static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
+static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
@@ -104,17 +75,17 @@ static Color Car_getFloor(Car *car) { // Retorna a cor embaixo do carro
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
-static void Car_accelerate(Car *car) { // Acelera o carro
+static void accelerate(Car *car) { // Acelera o carro
     car->vel += car->acc;
 }
 
-static bool Car_canTurn(
-    Car *car) { // Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
+// Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
+static bool canTurn(Car *car) {
     return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
 }
 
 static void Car_turn(Car *car, float angle) { // Virar com um angulo
-    if (Car_canTurn(car))
+    if (canTurn(car))
         car->angle += angle;
 }
 
@@ -140,39 +111,52 @@ static float dist(Vector2 a, Vector2 b) {
     return sqrtf(deltaX * deltaX + deltaY * deltaY);
 }
 
-static int getCheckpoint(Car *car) {
-    float lower   = 999999;
-    float lower_i = -1;
-    Color color   = Car_getFloor(car);
+static bool isValidCheckpoint(Car *car, int nextExpected) {
+    Color color = getFloorColor(car);
+    if (!(equalsColor(color, RACE_START_COLOR) || equalsColor(color, CHECKPOINTS_COLOR)))
+        return false;
 
-    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
-        float distance = dist(car->pos, CHECKPOINTS[i].pos);
-        if (distance < lower) {
-            lower   = distance;
-            lower_i = i;
+    return dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
+}
+
+// Verifica se passou por um checkpoint e atualiza tempos do carro
+static bool isOnCheckpoint(Car *car) {
+    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
+
+    if (!isValidCheckpoint(car, nextExpected))
+        return false;
+
+    car->checkpoint = nextExpected;
+
+    if (nextExpected == 0) { // completou a volta
+        car->lap++;
+
+        double now     = GetTime();
+        double lapTime = now - car->startLapTime;
+
+        if (car->lap == 0)
+            car->raceTime = now;
+
+        if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
+            car->bestLapTime = lapTime;
         }
+
+        car->startLapTime = now;
     }
 
-    if (equalsColor(color, (Color) {0, 255, 0}) || equalsColor(color, (Color) {0, 0, 255})) {
-        return lower_i;
-    }
-
-    car->closestCheckpoint         = lower_i;
-    car->closestCheckpointDistance = lower;
-
-    return -1;
+    return true;
 }
 
 void Car_update(Car *car) {
     if (car->ghost)
         return;
-    Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
+    Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
 
-    if (Car_checkCheckpoint(car) == -1) {     // Se não está passando por um checkpoint
-        Car_updateDragForce(car, floorColor); // Atualiza a força de atrito
+    if (!isOnCheckpoint(car)) {           // Se não está passando por um checkpoint
+        updateDragForce(car, floorColor); // Atualiza a força de atrito
     }
 
-    Car_applyPhysics(car);
+    applyPhysics(car);
 }
 
 void Car_draw(Car *car) {
@@ -205,29 +189,27 @@ Car *Car_create(   // Função para criar um carro
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
-    car->pos               = pos;
-    car->acc               = acc;
-    car->texture           = LoadTexture(texturePath);
-    car->width             = width;
-    car->height            = height;
-    car->angle             = angle;
-    car->angularAcc        = angularAcc;
-    car->minTurnSpeed      = minTurnSpeed;
-    car->breakForce        = 1 - breakCoeficient;
-    car->reverseForce      = reverseForce;
-    car->color             = color;
-    car->ghost             = ghost;
-    car->maxVelocity       = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * acc;
-    car->dragForce         = 1;
-    car->id                = id;
-    car->lap               = -1;
-    car->vel               = 0;
-    car->startLapTime      = GetTime();
-    car->raceTime          = GetTime();
-    car->bestLapTime       = -1;
-    car->checkpoint        = -1;
-    car->closestCheckpoint = -1;
-    car->closestCheckpointDistance = -1;
+    car->pos          = pos;
+    car->acc          = acc;
+    car->texture      = LoadTexture(texturePath);
+    car->width        = width;
+    car->height       = height;
+    car->angle        = angle;
+    car->angularAcc   = angularAcc;
+    car->minTurnSpeed = minTurnSpeed;
+    car->breakForce   = 1 - breakCoeficient;
+    car->reverseForce = reverseForce;
+    car->color        = color;
+    car->ghost        = ghost;
+    car->maxVelocity  = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * acc;
+    car->dragForce    = 1;
+    car->id           = id;
+    car->lap          = -1;
+    car->vel          = 0;
+    car->startLapTime = GetTime();
+    car->raceTime     = GetTime();
+    car->bestLapTime  = -1;
+    car->checkpoint   = -1;
     return car;
 }
 
@@ -239,7 +221,7 @@ void Car_free(Car *car) {
 void Car_move(Car *car, int up, int down, int right,
               int left) { // Atualiza as propriedades do carro de acordo com o input do player
     if (IsKeyDown(up)) {
-        Car_accelerate(car);
+        accelerate(car);
     }
     if (IsKeyDown(left)) {
         Car_turnLeft(car);
@@ -277,13 +259,10 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Min Turn Speed: %.2f\n"
              "Brake Force: %.2f\n"
              "Drag Force: %.2f\n"
-             "Reverse Force: %.2f\n"
-             "Closest Checkpoint i: %d\n"
-             "Closest Checkpoint Distance: %.2f\n",
+             "Reverse Force: %.2f\n",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
              GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel,
              car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularAcc,
-             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce,
-             car->closestCheckpoint, car->closestCheckpointDistance);
+             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);
 }

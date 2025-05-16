@@ -71,9 +71,11 @@ int SELECTED_MAP_IDX = 0;
 
 // Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
+Color RACE_START_COLOR    = {0, 255, 0};
+Color CHECKPOINTS_COLOR   = {0, 0, 255};
 
 // Estado do jogo
-State state = {SINGLEPLAYER, MENU, FIRST_PERSON};
+State state = {SINGLEPLAYER, MENU, FIRST_PERSON, 0};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
