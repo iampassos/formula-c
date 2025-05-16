@@ -11,7 +11,7 @@ float CAMERA_SMOOTHNESS = 0.05;
 
 // Informações do jogo
 char *GAME_NAME         = "FORMULA C";
-char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
+char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores", "Debug"};
 int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
 // Pasta de gravação dos arquivos dos carros fantasmas
@@ -75,7 +75,7 @@ Color RACE_START_COLOR    = {0, 255, 0};
 Color CHECKPOINTS_COLOR   = {0, 0, 255};
 
 // Estado do jogo
-State state = {SINGLEPLAYER, MENU, FIRST_PERSON, 0};
+State state = {SINGLEPLAYER, MENU, FIRST_PERSON};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);

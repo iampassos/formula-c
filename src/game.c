@@ -35,10 +35,10 @@ static void loadMap(Map map) {
     strcat(ghostCarPath, ".bin");
 
     trackBackground =
-        LoadTexture(state.debug ? map.maskPath : map.backgroundPath); // converte em textura
+        LoadTexture(state.mode == DEBUG ? map.maskPath : map.backgroundPath); // converte em textura
 
-    Image minimap =
-        LoadImage(state.debug ? map.maskPath : map.minimapPath); // Carrega a imagem do arquivo
+    Image minimap = LoadImage(state.mode == DEBUG ? map.maskPath
+                                                  : map.minimapPath); // Carrega a imagem do arquivo
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
@@ -80,9 +80,7 @@ static void load_best_lap() {
     }
 }
 
-void Game_loadSingleplayer() {
-    state.mode   = SINGLEPLAYER;
-    state.screen = GAME;
+static void loadSingleplayer() {
     Map map      = MAPS[state.map];
     loadMap(map);
     replayFrameIdx = 0;
@@ -116,13 +114,27 @@ void Game_loadSingleplayer() {
                            0.5f);
 }
 
-void Game_loadDebug() {
-    state.debug = 1;
-    Game_loadSingleplayer();
+static void loadDebug() {
+    loadSingleplayer();
 }
 
-void Game_loadSplitscreen() {
+static void loadSplitscreen() {
     return;
+}
+
+void Game_load() {
+    state.screen = GAME;
+    switch (state.mode) {
+    case SINGLEPLAYER:
+        loadSingleplayer();
+        break;
+    case SPLITSCREEN:
+        loadSplitscreen();
+        break;
+    case DEBUG:
+        loadDebug();
+        break;
+    }
 }
 
 static void updateGhostCar(Car *player) {
@@ -278,7 +290,7 @@ static void drawHud() {
 
     DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
 
-    if (state.debug) {
+    if (state.mode == DEBUG) {
         drawDebugInfo(player, ghost);
     }
     drawMinimap(player, ghost);

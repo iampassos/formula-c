@@ -5,9 +5,11 @@
 #include <math.h>
 #include <string.h>
 
+#define MAX_BUTTONS 10
+
 // Botões
-static Button BUTTONS[10];
-static Button MAPS_BUTTONS[10];
+static Button BUTTONS[MAX_BUTTONS];
+static Button MAPS_BUTTONS[MAX_BUTTONS];
 
 // Áudio
 static Sound clickSound;
@@ -26,21 +28,29 @@ static int padding;
 static int buttonFontSize;
 static int titleFontSize;
 
-static Button debugButton;
+static Button playButton;
 
 void interlagosMapButtonAction() {
     state.map = INTERLAGOS;
 }
 
 void debugButtonAction() {
-    state.debug = 1;
-    Game_loadDebug();
+    state.mode = DEBUG;
+}
+
+void singleplayerButtonAction() {
+    state.mode = SINGLEPLAYER;
+}
+
+void splitscreenButtonAction() {
+    state.mode = SPLITSCREEN;
 }
 
 void Menu_setup() {
 
-    BUTTONS[0].action      = Game_loadSingleplayer;
-    BUTTONS[1].action      = Game_loadSplitscreen;
+    BUTTONS[0].action      = singleplayerButtonAction;
+    BUTTONS[1].action      = splitscreenButtonAction;
+    BUTTONS[2].action      = debugButtonAction;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
 
     width   = SCREEN_WIDTH / 5;
@@ -50,8 +60,8 @@ void Menu_setup() {
     titleFontSize  = SCREEN_WIDTH / 20;
     buttonFontSize = SCREEN_WIDTH / 40;
 
-    debugButton = (Button) {
-        "Debug", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, debugButtonAction};
+    playButton = (Button) {
+        "Play", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, Game_load};
 
     int dy = padding + height;
     int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;
@@ -112,12 +122,11 @@ static void drawButton(Button btn) {
              rect.y + (rect.height - buttonFontSize) / 2, buttonFontSize, textColor);
 }
 
-static bool pressedButton(Button *btn, Vector2 mousePos, bool canSelect) {
+static bool pressedButton(Button *btn, Vector2 mousePos) {
     btn->hovered =
         CheckCollisionPointRec(mousePos, (Rectangle) {btn->pos.x, btn->pos.y, width, height});
 
     if (btn->hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        btn->selected = canSelect && true;
         PlaySound(clickSound);
         btn->action();
         return true;
@@ -126,22 +135,30 @@ static bool pressedButton(Button *btn, Vector2 mousePos, bool canSelect) {
     return false;
 }
 
+void unselectButtons(Button arr[]) {
+    for (int i = 0; i < MAX_BUTTONS; i++) {
+        arr[i].selected = false;
+    }
+}
+
 void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
-    for (int i = 0; i < TOTAL_GAME_MODES; i++)
-        pressedButton(BUTTONS + i, mouse, false);
-
-    for (int i = 0; i < TOTAL_MAPS; i++) {
-        if (pressedButton(MAPS_BUTTONS + i, mouse, true)) {
-            for (int j = 0; j < TOTAL_MAPS; j++) {
-                if (j != i)
-                    MAPS_BUTTONS[j].selected = false;
-            }
+    for (int i = 0; i < TOTAL_GAME_MODES; i++) {
+        if (pressedButton(BUTTONS + i, mouse)){
+            unselectButtons(BUTTONS);
+            BUTTONS[i].selected = true;
         }
     }
 
-    pressedButton(&debugButton, mouse, false);
+    for (int i = 0; i < TOTAL_MAPS; i++) {
+        if (pressedButton(MAPS_BUTTONS + i, mouse)){
+            unselectButtons(MAPS_BUTTONS);
+            MAPS_BUTTONS[i].selected = true;
+        }
+    }
+
+    pressedButton(&playButton, mouse);
 
     SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
     UpdateMusicStream(music);
@@ -173,5 +190,5 @@ void Menu_draw() {
         drawButton(MAPS_BUTTONS[i]);
     }
 
-    drawButton(debugButton);
+    drawButton(playButton);
 }

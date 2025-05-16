@@ -26,7 +26,7 @@ static void  applyMovementPhysics(Car *car);
 static Color getFloorColor(Car *car);
 static bool  canTurn(Car *car);
 static bool  isValidCheckpoint(Car *car, int nextExpected);
-static bool  isOnCheckpoint(Car *car);
+static void  updateLapStatus(Car *car);
 static void  turn(Car *car, float angle);
 static void  turnLeft(Car *car);
 static void  turnRight(Car *car);
@@ -60,13 +60,12 @@ void Car_update(Car *car) {
         return;
     Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
 
-    if (!isOnCheckpoint(car))            // Se não está passando por um checkpoint
-        applyDragForce(car, floorColor); // Atualiza a força de atrito
+    updateLapStatus(car);
+    applyDragForce(car, floorColor); // Atualiza a força de atrito
+    applyMovementPhysics(car);
 
     if (equalsColor(floorColor, OUTSIDE_TRACK_COLOR) && car->lap >= 0)
         returnToLastCheckpoint(car);
-
-    applyMovementPhysics(car);
 }
 
 void Car_draw(Car *car) {
@@ -79,8 +78,7 @@ void Car_draw(Car *car) {
 }
 
 // Atualiza as propriedades do carro de acordo com o input do player
-void Car_move(Car *car, int up, int down, int right,
-              int left) { 
+void Car_move(Car *car, int up, int down, int right, int left) {
     if (IsKeyDown(up)) {
         accelerate(car);
     }
@@ -257,11 +255,11 @@ static bool isValidCheckpoint(Car *car, int nextExpected) {
 }
 
 // Verifica se passou por um checkpoint e atualiza tempos do carro
-static bool isOnCheckpoint(Car *car) {
+static void updateLapStatus(Car *car) {
     int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
 
     if (!isValidCheckpoint(car, nextExpected))
-        return false;
+        return;
 
     car->checkpoint = nextExpected;
 
@@ -280,6 +278,4 @@ static bool isOnCheckpoint(Car *car) {
 
         car->startLapTime = now;
     }
-
-    return true;
 }
