@@ -19,10 +19,6 @@ char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
 char *CLICK_BUTTON_SOUND_PATH = "resources/sounds/click.mp3";
-
-// float CAR_VOLUME        = 0.2f;
-// float GAME_MUSIC_VOLUME = 1.0f;
-// float MENU_MUSIC_VOLUME = 1.0f;
 float CAR_VOLUME        = 0.0f;
 float GAME_MUSIC_VOLUME = 0.0f;
 float MENU_MUSIC_VOLUME = 0.0f;
@@ -39,11 +35,11 @@ Map MAPS[] = {{"Interlagos",
                "resources/masks/interlagos_maskV2.png", // maskPath
                {5400, 2000},
                2.66,
-               3,
-               {{/*Vector2*/ {4371, 2537}, 2.66f, true},
-                {/*Vector2*/ {6700, 8147}, 0.0f, false},
-                {/*Vector2*/ {8000, 4143}, -2.63, false},
-                {/*Vector2*/ {11069, 2257}, 2.17f, false}}},
+               4,
+               {{/*Vector2*/ {4371, 2537}, 2.66f},
+                {/*Vector2*/ {6700, 8147}, 0.0f},
+                {/*Vector2*/ {8000, 4143}, -2.63},
+                {/*Vector2*/ {11069, 2257}, 2.17f}}},
 
               {"Debug Map",
                "resources/masks/pista_debug_mask.png",
@@ -51,9 +47,9 @@ Map MAPS[] = {{"Interlagos",
                {6900, 2657},
                0,
                3,
-               {{/*Vector2*/ {4371, 2537}, 2.66f, true},
-                {/*Vector2*/ {6700, 8147}, 0.0f, false},
-                {/*Vector2*/ {11069, 2257}, 2.17f, false}}}};
+               {{/*Vector2*/ {4371, 2537}, 2.66f},
+                {/*Vector2*/ {6700, 8147}, 0.0f},
+                {/*Vector2*/ {11069, 2257}, 2.17f}}}};
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 
@@ -71,8 +67,6 @@ int SELECTED_MAP_IDX = 0;
 
 // Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
-Color RACE_START_COLOR    = {0, 0, 255};
-Color CHECKPOINT_COLOR    = {0, 255, 0};
 
 // Estado do jogo
 State state = {0};

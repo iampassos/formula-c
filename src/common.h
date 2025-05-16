@@ -6,7 +6,6 @@
 typedef struct {
     Vector2 pos;
     float   angle;
-    bool    isRaceStart;
 } Checkpoint;
 
 typedef struct {
@@ -63,8 +62,6 @@ extern int       SELECTED_MAP_IDX;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;
-// extern Color     RACE_START_COLOR;
-// extern Color     CHECKPOINT_COLOR;
 
 // Recursos visuais
 extern char *BACKGROUND_PATH;

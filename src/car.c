@@ -47,7 +47,7 @@ static float dist(Vector2 a, Vector2 b){
 
 static int getCheckpoint(Car *car) { // Retorna o número int associado aql checkpoint
     for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
-        if (dist(car->pos, CHECKPOINTS[i].pos) < 50)
+        if (dist(car->pos, CHECKPOINTS[i].pos) < 200)
             return i;
     }
     return -1;
@@ -75,7 +75,7 @@ static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a for�
 // Verifica se passou por um checkpoint e atualiza tempos do carro
 static int Car_checkCheckpoint(Car *car) {
     int checkpoint = getCheckpoint(car);
-    if (checkpoint == -1)
+    if (checkpoint < 0)
         return -1;
 
     int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
@@ -208,7 +208,7 @@ Car *Car_create(   // Função para criar um carro
     car->startLapTime = GetTime();
     car->raceTime     = GetTime();
     car->bestLapTime  = -1;
-    car->checkpoint   = 2;
+    car->checkpoint   = -1;
     return car;
 }
 
