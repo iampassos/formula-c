@@ -200,8 +200,11 @@ static void drawMinimap(Car *player, Car *ghost) {
     float xGhostHud = trackHud.width * ghost->pos.x / trackBackground.width + textureX;
     float yGhostHud = trackHud.height * ghost->pos.y / trackBackground.height;
 
-    DrawCircle(xPlayerHud, yPlayerHud, 8, RED);
-    DrawCircle(xGhostHud, yGhostHud, 8, GREEN);
+    DrawCircleLines(xPlayerHud, yPlayerHud, 6.5f, BLACK);
+    DrawCircle(xPlayerHud, yPlayerHud, 6, RED);
+
+    DrawCircleLines(xGhostHud, yGhostHud, 3.5f, BLACK);
+    DrawCircle(xGhostHud, yGhostHud, 3, WHITE);
 }
 
 static void drawSpeedometer(Car *player) {
