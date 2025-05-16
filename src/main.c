@@ -31,8 +31,9 @@ int   HUD_OPACITY     = 200;
 
 // Mapas
 Map MAPS[] = {{"Interlagos",
-               "resources/masks/interlagos_maskV2.png", // backgroundPath
-               "resources/masks/interlagos_maskV2.png", // maskPath
+               "resources/maps/interlagos_map.png", // backgroundPath
+               "resources/masks/interlagos_mask.png", // maskPath
+               "resources/minimaps/interlagos_minimap.png",
                {5400, 2000},
                2.66,
                4,
@@ -42,6 +43,7 @@ Map MAPS[] = {{"Interlagos",
                 {/*Vector2*/ {11069, 2257}, 2.17f}}},
 
               {"Debug Map",
+               "resources/masks/pista_debug_mask.png",
                "resources/masks/pista_debug_mask.png",
                "resources/masks/pista_debug_mask.png",
                {6900, 2657},

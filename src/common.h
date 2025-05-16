@@ -12,6 +12,7 @@ typedef struct {
     char      *name;
     char      *backgroundPath;
     char      *maskPath;
+    char      *minimapPath;
     Vector2    startCarPos;
     float      startAngle;
     int        checkpointSize;

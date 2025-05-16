@@ -29,7 +29,7 @@ static Music carSound;
 static void loadMap(Map map) {
     trackBackground = LoadTexture(map.backgroundPath); // converte em textura
 
-    Image minimap = LoadImage(map.backgroundPath); // Carrega a imagem do arquivo
+    Image minimap = LoadImage(map.minimapPath); // Carrega a imagem do arquivo
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
