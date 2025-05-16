@@ -28,9 +28,12 @@ typedef enum { SINGLEPLAYER, SPLITSCREEN } Mode;
 
 typedef enum { MENU, GAME } Screen;
 
+typedef enum { FIRST_PERSON, THIRD_PERSON } CameraView;
+
 typedef struct {
     Screen screen;
     Mode   mode;
+    CameraView cameraView;
 } State;
 
 extern State state;
@@ -38,6 +41,9 @@ extern State state;
 // Configurações de tela
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
+
+// Suavidade da camera
+extern float CAMERA_SMOOTHNESS;
 
 // Informações do jogo
 extern char *GAME_NAME;

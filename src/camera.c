@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "car.h"
+#include <math.h>
 #include <stdlib.h>
 
 static int BACKGROUND_WIDTH;
@@ -25,6 +26,11 @@ void Camera_free(Camera2D *camera) {
 void Camera_Background_setSize(int width, int height) {
     BACKGROUND_WIDTH  = width;
     BACKGROUND_HEIGHT = height;
+}
+
+static float LerpAngle(float a, float b, float t) {
+    float diff = fmodf(b - a + 180.0f, 360.0f) - 180.0f;
+    return a + diff * t;
 }
 
 void Camera_updateTarget(Camera2D *camera, Car *car) {
@@ -53,4 +59,8 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
         targetZoom = 2.0f;
 
     camera->zoom += (targetZoom - camera->zoom) * 0.1f;
+    if (state.cameraView == FIRST_PERSON) {
+        float targetRotation = -car->angle * RAD2DEG - 90.0f;
+        camera->rotation     = LerpAngle(camera->rotation, targetRotation, CAMERA_SMOOTHNESS);
+    }
 }

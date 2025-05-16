@@ -6,6 +6,9 @@
 int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
+// Suavidade da camera
+float CAMERA_SMOOTHNESS = 0.05;
+
 // Informações do jogo
 char *GAME_NAME         = "FORMULA C";
 char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
@@ -79,7 +82,7 @@ int SELECTED_MAP_IDX = 0;
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 
 // Estado do jogo
-State state = {0};
+State state = {SINGLEPLAYER, MENU, FIRST_PERSON};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);

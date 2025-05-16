@@ -174,7 +174,7 @@ void Game_update() {
     Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
     SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
-    SetMusicVolume(music, 0.2);
+    SetMusicVolume(music, GAME_MUSIC_VOLUME);
     UpdateMusicStream(music);
     UpdateMusicStream(carSound);
 
