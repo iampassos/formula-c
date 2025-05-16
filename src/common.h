@@ -2,12 +2,11 @@
 #define COMMON_H
 
 #include "raylib.h"
-#define CHECKPOINTS_SIZE 3
 
 typedef struct {
-    Color   color;
     Vector2 pos;
     float   angle;
+    bool    isRaceStart;
 } Checkpoint;
 
 typedef struct {
@@ -16,7 +15,8 @@ typedef struct {
     char      *maskPath;
     Vector2    startCarPos;
     float      startAngle;
-    Checkpoint checkpoints[CHECKPOINTS_SIZE];
+    int        checkpointSize;
+    Checkpoint checkpoints[100];
 } Map;
 
 typedef struct {
@@ -44,6 +44,9 @@ extern char *GAME_NAME;
 extern char  GAME_MODES[][100];
 extern int   TOTAL_GAME_MODES;
 
+// Dados do ghost car
+extern char *BEST_LAP_DATA_PATH;
+
 // Áudio
 extern char *GAME_MUSIC_PATH;
 extern char *MENU_MUSIC_PATH;
@@ -60,10 +63,13 @@ extern int       SELECTED_MAP_IDX;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;
+// extern Color     RACE_START_COLOR;
+// extern Color     CHECKPOINT_COLOR;
 
 // Recursos visuais
 extern char *BACKGROUND_PATH;
 extern char *CAR_IMAGE_PATH;
-extern int  HUD_OPACITY;
+extern char *LOGO_IMAGE_PATH;
+extern int   HUD_OPACITY;
 
 #endif

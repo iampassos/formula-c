@@ -38,7 +38,7 @@ static void loadMap(Map map) {
 
     // Carregando a imagem da máscara de pixels
     Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints);
+    Track_setCheckpoints(map.checkpoints, map.checkpointSize);
 
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
@@ -51,7 +51,7 @@ static void loadMap(Map map) {
 }
 
 static void update_best_lap() {
-    FILE *file = fopen("./data/best_lap.bin", "wb");
+    FILE *file = fopen(BEST_LAP_DATA_PATH, "wb");
     if (file != NULL) {
         for (int i = 0; i < bestLap->length; i++) {
             fwrite(&bestLap->data[i], sizeof(GhostCarFrame), 1, file);
@@ -61,7 +61,7 @@ static void update_best_lap() {
 }
 
 static void load_best_lap() {
-    FILE *file = fopen("./data/best_lap.bin", "rb");
+    FILE *file = fopen(BEST_LAP_DATA_PATH, "rb");
     if (file != NULL) {
         GhostCarFrame buffer;
         while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {

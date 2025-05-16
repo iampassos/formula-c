@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 // Checkpoints
-static Checkpoint CHECKPOINTS[CHECKPOINTS_SIZE];
+static Checkpoint CHECKPOINTS[100];
+static int        CHECKPOINTS_SIZE;
 
 // Pixels da imagem da pista
 static int    IMAGE_WIDTH;
@@ -22,9 +23,10 @@ void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de
     UnloadImage(trackMask);
 }
 
-void Track_setCheckpoints(
-    Checkpoint checkpoints[CHECKPOINTS_SIZE]) { // Definindo as cores dos checkpoints
-    for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
+// Definindo as cores dos checkpoints
+void Track_setCheckpoints(Checkpoint checkpoints[], int size) {
+    CHECKPOINTS_SIZE = size;
+    for (int i = 0; i < size; i++) {
         CHECKPOINTS[i] = checkpoints[i];
     }
 }
@@ -37,9 +39,15 @@ static bool equalsColor(Color a, Color b) { // Verifica se uma cor é igual a ou
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-static int getCheckpoint(Color color) { // Retorna o número int associado aql checkpoint
+static float dist(Vector2 a, Vector2 b){
+    float deltaX = b.x - a.x;
+    float deltaY = b.y - a.y;
+    return sqrtf(deltaX * deltaX + deltaY * deltaY);
+}
+
+static int getCheckpoint(Car *car) { // Retorna o número int associado aql checkpoint
     for (int i = 0; i < CHECKPOINTS_SIZE; i++) {
-        if (equalsColor(color, CHECKPOINTS[i].color))
+        if (dist(car->pos, CHECKPOINTS[i].pos) < 50)
             return i;
     }
     return -1;
@@ -64,13 +72,13 @@ static void Car_updateDragForce(Car *car, Color floorColor) { // Atualiza a for�
     }
 }
 
-static int Car_checkCheckpoint(
-    Car *car, Color floorColor) { // Verifica se passou por um checkpoint e atualiza tempos do carro
-    int checkpoint = getCheckpoint(floorColor);
-    if (checkpoint < 0)
+// Verifica se passou por um checkpoint e atualiza tempos do carro
+static int Car_checkCheckpoint(Car *car) {
+    int checkpoint = getCheckpoint(car);
+    if (checkpoint == -1)
         return -1;
 
-    int nextExpected = (car->checkpoint + 1) % 3;
+    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
     if (checkpoint == nextExpected) {
         car->checkpoint = checkpoint;
 
@@ -143,7 +151,7 @@ void Car_update(Car *car) {
         return;
     Color floorColor = Car_getFloor(car); // Pega a cor do chão embaixo do carro
 
-    if (Car_checkCheckpoint(car, floorColor) == -1) { // Se não está passando por um checkpoint
+    if (Car_checkCheckpoint(car) == -1) { // Se não está passando por um checkpoint
         Car_updateDragForce(car, floorColor);         // Atualiza a força de atrito
     }
 
@@ -252,8 +260,8 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Drag Force: %.2f\n"
              "Reverse Force: %.2f",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
-             GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel, car->maxVelocity, car->acc,
-             car->width, car->height, car->angle, car->angularAcc, car->minTurnSpeed,
-             car->breakForce, car->dragForce, car->reverseForce);
+             GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel,
+             car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularAcc,
+             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);
 }

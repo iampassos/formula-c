@@ -11,6 +11,9 @@ char *GAME_NAME         = "FORMULA C";
 char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
+// Dados do ghost car
+char *BEST_LAP_DATA_PATH = "./data/best_lap.bin";
+
 // Áudio
 char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
@@ -27,6 +30,7 @@ float MENU_MUSIC_VOLUME = 0.0f;
 // Recursos visuais
 char *BACKGROUND_PATH = "resources/menu/f12024.png";
 char *CAR_IMAGE_PATH  = "resources/cars/carroazul.png";
+char *LOGO_IMAGE_PATH = "resources/logo/formula_c-logo.png";
 int   HUD_OPACITY     = 200;
 
 // Mapas
@@ -35,18 +39,21 @@ Map MAPS[] = {{"Interlagos",
                "resources/masks/interlagos_maskV2.png", // maskPath
                {5400, 2000},
                2.66,
-               {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
-                {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
-                {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}},
+               3,
+               {{/*Vector2*/ {4371, 2537}, 2.66f, true},
+                {/*Vector2*/ {6700, 8147}, 0.0f, false},
+                {/*Vector2*/ {8000, 4143}, -2.63, false},
+                {/*Vector2*/ {11069, 2257}, 2.17f, false}}},
 
               {"Debug Map",
                "resources/masks/pista_debug_mask.png",
                "resources/masks/pista_debug_mask.png",
                {6900, 2657},
                0,
-               {{/*Color*/ {0, 255, 0}, /*Vector2*/ {4371, 2537}, 2.66f},
-                {/*Color*/ {0, 0, 255}, /*Vector2*/ {6700, 8147}, 0.0f},
-                {/*Color*/ {255, 0, 0}, /*Vector2*/ {11069, 2257}, 2.17f}}}};
+               3,
+               {{/*Vector2*/ {4371, 2537}, 2.66f, true},
+                {/*Vector2*/ {6700, 8147}, 0.0f, false},
+                {/*Vector2*/ {11069, 2257}, 2.17f, false}}}};
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 
@@ -62,8 +69,10 @@ int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
 // Pista selecionada
 int SELECTED_MAP_IDX = 0;
 
-// Cor que representa fora da pista
+// Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
+Color RACE_START_COLOR    = {0, 0, 255};
+Color CHECKPOINT_COLOR    = {0, 255, 0};
 
 // Estado do jogo
 State state = {0};
@@ -75,7 +84,7 @@ int main() {
     SCREEN_WIDTH  = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
 
-    Image icon = LoadImage("resources/logo/formula_c-logo.png");
+    Image icon = LoadImage(LOGO_IMAGE_PATH);
     ImageResize(&icon, 32, 32);
     SetWindowIcon(icon);
     UnloadImage(icon);
