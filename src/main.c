@@ -75,7 +75,7 @@ Color RACE_START_COLOR    = {0, 255, 0};
 Color CHECKPOINTS_COLOR   = {0, 0, 255};
 
 // Estado do jogo
-State state = {SINGLEPLAYER, MENU, FIRST_PERSON};
+State state = {SINGLEPLAYER, MENU, INTERLAGOS, THIRD_PERSON};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);

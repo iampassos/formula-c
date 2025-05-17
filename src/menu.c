@@ -72,6 +72,8 @@ void Menu_setup() {
         y += dy;
     }
 
+    BUTTONS[state.mode].selected = true;
+
     int yMaps = (SCREEN_HEIGHT - dy * (TOTAL_MAPS - 1) + padding) / 2;
     for (int i = 0; i < TOTAL_MAPS; i++) {
         strcpy(MAPS_BUTTONS[i].text, MAPS[i].name);
@@ -81,6 +83,8 @@ void Menu_setup() {
         MAPS_BUTTONS[i].pos.x = SCREEN_WIDTH / 4.0f - width / 2.0f;
         yMaps += dy;
     }
+
+    MAPS_BUTTONS[state.map].selected = true;
 
     textBox.x = (SCREEN_WIDTH - MeasureText(GAME_NAME, titleFontSize)) / 2.0f;
     textBox.y = (SCREEN_HEIGHT - dy * TOTAL_GAME_MODES) / 2.0f;
