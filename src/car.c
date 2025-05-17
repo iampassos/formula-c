@@ -82,11 +82,13 @@ void Car_move(Car *car, int up, int down, int right, int left) {
     if (IsKeyDown(up)) {
         accelerate(car);
     }
-    if (IsKeyDown(left)) {
-        turnLeft(car);
-    }
-    if (IsKeyDown(right)) {
-        turnRight(car);
+    if (canTurn(car)) {
+        if (IsKeyDown(left)) {
+            turnLeft(car);
+        }
+        if (IsKeyDown(right)) {
+            turnRight(car);
+        }
     }
 
     if (IsKeyDown(down)) {
@@ -220,8 +222,7 @@ static bool canTurn(Car *car) {
 }
 
 static void turn(Car *car, float angle) { // Virar com um angulo
-    if (canTurn(car))
-        car->angle += angle;
+    car->angle += angle;
 }
 
 static void turnLeft(Car *car) { // Virar para a esquerda
@@ -247,7 +248,7 @@ static float dist(Vector2 a, Vector2 b) {
 }
 
 static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor) {
-    if (!(equalsColor(floorColor, RACE_START_COLOR) || equalsColor(floorColor, CHECKPOINTS_COLOR)))
+    if (!equalsColor(floorColor, CHECKPOINTS_COLOR))
         return false;
 
     return dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;

@@ -71,7 +71,6 @@ extern int       TOTAL_MAPS;
 extern TrackArea TRACK_AREAS[];
 extern int       TRACK_AREA_SIZE;
 extern Color     OUTSIDE_TRACK_COLOR;
-extern Color     RACE_START_COLOR;
 extern Color     CHECKPOINTS_COLOR;
 
 // Recursos visuais

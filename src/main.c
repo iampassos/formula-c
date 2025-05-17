@@ -30,7 +30,7 @@ float MENU_MUSIC_VOLUME       = 0.0f;
 char *BACKGROUND_PATH = "resources/menu/f12024.png";
 char *CAR_IMAGE_PATH  = "resources/cars/carroazul.png";
 char *LOGO_IMAGE_PATH = "resources/logo/formula_c-logo.png";
-int   HUD_OPACITY     = 255;
+int   HUD_OPACITY     = 200;
 
 // Mapas
 Map MAPS[] = {
@@ -71,11 +71,10 @@ int SELECTED_MAP_IDX = 0;
 
 // Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
-Color RACE_START_COLOR    = {0, 255, 0};
-Color CHECKPOINTS_COLOR   = {0, 0, 255};
+Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 // Estado do jogo
-State state = {SINGLEPLAYER, MENU, INTERLAGOS, THIRD_PERSON};
+State state = {SINGLEPLAYER, MENU, INTERLAGOS, FIRST_PERSON};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
