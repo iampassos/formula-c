@@ -30,7 +30,7 @@ float MENU_MUSIC_VOLUME       = 0.0f;
 char *BACKGROUND_PATH = "resources/menu/f12024.png";
 char *CAR_IMAGE_PATH  = "resources/cars/carroazul.png";
 char *LOGO_IMAGE_PATH = "resources/logo/formula_c-logo.png";
-int   HUD_OPACITY     = 200;
+int   HUD_OPACITY     = 255;
 
 // Mapas
 Map MAPS[] = {
@@ -38,8 +38,8 @@ Map MAPS[] = {
      "resources/maps/interlagos_map.png",   // backgroundPath
      "resources/masks/interlagos_mask.png", // maskPath
      "resources/minimaps/interlagos_minimap.png",
-     {5005, 1884},
-     2.66,
+     {4721, 1910},
+     2.77f,
      10,
      {
          {/*Vector2*/ {4584, 2078}, 2.73f},
@@ -49,9 +49,9 @@ Map MAPS[] = {
          {/*Vector2*/ {9575, 5176}, -2.77f},
          {/*Vector2*/ {7315, 2106}, -0.63f},
          {/*Vector2*/ {9755, 2619}, -1.09f},
-         {/*Vector2*/ {12244, 4866}, 0.07f},
-         {/*Vector2*/ {13922, 2412}, -1.87f},
-         {/*Vector2*/ {8275, 520}, -3.57f},
+         {/*Vector2*/ {12303, 4781}, 0.07f},
+         {/*Vector2*/ {14136, 3216}, -1.87f},
+         {/*Vector2*/ {9357, 341}, -3.57f},
      }},
 };
 
