@@ -74,7 +74,7 @@ Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 // Estado do jogo
-State state = {SINGLEPLAYER, MENU, INTERLAGOS, FIRST_PERSON};
+State state = {SINGLEPLAYER, MENU, INTERLAGOS, THIRD_PERSON};
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);

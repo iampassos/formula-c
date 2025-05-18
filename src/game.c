@@ -30,15 +30,11 @@ static Music music;
 static Music carSound;
 
 static void loadMap(Map map) {
-    strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
-    strcat(ghostCarPath, map.name);
-    strcat(ghostCarPath, ".bin");
+    // Carrega a imagem de fundo
+    trackBackground = LoadTexture(state.mode == DEBUG ? map.maskPath : map.backgroundPath);
 
-    trackBackground =
-        LoadTexture(state.mode == DEBUG ? map.maskPath : map.backgroundPath); // converte em textura
-
-    Image minimap = LoadImage(state.mode == DEBUG ? map.maskPath
-                                                  : map.minimapPath); // Carrega a imagem do arquivo
+    // Carrega a imagem do minimapa
+    Image minimap = LoadImage(state.mode == DEBUG ? map.maskPath : map.minimapPath);
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
@@ -80,9 +76,11 @@ static void load_best_lap() {
     }
 }
 
-static void loadSingleplayer() {
-    Map map      = MAPS[state.map];
-    loadMap(map);
+static void loadSingleplayer(Map map) {
+    strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
+    strcat(ghostCarPath, map.name);
+    strcat(ghostCarPath, ".bin");
+
     replayFrameIdx = 0;
     lastLap        = 0;
     bestLap        = ArrayList_create();
@@ -98,7 +96,7 @@ static void loadSingleplayer() {
                                0.02, // força de frenagem
 
                                0.035, // aceleração angular (velocidade de rotação)
-                               0.2,   // velocidade mínima para fazer curva
+                               0.5,   // velocidade mínima para fazer curva
 
                                150, // largura
                                75,  // altura
@@ -114,25 +112,27 @@ static void loadSingleplayer() {
                            0.5f);
 }
 
-static void loadDebug() {
-    loadSingleplayer();
+static void loadDebug(Map map) {
+    loadSingleplayer(map);
 }
 
-static void loadSplitscreen() {
+static void loadSplitscreen(Map map) {
     return;
 }
 
 void Game_load() {
     state.screen = GAME;
+    Map map      = MAPS[state.map];
+    loadMap(map);
     switch (state.mode) {
     case SINGLEPLAYER:
-        loadSingleplayer();
+        loadSingleplayer(map);
         break;
     case SPLITSCREEN:
-        loadSplitscreen();
+        loadSplitscreen(map);
         break;
     case DEBUG:
-        loadDebug();
+        loadDebug(map);
         break;
     }
 }

@@ -74,7 +74,7 @@ void Car_draw(Car *car) {
                            car->height};                           // Tamanho e posição do carro
     Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
-                   car->id == 99 ? Fade(WHITE, 0.5f) : WHITE);
+                   car->id == 99 ? Fade(car->color, 0.5f) : car->color);
 }
 
 // Atualiza as propriedades do carro de acordo com o input do player
@@ -92,7 +92,7 @@ void Car_move(Car *car, int up, int down, int right, int left) {
     }
 
     if (IsKeyDown(down)) {
-        if (car->vel <= car->minTurnSpeed) {
+        if (car->vel < car->minTurnSpeed) {
             reverse(car);
         } else {
             breakSpeed(car);
@@ -108,7 +108,7 @@ Car *Car_create(   // Função para criar um carro
     float reverseForce,    // força de ré
     float breakCoeficient, // coeficiente de frenagem
 
-    float angularAcc,   // aceleração angular
+    float angularSpeed, // aceleração angular
     float minTurnSpeed, // velocidade mínima para virar
 
     int width,  // largura do carro
@@ -127,7 +127,7 @@ Car *Car_create(   // Função para criar um carro
     car->width        = width;
     car->height       = height;
     car->angle        = angle;
-    car->angularAcc   = angularAcc;
+    car->angularSpeed = angularSpeed;
     car->minTurnSpeed = minTurnSpeed;
     car->breakForce   = 1 - breakCoeficient;
     car->reverseForce = reverseForce;
@@ -166,14 +166,14 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Acceleration: %.2f\n"
              "Size: %dx%d\n"
              "Angle: %.2f\n"
-             "Angular Acceleration: %.2f\n"
+             "Angular Speed: %.2f\n"
              "Min Turn Speed: %.2f\n"
              "Brake Force: %.2f\n"
              "Drag Force: %.2f\n"
              "Reverse Force: %.2f\n",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
              GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel,
-             car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularAcc,
+             car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularSpeed,
              car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);
 }
@@ -193,20 +193,21 @@ static void applyDragForce(Car *car, Color floorColor) { // Atualiza a força de
     for (int i = 0; i < TRACK_AREA_SIZE; i++) {
         if (equalsColor(floorColor, TRACK_AREAS[i].color)) {
             car->dragForce = TRACK_AREAS[i].dragForce;
+            return;
         }
     }
 }
 
-static void
-applyMovementPhysics(Car *car) { // Atualiza a posição com base na velocidade e no ângulo
+// Atualiza a posição com base na velocidade e no ângulo
+static void applyMovementPhysics(Car *car) {
     car->vel *= car->dragForce;
     car->pos.x += cosf(car->angle) * car->vel;
     car->pos.y += sinf(car->angle) * car->vel;
 }
 
 static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
-    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4);
-    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4);
+    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
+    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
         return (Color) {0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
@@ -218,19 +219,19 @@ static void accelerate(Car *car) { // Acelera o carro
 
 // Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
 static bool canTurn(Car *car) {
-    return car->vel > car->minTurnSpeed || car->vel < -car->minTurnSpeed;
+    return fabs(car->vel) > car->minTurnSpeed;
 }
 
-static void turn(Car *car, float angle) { // Virar com um angulo
+static void turn(Car *car, float angle) {
     car->angle += angle;
 }
 
 static void turnLeft(Car *car) { // Virar para a esquerda
-    turn(car, -car->angularAcc);
+    turn(car, -car->angularSpeed);
 }
 
 static void turnRight(Car *car) { // Virar para a direita
-    turn(car, car->angularAcc);
+    turn(car, car->angularSpeed);
 }
 
 static void breakSpeed(Car *car) { // Freiar

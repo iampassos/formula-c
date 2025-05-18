@@ -20,7 +20,7 @@ typedef struct {
     int       width;
     int       height;
     float     angle;
-    float     angularAcc;
+    float     angularSpeed;
     float     minTurnSpeed;
     float     breakForce;
     float     dragForce;
@@ -43,7 +43,7 @@ Car *Car_create(Vector2 pos,   // posição inicial
                 float reverseForce,    // força de ré
                 float breakCoeficient, // coeficiente de frenagem
 
-                float angularAcc,   // aceleração angular
+                float angularSpeed,   // aceleração angular
                 float minTurnSpeed, // velocidade mínima para virar
 
                 int width,  // largura do carro
