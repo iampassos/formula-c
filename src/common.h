@@ -26,7 +26,7 @@ typedef struct {
 
 typedef enum { INTERLAGOS } CurrentMap;
 
-typedef enum { SINGLEPLAYER, SPLITSCREEN, DEBUG } Mode;
+typedef enum { SINGLEPLAYER, SPLITSCREEN } Mode;
 
 typedef enum { MENU, GAME } Screen;
 
@@ -35,6 +35,7 @@ typedef enum { FIRST_PERSON, THIRD_PERSON } CameraView;
 typedef struct {
     Screen     screen;
     Mode       mode;
+    bool       debug;
     CurrentMap map;
     CameraView cameraView;
 } State;

@@ -10,6 +10,8 @@
 // Botões
 static Button BUTTONS[MAX_BUTTONS];
 static Button MAPS_BUTTONS[MAX_BUTTONS];
+static Button debugButton;
+static Button playButton;
 
 // Áudio
 static Sound clickSound;
@@ -28,14 +30,13 @@ static int padding;
 static int buttonFontSize;
 static int titleFontSize;
 
-static Button playButton;
-
 void interlagosMapButtonAction() {
     state.map = INTERLAGOS;
 }
 
 void debugButtonAction() {
-    state.mode = DEBUG;
+    state.debug = !state.debug;
+    debugButton.selected = state.debug;
 }
 
 void singleplayerButtonAction() {
@@ -50,7 +51,6 @@ void Menu_setup() {
 
     BUTTONS[0].action      = singleplayerButtonAction;
     BUTTONS[1].action      = splitscreenButtonAction;
-    BUTTONS[2].action      = debugButtonAction;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
 
     width   = SCREEN_WIDTH / 5;
@@ -62,6 +62,9 @@ void Menu_setup() {
 
     playButton = (Button) {
         "Play", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, Game_load};
+
+    debugButton = (Button) {
+        "Debug", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - 2 * height - 40}, 0, 0, debugButtonAction};
 
     int dy = padding + height;
     int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;
@@ -149,19 +152,20 @@ void Menu_update() {
     Vector2 mouse = GetMousePosition();
 
     for (int i = 0; i < TOTAL_GAME_MODES; i++) {
-        if (pressedButton(BUTTONS + i, mouse)){
+        if (pressedButton(BUTTONS + i, mouse)) {
             unselectButtons(BUTTONS);
             BUTTONS[i].selected = true;
         }
     }
 
     for (int i = 0; i < TOTAL_MAPS; i++) {
-        if (pressedButton(MAPS_BUTTONS + i, mouse)){
+        if (pressedButton(MAPS_BUTTONS + i, mouse)) {
             unselectButtons(MAPS_BUTTONS);
             MAPS_BUTTONS[i].selected = true;
         }
     }
 
+    pressedButton(&debugButton, mouse);
     pressedButton(&playButton, mouse);
 
     SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
@@ -194,5 +198,6 @@ void Menu_draw() {
         drawButton(MAPS_BUTTONS[i]);
     }
 
+    drawButton(debugButton);
     drawButton(playButton);
 }

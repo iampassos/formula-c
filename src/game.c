@@ -31,10 +31,10 @@ static Music carSound;
 
 static void loadMap(Map map) {
     // Carrega a imagem de fundo
-    trackBackground = LoadTexture(state.mode == DEBUG ? map.maskPath : map.backgroundPath);
+    trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
 
     // Carrega a imagem do minimapa
-    Image minimap = LoadImage(state.mode == DEBUG ? map.maskPath : map.minimapPath);
+    Image minimap = LoadImage(state.debug ? map.maskPath : map.minimapPath);
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
     ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
@@ -112,10 +112,6 @@ static void loadSingleplayer(Map map) {
                            0.5f);
 }
 
-static void loadDebug(Map map) {
-    loadSingleplayer(map);
-}
-
 static void loadSplitscreen(Map map) {
     return;
 }
@@ -130,9 +126,6 @@ void Game_load() {
         break;
     case SPLITSCREEN:
         loadSplitscreen(map);
-        break;
-    case DEBUG:
-        loadDebug(map);
         break;
     }
 }
@@ -290,7 +283,7 @@ static void drawHud() {
 
     DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
 
-    if (state.mode == DEBUG) {
+    if (state.debug) {
         drawDebugInfo(player, ghost);
     }
     drawMinimap(player, ghost);
