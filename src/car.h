@@ -43,7 +43,7 @@ Car *Car_create(Vector2 pos,   // posição inicial
                 float reverseForce,    // força de ré
                 float breakCoeficient, // coeficiente de frenagem
 
-                float angularSpeed,   // aceleração angular
+                float angularSpeed, // aceleração angular
                 float minTurnSpeed, // velocidade mínima para virar
 
                 int width,  // largura do carro

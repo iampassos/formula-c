@@ -35,7 +35,7 @@ void interlagosMapButtonAction() {
 }
 
 void debugButtonAction() {
-    state.debug = !state.debug;
+    state.debug          = !state.debug;
     debugButton.selected = state.debug;
 }
 
@@ -48,7 +48,6 @@ void splitscreenButtonAction() {
 }
 
 void Menu_setup() {
-
     BUTTONS[0].action      = singleplayerButtonAction;
     BUTTONS[1].action      = splitscreenButtonAction;
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
@@ -63,8 +62,11 @@ void Menu_setup() {
     playButton = (Button) {
         "Play", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - height - 20}, 0, 0, Game_load};
 
-    debugButton = (Button) {
-        "Debug", {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - 2 * height - 40}, 0, 0, debugButtonAction};
+    debugButton = (Button) {"Debug",
+                            {SCREEN_WIDTH - width - 20, SCREEN_HEIGHT - 2 * height - 40},
+                            0,
+                            0,
+                            debugButtonAction};
 
     int dy = padding + height;
     int y  = (SCREEN_HEIGHT - dy * (TOTAL_GAME_MODES - 1) + padding) / 2;

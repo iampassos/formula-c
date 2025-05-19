@@ -14,6 +14,7 @@ static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada d
 static Texture2D   trackHud;
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
 static Camera2D   *camera;
+static Camera2D   *camera2;
 
 static char ghostCarPath[100];
 
@@ -113,7 +114,19 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
-    return;
+    Car *p1 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
+                         CAR_IMAGE_PATH, WHITE, false, 1);
+
+    Car *p2 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
+                         CAR_IMAGE_PATH, WHITE, false, 2);
+
+    LinkedList_addCar(cars, p1);
+    LinkedList_addCar(cars, p2);
+
+    camera =
+        Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
+    camera2 =
+        Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
 }
 
 void Game_load() {
@@ -183,90 +196,47 @@ void Game_cleanup() {
 }
 
 void Game_update() {
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+    if (state.mode == SINGLEPLAYER) {
+        Car *player = LinkedList_getCarById(cars, 1);
 
-    SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
-    SetMusicVolume(music, GAME_MUSIC_VOLUME);
-    UpdateMusicStream(music);
-    UpdateMusicStream(carSound);
+        SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
+        SetMusicVolume(music, GAME_MUSIC_VOLUME);
+        UpdateMusicStream(music);
+        UpdateMusicStream(carSound);
 
-    updateGhostCar(player);
+        updateGhostCar(player);
 
-    Car_move(player, KEY_W, KEY_S, KEY_D,
-             KEY_A); // Movendo o carro do player 2 de acordo com essas teclas
+        Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A);
 
-    LinkedList_forEach(
-        cars,
-        Car_update); // Jogando a função Car_update(Car* car); para cada carro da lista encadeada
+        LinkedList_forEach(cars, Car_update);
 
-    Camera_updateTarget(camera, player); // Atualizando a posição da camera
-}
+        Camera_updateTarget(camera, player);
+    } else {
+        Car *p1 = LinkedList_getCarById(cars, 1);
+        Car *p2 = LinkedList_getCarById(cars, 2);
 
-static void drawMinimap(Car *player, Car *ghost) {
-    float textureX = SCREEN_WIDTH - trackHud.width;
+        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+        Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
 
-    DrawTexture(trackHud, textureX, 0, (Color) {255, 255, 255, HUD_OPACITY});
-    float xPlayerHud = trackHud.width * player->pos.x / trackBackground.width + textureX;
-    float yPlayerHud = trackHud.height * player->pos.y / trackBackground.height;
+        LinkedList_forEach(cars, Car_update);
 
-    float xGhostHud = trackHud.width * ghost->pos.x / trackBackground.width + textureX;
-    float yGhostHud = trackHud.height * ghost->pos.y / trackBackground.height;
-
-    DrawCircleLines(xPlayerHud, yPlayerHud, 6.5f, BLACK);
-    DrawCircle(xPlayerHud, yPlayerHud, 6, RED);
-
-    DrawCircleLines(xGhostHud, yGhostHud, 3.5f, BLACK);
-    DrawCircle(xGhostHud, yGhostHud, 3, WHITE);
-}
-
-static void drawSpeedometer(Car *player) {
-    float speedometerAngle = -PI + PI * player->vel / player->maxVelocity;
-    float speedometerSize  = SCREEN_WIDTH / 12;
-
-    Vector2 speedometerStart = {SCREEN_WIDTH / 2, SCREEN_HEIGHT - SCREEN_HEIGHT / 60};
-    Vector2 speedometerEnd   = {cosf(speedometerAngle) * speedometerSize + speedometerStart.x,
-                                sinf(speedometerAngle) * speedometerSize + speedometerStart.y};
-
-    DrawCircleSector(speedometerStart, speedometerSize, -180, 0, 32,
-                     (Color) {0, 0, 0, HUD_OPACITY});
-    DrawCircleSectorLines(speedometerStart, speedometerSize, -180, 0, 32, WHITE);
-
-    int   tickCount  = 9; // número de marcações, por exemplo de 0 a 100 em passos de 10
-    float tickLength = 10.0f;
-
-    for (int i = 0; i <= tickCount; i++) {
-        float t     = (float) i / tickCount;
-        float angle = -PI + PI * t; // de -π a 0
-        float cosA  = cosf(angle);
-        float sinA  = sinf(angle);
-
-        Vector2 start = {speedometerStart.x + cosA * (speedometerSize - tickLength),
-                         speedometerStart.y + sinA * (speedometerSize - tickLength)};
-
-        Vector2 end = {speedometerStart.x + cosA * speedometerSize,
-                       speedometerStart.y + sinA * speedometerSize};
-
-        DrawLineEx(start, end, 2, (Color) {255, 255, 255, HUD_OPACITY});
-
-        int     velValue = (int) (player->maxVelocity * t);
-        Vector2 labelPos = {speedometerStart.x + cosA * (speedometerSize - tickLength - 15),
-                            speedometerStart.y + sinA * (speedometerSize - tickLength - 15)};
-        DrawText(TextFormat("%d", velValue), (int) labelPos.x - 10, (int) labelPos.y - 10, 14,
-                 WHITE);
+        Camera_updateTarget(camera, p1);
+        Camera_updateTarget(camera2, p2);
     }
+}
 
-    float t           = player->vel / player->maxVelocity;
-    Color needleColor = (Color) {(unsigned char) (255 * t),       // vermelho aumenta
-                                 (unsigned char) (255 * (1 - t)), // verde diminui
-                                 0, HUD_OPACITY};
+static void drawMinimap(Car *player) {
+    float x =
+        trackHud.width * player->pos.x / trackBackground.width + SCREEN_WIDTH - trackHud.width;
+    float y = trackHud.height * player->pos.y / trackBackground.height;
 
-    DrawLineEx(speedometerStart, speedometerEnd, 5, needleColor);
+    DrawCircleLines(x, y, 6.5f, BLACK);
+    DrawCircle(x, y, 6, RED);
 }
 
 static void drawDebugInfo(Car *player, Car *ghost) {
-    // Mostrando as informações do carro com id 1
     Car_showInfo(player, SCREEN_WIDTH - 400, 300, 20, BLACK);
-    // Debug ghost car
+
     char stateText[1000];
     sprintf(stateText, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
             ArrayList_length(bestLap), replayFrameIdx);
@@ -286,19 +256,36 @@ static void drawHud() {
     if (state.debug) {
         drawDebugInfo(player, ghost);
     }
-    drawMinimap(player, ghost);
-    drawSpeedometer(player);
+
+    DrawTexture(trackHud, SCREEN_WIDTH - trackHud.width, 0, (Color) {255, 255, 255, HUD_OPACITY});
+    LinkedList_forEach(cars, drawMinimap);
+}
+
+void Map_draw() {
+    DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
+    LinkedList_forEach(
+        cars,
+        Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
 }
 
 void Game_draw() {
-    BeginMode2D(*camera);
+    if (state.mode == SINGLEPLAYER) {
+        BeginMode2D(*camera);
+        Map_draw();
+        EndMode2D();
+    } else {
+        BeginScissorMode(0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
+        BeginMode2D(*camera);
+        Map_draw();
+        EndMode2D();
+        EndScissorMode();
 
-    DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
-
-    LinkedList_forEach(
-        cars, Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
-
-    EndMode2D();
+        BeginScissorMode(SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
+        BeginMode2D(*camera2);
+        Map_draw();
+        EndMode2D();
+        EndScissorMode();
+    }
 
     drawHud();
 
