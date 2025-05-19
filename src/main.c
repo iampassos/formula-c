@@ -66,9 +66,6 @@ TrackArea TRACK_AREAS[] = {
 
 int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
 
-// Pista selecionada
-int SELECTED_MAP_IDX = 0;
-
 // Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 Color CHECKPOINTS_COLOR   = {0, 255, 0};

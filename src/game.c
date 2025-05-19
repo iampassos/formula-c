@@ -55,7 +55,7 @@ static void drawDebugInfo(Car *player, Car *ghost);
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
 static void drawHud();
-static void MapDraw();
+static void drawMap();
 
 //----------------------------------------------------------------------------------
 // Carregamento do jogo
@@ -131,7 +131,7 @@ void Game_draw() {
     }
 
     BeginMode2D(*camera1);
-    MapDraw();
+    drawMap();
     EndMode2D();
 
     Car *p1 = LinkedList_getCarById(cars, 1);
@@ -142,7 +142,7 @@ void Game_draw() {
 
         BeginScissorMode(SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
         BeginMode2D(*camera2);
-        MapDraw();
+        drawMap();
         EndMode2D();
         EndScissorMode();
 
@@ -366,7 +366,7 @@ static void drawHud() {
     LinkedList_forEach(cars, drawPlayerInMinimap);
 }
 
-void MapDraw() {
+void drawMap() {
     DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
     LinkedList_forEach(
         cars,
