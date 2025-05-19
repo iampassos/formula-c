@@ -223,26 +223,10 @@ static void loadSingleplayer(Map map) {
     bestLap        = ArrayList_create();
     loadBestLap();
     currentLap    = ArrayList_create();
-    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 2.66, 0.3, 0.2, 0.02, 0.035, 0.2, 150, 75,
-                               CAR_IMAGE_PATH, WHITE, true, 99);
-    Car *player   = Car_create(map.startCarPos, // pos
-                               map.startAngle,  // angulo inicial do carro
-
-                               0.3,  // aceleracao do carro
-                               0.2,  // força da marcha ré
-                               0.02, // força de frenagem
-
-                               0.035, // aceleração angular (velocidade de rotação)
-                               0.5,   // velocidade mínima para fazer curva
-
-                               150, // largura
-                               75,  // altura
-
-                               CAR_IMAGE_PATH, // path da textura
-                               WHITE,          // Cor do carro
-                               false,          // Carro fantasma
-                               1               // id do carro
-      );
+    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH,
+                               WHITE, true, 99);
+    Car *player   = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH,
+                               WHITE, false, 1);
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
@@ -253,11 +237,11 @@ static void loadSplitscreen(Map map) {
     minimapPos.x = SCREEN_WIDTH / 2 - trackHud.width / 2;
     minimapPos.y = 0;
     Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-    Car *p1 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
-                         CAR_IMAGE_PATH, RED, false, 1);
+    Car *p1 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH, WHITE,
+                         false, 1);
 
-    Car *p2 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
-                         CAR_IMAGE_PATH, BLUE, false, 2);
+    Car *p2 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH, WHITE,
+                         false, 2);
 
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);

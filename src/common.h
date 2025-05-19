@@ -40,6 +40,17 @@ typedef struct {
     CameraView cameraView;
 } State;
 
+typedef struct {
+    float acc;
+    float reverseForce;
+    float breakForce;
+    float angularSpeed;
+    int   width;
+    int   height;
+} CarConfig;
+
+extern CarConfig DEFAULT_CAR_CONFIG;
+
 extern State state;
 
 // Configurações de tela

@@ -39,15 +39,7 @@ void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 Car *Car_create(Vector2 pos,   // posição inicial
                 float   angle, // orientação inicial
 
-                float acc,             // aceleração
-                float reverseForce,    // força de ré
-                float breakCoeficient, // coeficiente de frenagem
-
-                float angularSpeed, // aceleração angular
-                float minTurnSpeed, // velocidade mínima para virar
-
-                int width,  // largura do carro
-                int height, // altura do carro
+                CarConfig config,
 
                 const char *texturePath, // path da textura
                 Color color, bool ghost,

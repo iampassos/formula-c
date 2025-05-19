@@ -24,9 +24,8 @@ void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as core
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
-Car *Car_create(Vector2 pos, float angle, float acc, float reverseForce, float breakCoeficient,
-                float angularSpeed, float minTurnSpeed, int width, int height,
-                const char *texturePath, Color color, bool ghost, int id);
+Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
+                bool ghost, int id);
 
 void Car_free(Car *car); // Libera a memória de um carro
 
@@ -90,40 +89,24 @@ void Track_Unload() { // Função para descarregar as variáveis associadas a pi
 // Criar / liberar memória do carro
 //----------------------------------------------------------------------------------
 
-Car *Car_create(   // Função para criar um carro
-    Vector2 pos,   // posição inicial
-    float   angle, // orientação inicial
-
-    float acc,             // aceleração
-    float reverseForce,    // força de ré
-    float breakCoeficient, // coeficiente de frenagem
-
-    float angularSpeed, // aceleração angular
-    float minTurnSpeed, // velocidade mínima para virar
-
-    int width,  // largura do carro
-    int height, // altura do carro
-
-    const char *texturePath, // path da textura
-    Color color, bool ghost,
-    int id // identificador único
-) {
+Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
+                bool ghost, int id) {
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
     car->pos          = pos;
-    car->acc          = acc;
     car->texture      = LoadTexture(texturePath);
-    car->width        = width;
-    car->height       = height;
     car->angle        = angle;
-    car->angularSpeed = angularSpeed;
-    car->minTurnSpeed = minTurnSpeed;
-    car->breakForce   = 1 - breakCoeficient;
-    car->reverseForce = reverseForce;
+    car->acc          = config.acc;
+    car->width        = config.width;
+    car->height       = config.height;
+    car->angularSpeed = config.angularSpeed;
+    car->breakForce   = config.breakForce;
+    car->reverseForce = config.reverseForce;
     car->color        = color;
     car->ghost        = ghost;
-    car->maxVelocity  = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * acc;
+    car->maxVelocity  = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
+    car->minTurnSpeed = car->maxVelocity / 50;
     car->dragForce    = 1;
     car->id           = id;
     car->lap          = -1;
@@ -131,7 +114,7 @@ Car *Car_create(   // Função para criar um carro
     car->startLapTime = GetTime();
     car->raceTime     = GetTime();
     car->bestLapTime  = -1;
-    car->checkpoint   = 0;
+    car->checkpoint   = -1;
     return car;
 }
 

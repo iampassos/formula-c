@@ -70,6 +70,9 @@ int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
+// Carro padrão
+CarConfig DEFAULT_CAR_CONFIG = {0.3, 0.2, 0.98, 0.035, 150, 75};
+
 // Estado do jogo
 State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, THIRD_PERSON};
 
