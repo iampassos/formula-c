@@ -65,4 +65,5 @@ void Car_move(Car *car, int up, int down, int right,
 void Car_showInfo(Car *car, int x, int y, int fontSize,
                   Color fontColor); // Mostra as informações do carro no console (PARA DEBUG)
 
+float dist(Vector2 a, Vector2 b);
 #endif

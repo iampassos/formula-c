@@ -19,7 +19,7 @@ static float MIN_DIST_TO_DETECT;
 
 // Funções internas
 static bool  equalsColor(Color a, Color b);
-static float dist(Vector2 a, Vector2 b);
+float        dist(Vector2 a, Vector2 b);
 static void  returnToLastCheckpoint(Car *car);
 static void  applyDragForce(Car *car, Color floorColor);
 static void  applyMovementPhysics(Car *car);
@@ -242,7 +242,7 @@ static void reverse(Car *car) { // Marcha ré
     car->vel -= car->acc * car->reverseForce;
 }
 
-static float dist(Vector2 a, Vector2 b) {
+float dist(Vector2 a, Vector2 b) {
     float deltaX = b.x - a.x;
     float deltaY = b.y - a.y;
     return sqrtf(deltaX * deltaX + deltaY * deltaY);

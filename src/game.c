@@ -13,8 +13,9 @@
 static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
 static Texture2D   trackHud;
 static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
-static Camera2D   *camera;
-static Camera2D   *camera2;
+
+static Camera2D *camera1;
+static Camera2D *camera2;
 
 static char ghostCarPath[100];
 
@@ -109,24 +110,24 @@ static void loadSingleplayer(Map map) {
       );
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
-    camera = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
-                           0.5f);
+    camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                            0.0f, 0.5f);
 }
 
 static void loadSplitscreen(Map map) {
     Car *p1 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
-                         CAR_IMAGE_PATH, WHITE, false, 1);
+                         CAR_IMAGE_PATH, RED, false, 1);
 
     Car *p2 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
-                         CAR_IMAGE_PATH, WHITE, false, 2);
+                         CAR_IMAGE_PATH, BLUE, false, 2);
 
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);
 
-    camera =
+    camera1 =
         Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
-    camera2 =
-        Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
+    camera2 = Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0f},
+                            0.0f, 0.5f);
 }
 
 void Game_load() {
@@ -181,7 +182,8 @@ static void mapCleanup() {
     LinkedList_clear(cars);
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
     UnloadTexture(trackHud);        // Liberando a textura da imagem do plano de fundo
-    Camera_free(camera);
+    Camera_free(camera1);
+    Camera_free(camera2);
     ArrayList_free(bestLap);
     ArrayList_free(currentLap);
     UnloadMusicStream(music);
@@ -196,23 +198,22 @@ void Game_cleanup() {
 }
 
 void Game_update() {
-    if (state.mode == SINGLEPLAYER) {
-        Car *player = LinkedList_getCarById(cars, 1);
+    Car *p1 = LinkedList_getCarById(cars, 1);
 
-        SetMusicPitch(carSound, 0.6 + player->vel / 13.0f);
+    if (state.mode == SINGLEPLAYER) {
+        SetMusicPitch(carSound, 0.6 + p1->vel / 13.0f);
         SetMusicVolume(music, GAME_MUSIC_VOLUME);
         UpdateMusicStream(music);
         UpdateMusicStream(carSound);
 
-        updateGhostCar(player);
+        updateGhostCar(p1);
 
-        Car_move(player, KEY_W, KEY_S, KEY_D, KEY_A);
+        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
 
         LinkedList_forEach(cars, Car_update);
 
-        Camera_updateTarget(camera, player);
+        Camera_updateTarget(camera1, p1);
     } else {
-        Car *p1 = LinkedList_getCarById(cars, 1);
         Car *p2 = LinkedList_getCarById(cars, 2);
 
         Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
@@ -220,18 +221,9 @@ void Game_update() {
 
         LinkedList_forEach(cars, Car_update);
 
-        Camera_updateTarget(camera, p1);
+        Camera_updateTarget(camera1, p1);
         Camera_updateTarget(camera2, p2);
     }
-}
-
-static void drawMinimap(Car *player) {
-    float x =
-        trackHud.width * player->pos.x / trackBackground.width + SCREEN_WIDTH - trackHud.width;
-    float y = trackHud.height * player->pos.y / trackBackground.height;
-
-    DrawCircleLines(x, y, 6.5f, BLACK);
-    DrawCircle(x, y, 6, RED);
 }
 
 static void drawDebugInfo(Car *player, Car *ghost) {
@@ -247,13 +239,27 @@ static void drawDebugInfo(Car *player, Car *ghost) {
     DrawText(stateText2, 10, 600, 20, BLACK);
 }
 
-static void drawHud() {
-    Car *ghost  = LinkedList_getCarById(cars, 99);
-    Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+static void drawMinimap(Car *player) {
+    float x =
+        trackHud.width * player->pos.x / trackBackground.width + SCREEN_WIDTH - trackHud.width;
+    float y = trackHud.height * player->pos.y / trackBackground.height;
 
+    if (player->ghost) {
+        DrawCircleLines(x, y, 3.5f, BLACK);
+        DrawCircle(x, y, 3, WHITE);
+    } else {
+        DrawCircleLines(x, y, 6.5f, BLACK);
+        DrawCircle(x, y, 6, player->color);
+    }
+}
+
+static void drawHud() {
     DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
 
     if (state.debug) {
+        Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+
+        Car *ghost = LinkedList_getCarById(cars, 99);
         drawDebugInfo(player, ghost);
     }
 
@@ -268,16 +274,27 @@ void Map_draw() {
         Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
 }
 
+void Velocity_draw(Car *player, float x, float y) {
+    char buffer[8];
+    snprintf(buffer, sizeof(buffer), "%.1f", player->vel * 3.6f);
+    DrawText(buffer, x, y, 64, WHITE);
+}
+
 void Game_draw() {
-    if (state.mode == SINGLEPLAYER) {
-        BeginMode2D(*camera);
-        Map_draw();
-        EndMode2D();
-    } else {
+    int split = state.mode == SPLITSCREEN;
+
+    if (split) {
         BeginScissorMode(0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
-        BeginMode2D(*camera);
-        Map_draw();
-        EndMode2D();
+    }
+
+    BeginMode2D(*camera1);
+    Map_draw();
+    EndMode2D();
+
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    Velocity_draw(p1, 128, SCREEN_HEIGHT - 2 * 64);
+
+    if (split) {
         EndScissorMode();
 
         BeginScissorMode(SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
@@ -285,6 +302,11 @@ void Game_draw() {
         Map_draw();
         EndMode2D();
         EndScissorMode();
+
+        Car *p2 = LinkedList_getCarById(cars, 2);
+        Velocity_draw(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
+
+        DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, WHITE);
     }
 
     drawHud();
