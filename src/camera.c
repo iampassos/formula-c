@@ -6,6 +6,9 @@
 static int BACKGROUND_WIDTH;
 static int BACKGROUND_HEIGHT;
 
+static int CAMERA_WIDTH;
+static int CAMERA_HEIGHT;
+
 Camera2D *Camera_create(Vector2 target, Vector2 offset, float rotation, float zoom) {
     Camera2D *camera = (Camera2D *) malloc(sizeof(Camera2D));
     if (camera == NULL)
@@ -28,14 +31,19 @@ void Camera_Background_setSize(int width, int height) {
     BACKGROUND_HEIGHT = height;
 }
 
+void Camera_setSize(int width, int height){
+    CAMERA_WIDTH = width;
+    CAMERA_HEIGHT = height;
+}
+
 static float LerpAngle(float a, float b, float t) {
     float diff = fmodf(b - a + 180.0f, 360.0f) - 180.0f;
     return a + diff * t;
 }
 
 void Camera_updateTarget(Camera2D *camera, Car *car) {
-    float halfW = SCREEN_WIDTH / (2.0f * camera->zoom);
-    float halfH = SCREEN_HEIGHT / (2.0f * camera->zoom);
+    float halfW = CAMERA_WIDTH / (2.0f * camera->zoom);
+    float halfH = CAMERA_HEIGHT / (2.0f * camera->zoom);
 
     float x = car->pos.x;
     float y = car->pos.y;

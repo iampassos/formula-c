@@ -79,6 +79,7 @@ static void load_best_lap() {
 }
 
 static void loadSingleplayer(Map map) {
+    Camera_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
     strcat(ghostCarPath, map.name);
     strcat(ghostCarPath, ".bin");
@@ -115,6 +116,7 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
+    Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     Car *p1 = Car_create(map.startCarPos, map.startAngle, 0.3, 0.2, 0.02, 0.035, 0.5, 150, 75,
                          CAR_IMAGE_PATH, RED, false, 1);
 
@@ -182,10 +184,13 @@ static void mapCleanup() {
     LinkedList_clear(cars);
     UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
     UnloadTexture(trackHud);        // Liberando a textura da imagem do plano de fundo
+    if (state.mode == SINGLEPLAYER) {
+        ArrayList_free(bestLap);
+        ArrayList_free(currentLap);
+    } else {
+        Camera_free(camera2);
+    }
     Camera_free(camera1);
-    Camera_free(camera2);
-    ArrayList_free(bestLap);
-    ArrayList_free(currentLap);
     UnloadMusicStream(music);
     UnloadMusicStream(carSound);
 }
