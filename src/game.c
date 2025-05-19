@@ -234,7 +234,7 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
-    minimapPos.x = SCREEN_WIDTH / 2 - trackHud.width / 2;
+    minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 0;
     Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     Car *p1 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH, WHITE,
@@ -358,7 +358,8 @@ void drawMap() {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
-    char buffer[8];
-    snprintf(buffer, sizeof(buffer), "%.1f", player->vel * 3.6f);
-    DrawText(buffer, x, y, 64, WHITE);
+    char buffer[15];
+    snprintf(buffer, sizeof(buffer), "%.1f km/h", 3600 * 1.1 * player->vel * 60 / trackBackground.width / 2);
+    Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
+    DrawText(buffer, x, y, 64, textColor);
 }

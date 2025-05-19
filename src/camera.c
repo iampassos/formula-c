@@ -59,12 +59,7 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
 
     camera->target = (Vector2) {x, y};
 
-    float targetZoom = 1.0f - (car->vel * 0.02f);
-
-    if (targetZoom < 0.5f)
-        targetZoom = 0.5f;
-    if (targetZoom > 2.0f)
-        targetZoom = 2.0f;
+    float targetZoom = 1.0f - (car->vel / car->maxVelocity) + 0.5;
 
     camera->zoom += (targetZoom - camera->zoom) * 0.1f;
     if (state.cameraView == FIRST_PERSON) {
