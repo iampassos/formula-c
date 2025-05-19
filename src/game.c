@@ -6,7 +6,6 @@
 #include "linked_list.h"
 #include "raylib.h"
 #include "stdio.h"
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -25,6 +24,7 @@ static int minimapHeigth;
 static ArrayList *bestLap    = NULL;
 static ArrayList *currentLap = NULL;
 
+static int lap            = 0;
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
@@ -54,6 +54,7 @@ static void updateGhostCar(Car *player);
 static void drawDebugInfo(Car *player, Car *ghost);
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
+static void drawLaps(Car *player, float x, float y);
 static void drawHud();
 static void drawMap();
 
@@ -136,6 +137,7 @@ void Game_draw() {
 
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
+    drawLaps(p1, 32, 32);
 
     if (split) {
         EndScissorMode();
@@ -148,8 +150,9 @@ void Game_draw() {
 
         Car *p2 = LinkedList_getCarById(cars, 2);
         drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
+        drawLaps(p2, SCREEN_WIDTH / 2.0f + 32, 32);
 
-        DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, WHITE);
+        DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
     }
 
     drawHud();
@@ -212,7 +215,7 @@ static void mapCleanup() {
 
 static void loadSingleplayer(Map map) {
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y = 0;
+    minimapPos.y = 10;
     Camera_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
     strcat(ghostCarPath, map.name);
@@ -223,10 +226,10 @@ static void loadSingleplayer(Map map) {
     bestLap        = ArrayList_create();
     loadBestLap();
     currentLap    = ArrayList_create();
-    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH,
+    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
                                WHITE, true, 99);
-    Car *player   = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH,
-                               WHITE, false, 1);
+    Car *player   = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG,
+                               CAR_IMAGES_PATH[0], WHITE, false, 1);
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
     camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
@@ -235,13 +238,13 @@ static void loadSingleplayer(Map map) {
 
 static void loadSplitscreen(Map map) {
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y = 0;
+    minimapPos.y = 10;
     Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-    Car *p1 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH, WHITE,
-                         false, 1);
+    Car *p1 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
+                         BLUE, false, 1);
 
-    Car *p2 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGE_PATH, WHITE,
-                         false, 2);
+    Car *p2 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[2],
+                         ORANGE, false, 2);
 
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);
@@ -337,8 +340,6 @@ static void drawPlayerInMinimap(Car *player) {
 }
 
 static void drawHud() {
-    DrawText("Pressione Q para voltar ao menu", 10, 10, 20, BLACK);
-
     if (state.debug) {
         Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
 
@@ -358,8 +359,20 @@ void drawMap() {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
-    char buffer[15];
-    snprintf(buffer, sizeof(buffer), "%.1f km/h", 3600 * 1.1 * player->vel * 60 / trackBackground.width / 2);
+    char buffer[16];
+    snprintf(buffer, sizeof(buffer), "%.1f km/h",
+             3600 * 1.1 * player->vel * 60 / trackBackground.width / 1.5f);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
     DrawText(buffer, x, y, 64, textColor);
 }
+
+void drawLaps(Car *player, float x, float y) {
+    char buffer[32];
+
+    if (player != NULL && player->lap > -1) {
+        snprintf(buffer, sizeof(buffer), "Lap %d", player->lap + 1);
+    }
+
+    DrawText(buffer, x, y, 64, WHITE);
+}
+

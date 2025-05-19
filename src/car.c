@@ -173,7 +173,7 @@ void Car_draw(Car *car) {
                            car->height};                           // Tamanho e posição do carro
     Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
-                   car->ghost ? Fade(car->color, 0.5f) : car->color);
+                   car->ghost ? Fade(car->color, 0.5f) : WHITE);
 }
 
 void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {

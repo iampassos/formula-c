@@ -90,5 +90,6 @@ extern char *BACKGROUND_PATH;
 extern char *CAR_IMAGE_PATH;
 extern char *LOGO_IMAGE_PATH;
 extern int   HUD_OPACITY;
+extern char *CAR_IMAGES_PATH[];
 
 #endif
