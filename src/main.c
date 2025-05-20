@@ -25,7 +25,7 @@ char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
 char *CLICK_BUTTON_SOUND_PATH = "resources/sounds/click.mp3";
-float CAR_VOLUME              = 0.0f;
+float CAR_VOLUME              = 0.1f;
 float GAME_MUSIC_VOLUME       = 0.0f;
 float MENU_MUSIC_VOLUME       = 0.0f;
 

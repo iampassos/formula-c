@@ -24,8 +24,8 @@ void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as core
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
-Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
-                bool ghost, int id);
+Car *Car_create(Vector2 pos, float angle, CarConfig config,
+                const char *texturePath, Color color, bool ghost, int id);
 
 void Car_free(Car *car); // Libera a memória de um carro
 
@@ -115,11 +115,15 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->raceTime     = GetTime();
     car->bestLapTime  = -1;
     car->checkpoint   = -1;
+    car->sound        = LoadMusicStream(CAR_SOUND_PATH);
+    PlayMusicStream(car->sound);
+    SetMusicVolume(car->sound, CAR_VOLUME);
     return car;
 }
 
 void Car_free(Car *car) {
     UnloadTexture(car->texture);
+    UnloadMusicStream(car->sound);
     free(car);
 }
 
@@ -130,6 +134,8 @@ void Car_free(Car *car) {
 void Car_update(Car *car) {
     if (car->ghost)
         return;
+    SetMusicPitch(car->sound, 0.6 + car->vel / 13.0f);
+    UpdateMusicStream(car->sound);
     Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
 
     updateLapStatus(car, floorColor);

@@ -28,7 +28,6 @@ static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 static Music music;
-static Music carSound;
 
 static Vector2 minimapPos;
 
@@ -103,36 +102,26 @@ void Game_update() {
         return;
     }
 
+    UpdateMusicStream(music);
+
     Car *p1 = LinkedList_getCarById(cars, 1);
 
     if (state.mode == SINGLEPLAYER) {
-        SetMusicPitch(carSound, 0.6 + p1->vel / 13.0f);
-        SetMusicVolume(music, GAME_MUSIC_VOLUME);
-        UpdateMusicStream(music);
-        UpdateMusicStream(carSound);
-
         updateGhostCar(p1);
-
-        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
-
-        LinkedList_forEach(cars, Car_update);
     } else {
+        Car *p2 = LinkedList_getCarById(cars, 2);
 
         LinkedList_forEach(cars, updateWinner);
         if (winner)
             return;
 
-        Car *p2 = LinkedList_getCarById(cars, 2);
-
-        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
         Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
-
-        LinkedList_forEach(cars, Car_update);
 
         Camera_updateTarget(camera2, p2);
     }
-
+    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
     Camera_updateTarget(camera1, p1);
+    LinkedList_forEach(cars, Car_update);
 }
 
 //----------------------------------------------------------------------------------
@@ -207,12 +196,9 @@ static void loadMap(Map map) {
 
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
-    music    = LoadMusicStream(GAME_MUSIC_PATH);
-    carSound = LoadMusicStream(CAR_SOUND_PATH);
-    SetMusicVolume(carSound, CAR_VOLUME);
+    music = LoadMusicStream(GAME_MUSIC_PATH);
     SetMusicVolume(music, GAME_MUSIC_VOLUME);
     PlayMusicStream(music);
-    PlayMusicStream(carSound);
 }
 
 static void mapCleanup() {
@@ -228,7 +214,6 @@ static void mapCleanup() {
     }
     Camera_free(camera1);
     UnloadMusicStream(music);
-    UnloadMusicStream(carSound);
 }
 
 //----------------------------------------------------------------------------------
