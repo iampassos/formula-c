@@ -25,9 +25,9 @@ char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
 char *CLICK_BUTTON_SOUND_PATH = "resources/sounds/click.mp3";
 char *SMAPHORE_SOUND_PATH     = "resources/sounds/click.mp3";
-float CAR_VOLUME              = 0.1f;
-float GAME_MUSIC_VOLUME       = 0.3f;
-float MENU_MUSIC_VOLUME       = 0.01f;
+float CAR_VOLUME              = 0.0f;
+float GAME_MUSIC_VOLUME       = 0.0f;
+float MENU_MUSIC_VOLUME       = 0.00f;
 
 // Recursos visuais
 char *SEMAPHORE_PATH[]  = {"resources/others/nolight.png", "resources/others/redlight.png"};
@@ -64,10 +64,10 @@ int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 
 // Áreas da pista
 TrackArea TRACK_AREAS[] = {
-    /* pista  */ {{127, 127, 127}, 0.99},
-    /* fraca  */ {{255, 127, 39}, 0.96},
-    /* forte  */ {{163, 73, 164}, 0.93},
-    /* grama  */ {{34, 177, 76}, 0.98}};
+    /* pista  */ {{127, 127, 127}, 0.997},
+    /* fraca  */ {{255, 127, 39}, 0.985},
+    /* forte  */ {{163, 73, 164}, 0.98},
+    /* grama  */ {{34, 177, 76}, 0.991}};
 
 int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
 
@@ -76,7 +76,7 @@ Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 // Carro padrão
-CarConfig DEFAULT_CAR_CONFIG = {0.3, 0.2, 0.98, 0.035, 150, 75};
+CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
 int WINNER_FONT_SIZE = 128;
 

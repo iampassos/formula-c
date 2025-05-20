@@ -23,6 +23,8 @@ typedef struct {
     float     angle;
     float     angularSpeed;
     float     minTurnSpeed;
+    float     maxAngularSpeed;
+    float     minAngularSpeed;
     float     breakForce;
     float     dragForce;
     float     reverseForce;

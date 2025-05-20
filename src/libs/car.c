@@ -92,28 +92,30 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
-    car->pos          = pos;
-    car->texture      = LoadTexture(texturePath);
-    car->angle        = angle;
-    car->acc          = config.acc;
-    car->width        = config.width;
-    car->height       = config.height;
-    car->angularSpeed = config.angularSpeed;
-    car->breakForce   = config.breakForce;
-    car->reverseForce = config.reverseForce;
-    car->color        = color;
-    car->ghost        = ghost;
-    car->maxVelocity  = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
-    car->minTurnSpeed = car->maxVelocity / 50;
-    car->dragForce    = 1;
-    car->id           = id;
-    car->lap          = -1;
-    car->vel          = 0;
-    car->startLapTime = GetTime();
-    car->raceTime     = GetTime();
-    car->bestLapTime  = -1;
-    car->checkpoint   = -1;
-    car->sound        = LoadMusicStream(CAR_SOUND_PATH);
+    car->pos             = pos;
+    car->texture         = LoadTexture(texturePath);
+    car->angle           = angle;
+    car->acc             = config.acc;
+    car->width           = config.width;
+    car->height          = config.height;
+    car->angularSpeed    = config.angularSpeed;
+    car->maxAngularSpeed = config.angularSpeed * 30;
+    car->minAngularSpeed = config.angularSpeed * 7;
+    car->breakForce      = config.breakForce;
+    car->reverseForce    = config.reverseForce;
+    car->color           = color;
+    car->ghost           = ghost;
+    car->maxVelocity     = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
+    car->minTurnSpeed    = car->maxVelocity / 50;
+    car->dragForce       = 1;
+    car->id              = id;
+    car->lap             = -1;
+    car->vel             = 0;
+    car->startLapTime    = GetTime();
+    car->raceTime        = GetTime();
+    car->bestLapTime     = -1;
+    car->checkpoint      = -1;
+    car->sound           = LoadMusicStream(CAR_SOUND_PATH);
     PlayMusicStream(car->sound);
     SetMusicVolume(car->sound, CAR_VOLUME);
     return car;
@@ -316,7 +318,14 @@ static bool canTurn(Car *car) {
 }
 
 static void turn(Car *car, float angle) {
-    car->angle += angle;
+    // Calcule um fator interpolado baseado na velocidade relativa
+    float speedRatio = car->vel / car->maxVelocity;
+
+    // Interpola linearmente entre maxSensitivity e minSensitivity
+    float steeringSensitivity = car->maxAngularSpeed - (car->maxAngularSpeed - car->minAngularSpeed) * speedRatio;
+
+    // Aplica o ângulo com sensibilidade ajustada
+    car->angle += angle * steeringSensitivity;
 }
 
 static void turnLeft(Car *car) { // Virar para a esquerda

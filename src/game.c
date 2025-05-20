@@ -294,12 +294,6 @@ static void loadSplitscreen(Map map) {
 
 static void loadBestLap() {
     FILE *file = fopen(ghostCarPath, "rb");
-
-    if (!file) {
-        file = fopen(ghostCarPath, "wb");
-    }
-
-    file = fopen(ghostCarPath, "rb");
     if (file != NULL) {
         GhostCarFrame buffer;
         while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {
@@ -443,7 +437,7 @@ static void drawPlayerInMinimap(Car *player) {
 
 static void drawSpeedometer(Car *player, float x, float y) {
     snprintf(textBuffer, sizeof(textBuffer), "%.1f km/h",
-             3600 * 1.1 * player->vel * 60 / trackBackground.width / 1.5f);
+             3600 * 0.75 * player->vel * 60 / trackBackground.width);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
     drawTextWithShadow(textBuffer, x, y, 64, textColor);
 }
