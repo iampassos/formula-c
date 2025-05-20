@@ -56,6 +56,7 @@ static void updateBestLap();
 static void updateGhostCar(Car *player);
 
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
+static void drawLapTime(Car *player, float x, float y);
 static void drawDebugInfo(Car *player, Car *ghost);
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
@@ -178,6 +179,7 @@ void Game_draw() {
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
     drawLaps(p1, 32, 32);
+    drawLapTime(p1, 32, 96);
 
     if (split) {
         EndScissorMode();
@@ -191,6 +193,7 @@ void Game_draw() {
         Car *p2 = LinkedList_getCarById(cars, 2);
         drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
         drawLaps(p2, SCREEN_WIDTH / 2.0f + 32, 32);
+        drawLapTime(p2, SCREEN_WIDTH / 2.0f + 32, 96);
 
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
     }
@@ -421,12 +424,12 @@ static void drawHud() {
     LinkedList_forEach(cars, drawPlayerInMinimap);
 }
 
-void drawMap() {
+static void drawMap() {
     DrawTexture(trackBackground, 0, 0, WHITE);
     LinkedList_forEach(cars, Car_draw);
 }
 
-void drawSpeedometer(Car *player, float x, float y) {
+static void drawSpeedometer(Car *player, float x, float y) {
     char buffer[16];
     snprintf(buffer, sizeof(buffer), "%.1f km/h",
              3600 * 1.1 * player->vel * 60 / trackBackground.width / 1.5f);
@@ -434,7 +437,7 @@ void drawSpeedometer(Car *player, float x, float y) {
     drawTextWithShadow(buffer, x, y, 64, textColor);
 }
 
-void drawLaps(Car *player, float x, float y) {
+static void drawLaps(Car *player, float x, float y) {
     char buffer[32];
 
     if (player->lap > -1) {
@@ -446,4 +449,17 @@ void drawLaps(Car *player, float x, float y) {
     }
 
     drawTextWithShadow(buffer, x, y, 64, WHITE);
+}
+
+static void drawLapTime(Car *player, float x, float y) {
+    char buffer[32];
+
+    if (player->lap > -1) {
+        double time = GetTime() - player->startLapTime;
+        int    mins = time / 60;
+        float  secs = time - (mins * 60);
+        snprintf(buffer, sizeof(buffer), "%d:%05.2fs", mins, secs);
+    }
+
+    drawTextWithShadow(buffer, x, y, 48, WHITE);
 }
