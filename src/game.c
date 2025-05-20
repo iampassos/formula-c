@@ -160,9 +160,14 @@ void Game_draw() {
         EndMode2D();
     }
 
-    if (winner == NULL) {
-        drawHud();
+    if (state.mode == SPLITSCREEN) {
+        if (winner == NULL) {
+            drawHud();
+        }
+        return;
     }
+
+    drawHud();
 }
 
 //----------------------------------------------------------------------------------
@@ -237,6 +242,7 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
+    winner       = NULL;
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 10;
 
