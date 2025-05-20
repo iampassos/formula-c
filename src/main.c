@@ -7,7 +7,7 @@ int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
 // Condição de vitoria
-int MAX_LAPS=1;
+int MAX_LAPS = 3;
 
 // Suavidade da camera
 float CAMERA_SMOOTHNESS = 0.05;

@@ -17,6 +17,7 @@ static Camera2D *camera1;
 static Camera2D *camera2;
 
 static char ghostCarPath[100];
+static char textBuffer[1000];
 
 static int minimapWidth;
 static int minimapHeigth;
@@ -55,7 +56,7 @@ static void updateWinner(Car *player);
 
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawLapTime(Car *player, float x, float y);
-static void drawDebugInfo(Car *player, Car *ghost);
+static void drawGhostCarDebug();
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
 static void drawLaps(Car *player, float x, float y);
@@ -133,7 +134,7 @@ void Game_draw() {
         return;
     }
 
-    int split = state.mode == SPLITSCREEN;
+    bool split = state.mode == SPLITSCREEN;
 
     if (split) {
         BeginScissorMode(0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
@@ -142,11 +143,6 @@ void Game_draw() {
     BeginMode2D(*camera1);
     drawMap();
     EndMode2D();
-
-    Car *p1 = LinkedList_getCarById(cars, 1);
-    drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
-    drawLaps(p1, 32, 32);
-    drawLapTime(p1, 32, 96);
 
     if (split) {
         EndScissorMode();
@@ -157,18 +153,13 @@ void Game_draw() {
         EndMode2D();
         EndScissorMode();
 
-        Car *p2 = LinkedList_getCarById(cars, 2);
-        drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
-        drawLaps(p2, SCREEN_WIDTH / 2.0f + 32, 32);
-        drawLapTime(p2, SCREEN_WIDTH / 2.0f + 32, 96);
-
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
         if (winner) {
-            char buffer[32];
-            int  font = 128;
-            snprintf(buffer, sizeof(buffer), "Jogador %d Ganhou", winner);
-            drawTextWithShadow(buffer, (SCREEN_WIDTH / 2.0f) - (MeasureText(buffer, font) / 2.0f),
+            int font = 128;
+            snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner);
+            drawTextWithShadow(textBuffer,
+                               (SCREEN_WIDTH / 2.0f) - (MeasureText(textBuffer, font) / 2.0f),
                                SCREEN_HEIGHT / 2.0f - font, font, YELLOW);
         }
     }
@@ -345,7 +336,45 @@ static void updateWinner(Car *player) {
 }
 
 //----------------------------------------------------------------------------------
-// Draw
+// Draw map
+//----------------------------------------------------------------------------------
+
+static void drawMap() {
+    DrawTexture(trackBackground, 0, 0, WHITE);
+    LinkedList_forEach(cars, Car_draw);
+}
+
+//----------------------------------------------------------------------------------
+// Draw hud
+//----------------------------------------------------------------------------------
+
+static void drawHud() {
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
+    drawLaps(p1, 32, 32);
+    drawLapTime(p1, 32, 96);
+    if (state.debug) {
+        Car_showInfo(p1, 20, 300, 20, BLACK);
+        if (state.mode == SINGLEPLAYER)
+            drawGhostCarDebug();
+    }
+
+    if (state.mode == SPLITSCREEN) {
+        Car *p2 = LinkedList_getCarById(cars, 2);
+        drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
+        drawLaps(p2, SCREEN_WIDTH / 2.0f + 32, 32);
+        drawLapTime(p2, SCREEN_WIDTH / 2.0f + 32, 96);
+        if (state.debug) {
+            Car_showInfo(p2, SCREEN_WIDTH - 400, 300, 20, BLACK);
+        }
+    }
+
+    DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
+    LinkedList_forEach(cars, drawPlayerInMinimap);
+}
+
+//----------------------------------------------------------------------------------
+// Funções auxiliares para desenhar a hud
 //----------------------------------------------------------------------------------
 
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color) {
@@ -353,17 +382,13 @@ static void drawTextWithShadow(char *text, float x, float y, int size, Color col
     DrawText(text, x, y, size, color);
 }
 
-static void drawDebugInfo(Car *player, Car *ghost) {
-    Car_showInfo(player, SCREEN_WIDTH - 400, 300, 20, BLACK);
-
-    char stateText[1000];
-    sprintf(stateText, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
+static void drawGhostCarDebug() {
+    sprintf(textBuffer, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
             ArrayList_length(bestLap), replayFrameIdx);
-    DrawText(stateText, 10, 500, 20, BLACK);
+    DrawText(textBuffer, SCREEN_WIDTH - 200, 500, 20, BLACK);
 
-    char stateText2[1000];
-    sprintf(stateText2, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
-    DrawText(stateText2, 10, 600, 20, BLACK);
+    sprintf(textBuffer, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
+    DrawText(textBuffer, SCREEN_WIDTH - 200, 600, 20, BLACK);
 }
 
 static void drawPlayerInMinimap(Car *player) {
@@ -379,48 +404,26 @@ static void drawPlayerInMinimap(Car *player) {
     }
 }
 
-static void drawHud() {
-    if (state.debug) {
-        Car *player = LinkedList_getCarById(cars, 1);
-
-        Car *ghost = LinkedList_getCarById(cars, 99);
-        drawDebugInfo(player, ghost);
-    }
-
-    DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
-    LinkedList_forEach(cars, drawPlayerInMinimap);
-}
-
-static void drawMap() {
-    DrawTexture(trackBackground, 0, 0, WHITE);
-    LinkedList_forEach(cars, Car_draw);
-}
-
 static void drawSpeedometer(Car *player, float x, float y) {
-    char buffer[16];
-    snprintf(buffer, sizeof(buffer), "%.1f km/h",
+    snprintf(textBuffer, sizeof(textBuffer), "%.1f km/h",
              3600 * 1.1 * player->vel * 60 / trackBackground.width / 1.5f);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
-    drawTextWithShadow(buffer, x, y, 64, textColor);
+    drawTextWithShadow(textBuffer, x, y, 64, textColor);
 }
 
 static void drawLaps(Car *player, float x, float y) {
-    char buffer[32];
-
     if (player->lap > -1 && player->lap < MAX_LAPS) {
-        snprintf(buffer, sizeof(buffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
-        drawTextWithShadow(buffer, x, y, 64, WHITE);
+        snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
+        drawTextWithShadow(textBuffer, x, y, 64, WHITE);
     }
 }
 
 static void drawLapTime(Car *player, float x, float y) {
-    char buffer[32];
-
     if (player->lap > -1 && player->lap < MAX_LAPS) {
         double time = GetTime() - player->startLapTime;
         int    mins = time / 60;
         float  secs = time - (mins * 60);
-        snprintf(buffer, sizeof(buffer), "%d:%05.2fs", mins, secs);
-        drawTextWithShadow(buffer, x, y, 48, WHITE);
+        snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
+        drawTextWithShadow(textBuffer, x, y, 48, WHITE);
     }
 }
