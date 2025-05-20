@@ -116,7 +116,7 @@ void Game_update() {
         updateGhostCar(p1);
     } else {
         if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 3.0f) {
+            if (GetTime() - state.raceTime > 3.5f) {
                 SetSoundPitch(semaphoreSound, 1.2);
                 PlaySound(semaphoreSound);
                 state.status = STARTED;
@@ -467,13 +467,9 @@ static void drawLapTime(Car *player, float x, float y) {
 }
 
 static void drawSemaphore(float x, float y, int size) {
-
-    // Lógica para tocar som a cada 1s
-    if (GetTime() - lastSoundTime >= 1.0 && count <= 3) {
-        if (count < 3) {
-            SetSoundPitch(semaphoreSound, 0.8);
-            PlaySound(semaphoreSound);
-        }
+    if (GetTime() - state.raceTime >= 0.5f && GetTime() - lastSoundTime >= 1.0) {
+        SetSoundPitch(semaphoreSound, 0.8);
+        PlaySound(semaphoreSound);
         lastSoundTime = GetTime();
         count++;
     }
