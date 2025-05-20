@@ -320,6 +320,12 @@ static void loadSplitscreen(Map map) {
 
 static void loadBestLap() {
     FILE *file = fopen(ghostCarPath, "rb");
+
+    if (!file) {
+        file = fopen(ghostCarPath, "wb");
+    }
+
+    file = fopen(ghostCarPath, "rb");
     if (file != NULL) {
         GhostCarFrame buffer;
         while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {
