@@ -7,7 +7,7 @@ int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
 // Condição de vitoria
-int MAX_LAPS = 3;
+int MAX_LAPS = 1;
 
 // Suavidade da camera
 float CAMERA_SMOOTHNESS = 0.05;
@@ -76,6 +76,8 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 // Carro padrão
 CarConfig DEFAULT_CAR_CONFIG = {0.3, 0.2, 0.98, 0.035, 150, 75};
+
+int WINNER_FONT_SIZE = 128;
 
 // Estado do jogo
 State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, THIRD_PERSON};

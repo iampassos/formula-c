@@ -91,8 +91,9 @@ extern char *CAR_IMAGE_PATH;
 extern char *LOGO_IMAGE_PATH;
 extern int   HUD_OPACITY;
 extern char *CAR_IMAGES_PATH[];
+extern int   WINNER_FONT_SIZE;
 
-// Condiçõe de vitoria
+// Quantidade de voltas
 extern int MAX_LAPS;
 
 #endif

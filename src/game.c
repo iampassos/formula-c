@@ -54,14 +54,17 @@ static void updateGhostCar(Car *player);
 
 static void updateWinner(Car *player);
 
+static void drawMap();
+void        drawView(Camera2D *camera, Rectangle scissor);
+
+static void drawHud();
+
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawLapTime(Car *player, float x, float y);
 static void drawGhostCarDebug();
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
 static void drawLaps(Car *player, float x, float y);
-static void drawHud();
-static void drawMap();
 
 //----------------------------------------------------------------------------------
 // Carregamento do jogo
@@ -130,38 +133,28 @@ void Game_update() {
 //----------------------------------------------------------------------------------
 
 void Game_draw() {
-    if (state.screen != GAME) {
+    if (state.screen != GAME)
         return;
-    }
 
-    bool split = state.mode == SPLITSCREEN;
+    if (state.mode == SPLITSCREEN) {
+        drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
 
-    if (split) {
-        BeginScissorMode(0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
-    }
-
-    BeginMode2D(*camera1);
-    drawMap();
-    EndMode2D();
-
-    if (split) {
-        EndScissorMode();
-
-        BeginScissorMode(SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT);
-        BeginMode2D(*camera2);
-        drawMap();
-        EndMode2D();
-        EndScissorMode();
+        drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
 
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
         if (winner) {
-            int font = 128;
             snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner);
-            drawTextWithShadow(textBuffer,
-                               (SCREEN_WIDTH / 2.0f) - (MeasureText(textBuffer, font) / 2.0f),
-                               SCREEN_HEIGHT / 2.0f - font, font, YELLOW);
+            int textWidth = MeasureText(textBuffer, WINNER_FONT_SIZE);
+            drawTextWithShadow(textBuffer, (SCREEN_WIDTH - textWidth) / 2.0f,
+                               (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
         }
+
+    } else {
+        // Tela única
+        BeginMode2D(*camera1);
+        drawMap();
+        EndMode2D();
     }
 
     drawHud();
@@ -342,6 +335,14 @@ static void updateWinner(Car *player) {
 static void drawMap() {
     DrawTexture(trackBackground, 0, 0, WHITE);
     LinkedList_forEach(cars, Car_draw);
+}
+
+void drawView(Camera2D *camera, Rectangle scissor) {
+    BeginScissorMode(scissor.x, scissor.y, scissor.width, scissor.height);
+    BeginMode2D(*camera);
+    drawMap();
+    EndMode2D();
+    EndScissorMode();
 }
 
 //----------------------------------------------------------------------------------
