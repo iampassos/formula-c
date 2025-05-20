@@ -57,6 +57,7 @@ void        drawView(Camera2D *camera, Rectangle scissor);
 
 static void drawHud();
 
+static void drawSemaphore(float x, float y, int size);
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawLapTime(Car *player, float x, float y);
 static void drawGhostCarDebug();
@@ -112,7 +113,7 @@ void Game_update() {
         updateGhostCar(p1);
     } else {
         if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 3) {
+            if (GetTime() - state.raceTime > 3.5f) {
                 state.status = STARTED;
             }
             return;
@@ -156,6 +157,8 @@ void Game_draw() {
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
         if (state.status == COUNTDOWN) {
+            drawSemaphore(SCREEN_WIDTH * 1.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
+            drawSemaphore(SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
             return;
         }
 
@@ -165,7 +168,6 @@ void Game_draw() {
             drawTextWithShadow(textBuffer, (SCREEN_WIDTH - textWidth) / 2.0f,
                                (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
         }
-
     } else {
         // Tela única
         BeginMode2D(*camera1);
@@ -452,4 +454,11 @@ static void drawLapTime(Car *player, float x, float y) {
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
         drawTextWithShadow(textBuffer, x, y, 48, WHITE);
     }
+}
+
+static void drawSemaphore(float x, float y, int size) {
+    double passed = GetTime() - state.raceTime;
+    DrawCircle(x - 3 * size, y, size, passed > 0.5f ? RED : BLACK);
+    DrawCircle(x, y, size, passed > 1.5f ? RED : BLACK);
+    DrawCircle(x + 3 * size, y, size, passed > 2.5f ? RED : BLACK);
 }
