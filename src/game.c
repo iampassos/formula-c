@@ -160,13 +160,6 @@ void Game_draw() {
         EndMode2D();
     }
 
-    if (state.mode == SPLITSCREEN) {
-        if (winner == NULL) {
-            drawHud();
-        }
-        return;
-    }
-
     drawHud();
 }
 
@@ -356,6 +349,8 @@ void drawView(Camera2D *camera, Rectangle scissor) {
 //----------------------------------------------------------------------------------
 
 static void drawHud() {
+    if (winner)
+        return;
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
     drawLaps(p1, 32, 32);
@@ -419,10 +414,10 @@ static void drawSpeedometer(Car *player, float x, float y) {
 }
 
 static void drawLaps(Car *player, float x, float y) {
-    if (player->lap > -1 && player->lap < MAX_LAPS) {
+    if (player->lap > -1) {
         if (state.mode == SINGLEPLAYER) {
             snprintf(textBuffer, sizeof(textBuffer), "Volta %d", player->lap + 1);
-        } else {
+        } else if (player->lap < MAX_LAPS) {
             snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
         }
         drawTextWithShadow(textBuffer, x, y, 64, WHITE);
@@ -430,7 +425,7 @@ static void drawLaps(Car *player, float x, float y) {
 }
 
 static void drawLapTime(Car *player, float x, float y) {
-    if (player->lap > -1 && player->lap < MAX_LAPS) {
+    if (player->lap > -1) {
         double time = GetTime() - player->startLapTime;
         int    mins = time / 60;
         float  secs = time - (mins * 60);

@@ -19,7 +19,6 @@ static Music music;
 
 // Recursos visuais
 static Texture2D background;
-static Vector2   textBox;
 
 // Dimensões e espaçamento
 static int width;
@@ -28,7 +27,6 @@ static int padding;
 
 // Tamanhos de fonte
 static int buttonFontSize;
-static int titleFontSize;
 
 void interlagosMapButtonAction() {
     state.map = INTERLAGOS;
