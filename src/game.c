@@ -32,10 +32,10 @@ static Music carSound;
 
 static Vector2 minimapPos;
 
-int    winner        = -1;
-int    maxLaps       = 3;
-int    countdown     = 3 + 1; // 3 + 1 segundo
-double lastDecrement = -1;
+int    winner;
+int    maxLaps;
+int    countdown;
+double lastDecrement;
 
 // --- Funções públicas ---
 void Game_setup();
@@ -97,6 +97,12 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
+    if (IsKeyDown(KEY_Q)) {
+        state.screen = MENU;
+        mapCleanup();
+        return;
+    }
+
     Car *p1 = LinkedList_getCarById(cars, 1);
 
     if (state.mode == SINGLEPLAYER) {
@@ -155,6 +161,10 @@ void Game_update() {
 //----------------------------------------------------------------------------------
 
 void Game_draw() {
+    if (state.screen != GAME) {
+        return;
+    }
+
     int split = state.mode == SPLITSCREEN;
 
     if (split) {
@@ -279,6 +289,11 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
+    winner        = -1;
+    maxLaps       = 3;
+    countdown     = 3 + 1; // 3 + 1 segundo
+    lastDecrement = -1;
+
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 10;
 
