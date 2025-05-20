@@ -61,7 +61,6 @@ extern int SCREEN_HEIGHT;
 extern float CAMERA_SMOOTHNESS;
 
 // Informações do jogo
-extern char *GAME_NAME;
 extern char  GAME_MODES[][100];
 extern int   TOTAL_GAME_MODES;
 

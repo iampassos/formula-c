@@ -13,7 +13,6 @@ int MAX_LAPS = 3;
 float CAMERA_SMOOTHNESS = 0.05;
 
 // Informações do jogo
-char *GAME_NAME         = "FORMULA C";
 char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
