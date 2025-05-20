@@ -32,7 +32,7 @@ static Music music;
 
 static Vector2 minimapPos;
 
-static int winner = 0; // para saber qual carro ganhou
+static Car *winner = NULL;
 
 // --- Funções públicas ---
 void Game_setup();
@@ -116,8 +116,13 @@ void Game_update() {
         Car *p2 = LinkedList_getCarById(cars, 2);
 
         LinkedList_forEach(cars, updateWinner);
-        if (winner)
+        if (winner) {
+            if (GetTime() - winner->startLapTime > 3) {
+                state.screen = MENU;
+                mapCleanup();
+            }
             return;
+        }
 
         Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
 
@@ -138,18 +143,16 @@ void Game_draw() {
 
     if (state.mode == SPLITSCREEN) {
         drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
-
         drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
 
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
         if (winner) {
-            snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner);
+            snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
             int textWidth = MeasureText(textBuffer, WINNER_FONT_SIZE);
             drawTextWithShadow(textBuffer, (SCREEN_WIDTH - textWidth) / 2.0f,
                                (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
         }
-
     } else {
         // Tela única
         BeginMode2D(*camera1);
@@ -157,7 +160,9 @@ void Game_draw() {
         EndMode2D();
     }
 
-    drawHud();
+    if (winner == NULL) {
+        drawHud();
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -317,13 +322,8 @@ static void updateGhostCar(Car *player) {
 //----------------------------------------------------------------------------------
 
 static void updateWinner(Car *player) {
-    float actualTime = GetTime();
     if (player->lap == MAX_LAPS) {
-        winner = player->id;
-        if (actualTime - player->startLapTime > 2) {
-            state.screen = MENU;
-            mapCleanup();
-        }
+        winner = player;
         return;
     }
 }
@@ -414,7 +414,11 @@ static void drawSpeedometer(Car *player, float x, float y) {
 
 static void drawLaps(Car *player, float x, float y) {
     if (player->lap > -1 && player->lap < MAX_LAPS) {
-        snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
+        if (state.mode == SINGLEPLAYER) {
+            snprintf(textBuffer, sizeof(textBuffer), "Volta %d", player->lap + 1);
+        } else {
+            snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
+        }
         drawTextWithShadow(textBuffer, x, y, 64, WHITE);
     }
 }
