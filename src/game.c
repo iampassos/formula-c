@@ -26,8 +26,10 @@ static ArrayList *currentLap = NULL;
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
-static Music music;
-static Sound semaphoreSound;
+static Music  music;
+static Sound  semaphoreSound;
+static double lastSoundTime;
+static int    count;
 
 static Vector2 minimapPos;
 
@@ -114,7 +116,9 @@ void Game_update() {
         updateGhostCar(p1);
     } else {
         if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 4.2) {
+            if (GetTime() - state.raceTime > 3.0f) {
+                SetSoundPitch(semaphoreSound, 1.2);
+                PlaySound(semaphoreSound);
                 state.status = STARTED;
             }
             return;
@@ -256,6 +260,8 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
+    lastSoundTime  = 0;
+    count          = 0;
     state.status   = COUNTDOWN;
     state.raceTime = GetTime();
     winner         = NULL;
@@ -461,24 +467,18 @@ static void drawLapTime(Car *player, float x, float y) {
 }
 
 static void drawSemaphore(float x, float y, int size) {
-    static double lastSoundTime = 0;
-    static int    count         = 0;
 
     // Lógica para tocar som a cada 1s
-    if (GetTime() - lastSoundTime >= 1.0 && count <= 4) {
-        if (count < 4) {
+    if (GetTime() - lastSoundTime >= 1.0 && count <= 3) {
+        if (count < 3) {
             SetSoundPitch(semaphoreSound, 0.8);
-            PlaySound(semaphoreSound);
-        } else if (count == 4) {
-            SetSoundPitch(semaphoreSound, 1.2);
             PlaySound(semaphoreSound);
         }
         lastSoundTime = GetTime();
         count++;
     }
 
-    // Lógica para desenhar os círculos
-    DrawCircle(x - 3 * size, y, size, count > 1 ? RED : BLACK);
-    DrawCircle(x, y, size, count > 2 ? RED : BLACK);
-    DrawCircle(x + 3 * size, y, size, count > 3 ? RED : BLACK);
+    DrawCircle(x - 3 * size, y, size, count >= 1 ? RED : BLACK);
+    DrawCircle(x, y, size, count >= 2 ? RED : BLACK);
+    DrawCircle(x + 3 * size, y, size, count >= 3 ? RED : BLACK);
 }
