@@ -113,9 +113,19 @@ void Game_update() {
     if (state.mode == SINGLEPLAYER) {
         updateGhostCar(p1);
     } else {
+        if (state.status == COUNTDOWN) {
+            if (GetTime() - state.raceTime > 3) {
+                state.status = STARTED;
+            }
+            return;
+        }
+
         Car *p2 = LinkedList_getCarById(cars, 2);
 
-        LinkedList_forEach(cars, updateWinner);
+        if (winner == NULL) {
+            LinkedList_forEach(cars, updateWinner);
+        }
+
         if (winner) {
             if (GetTime() - winner->startLapTime > 3) {
                 state.screen = MENU;
@@ -147,12 +157,17 @@ void Game_draw() {
 
         DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
+        if (state.status == COUNTDOWN) {
+            return;
+        }
+
         if (winner) {
             snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
             int textWidth = MeasureText(textBuffer, WINNER_FONT_SIZE);
             drawTextWithShadow(textBuffer, (SCREEN_WIDTH - textWidth) / 2.0f,
                                (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
         }
+
     } else {
         // Tela única
         BeginMode2D(*camera1);
@@ -160,7 +175,9 @@ void Game_draw() {
         EndMode2D();
     }
 
-    drawHud();
+    if (state.status == STARTED) {
+        drawHud();
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -208,8 +225,10 @@ static void mapCleanup() {
 //----------------------------------------------------------------------------------
 
 static void loadSingleplayer(Map map) {
-    minimapPos.x = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y = 10;
+    state.status   = STARTED;
+    state.raceTime = GetTime();
+    minimapPos.x   = SCREEN_WIDTH - trackHud.width;
+    minimapPos.y   = 10;
 
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
     strcat(ghostCarPath, map.name);
@@ -235,9 +254,11 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
-    winner       = NULL;
-    minimapPos.x = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y = 10;
+    state.status   = COUNTDOWN;
+    state.raceTime = GetTime();
+    winner         = NULL;
+    minimapPos.x   = SCREEN_WIDTH - trackHud.width;
+    minimapPos.y   = 10;
 
     Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
                          BLUE, false, 1);
@@ -322,7 +343,8 @@ static void updateGhostCar(Car *player) {
 
 static void updateWinner(Car *player) {
     if (player->lap == MAX_LAPS) {
-        winner = player;
+        winner       = player;
+        state.status = ENDED;
         return;
     }
 }
