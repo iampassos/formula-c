@@ -62,6 +62,7 @@ static void drawHud();
 
 static void drawSemaphore(float x, float y, int size);
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
+static void drawBestLapTime(Car *player, float x, float y);
 static void drawLapTime(Car *player, float x, float y);
 static void drawGhostCarDebug();
 static void drawPlayerInMinimap(Car *player);
@@ -324,7 +325,6 @@ static void updateGhostCar(Car *player) {
         lastLap        = player->lap;
         replayFrameIdx = 0;
         ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {-1000, -1000}, 0});
-        printf("%d %d\n", ArrayList_length(currentLap), ArrayList_length(bestLap));
         if (ArrayList_length(currentLap) < ArrayList_length(bestLap) ||
             ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
@@ -387,6 +387,9 @@ static void drawHud() {
     drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
     drawLaps(p1, 32, 32);
     drawLapTime(p1, 32, 96);
+    if (state.mode == SINGLEPLAYER) {
+        drawBestLapTime(p1, 32, 144);
+    }
     if (state.debug) {
         Car_showInfo(p1, 20, 300, 20, BLACK);
         if (state.mode == SINGLEPLAYER)
@@ -463,6 +466,16 @@ static void drawLapTime(Car *player, float x, float y) {
         float  secs = time - (mins * 60);
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
         drawTextWithShadow(textBuffer, x, y, 48, WHITE);
+    }
+}
+
+static void drawBestLapTime(Car *player, float x, float y) {
+    if (player->lap > -1 && ArrayList_length(bestLap) > 0) {
+        double time = ArrayList_length(bestLap) * 16.67f / 1000;
+        int    mins = time / 60;
+        float  secs = time - (mins * 60);
+        snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
+        drawTextWithShadow(textBuffer, x, y, 42, (Color) {158, 24, 181, 255});
     }
 }
 
