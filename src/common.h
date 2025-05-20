@@ -92,4 +92,7 @@ extern char *LOGO_IMAGE_PATH;
 extern int   HUD_OPACITY;
 extern char *CAR_IMAGES_PATH[];
 
+// Condiçõe de vitoria
+extern int MAX_LAPS;
+
 #endif
