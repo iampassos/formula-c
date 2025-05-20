@@ -1,6 +1,5 @@
 #include "menu.h"
 #include "common.h"
-#include "game.h"
 #include "raylib.h"
 #include <string.h>
 
@@ -29,7 +28,7 @@ static int margin;
 static int buttonFontSize;
 
 // --- Funções públicas ---
-void Menu_setup();
+void Menu_setup(void (*play)());
 void Menu_update();
 void Menu_draw();
 void Menu_cleanup();
@@ -37,7 +36,7 @@ void Menu_cleanup();
 // --- Funções internas ---
 static void setupGameModeButtons();
 static void setupMapButtons();
-static void setupMainButtons();
+static void setupMainButtons(void (*play)());
 static void loadMenuAssets();
 
 static void drawButton(Button btn);
@@ -70,7 +69,7 @@ static void splitscreenButtonAction() {
 // Carregar o menu
 //----------------------------------------------------------------------------------
 
-void Menu_setup() {
+void Menu_setup(void (*play)()) {
     width          = SCREEN_WIDTH / 5;
     height         = SCREEN_HEIGHT / 10;
     padding        = SCREEN_HEIGHT / 9;
@@ -79,7 +78,7 @@ void Menu_setup() {
 
     setupGameModeButtons();
     setupMapButtons();
-    setupMainButtons();
+    setupMainButtons(play);
     loadMenuAssets();
 }
 
@@ -169,9 +168,9 @@ static void setupMapButtons() {
     MAPS_BUTTONS[0].action = interlagosMapButtonAction;
 }
 
-static void setupMainButtons() {
+static void setupMainButtons(void (*play)()) {
     playButton = (Button) {
-        "Play", {SCREEN_WIDTH - width - margin, SCREEN_HEIGHT - height - margin}, 0, 0, Game_load};
+        "Play", {SCREEN_WIDTH - width - margin, SCREEN_HEIGHT - height - margin}, 0, 0, play};
 
     debugButton =
         (Button) {"Debug",

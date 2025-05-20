@@ -11,7 +11,7 @@ typedef struct {
     void (*action)();
 } Button;
 
-void Menu_setup();
+void Menu_setup(void (*play)());
 void Menu_cleanup();
 void Menu_update();
 void Menu_draw();

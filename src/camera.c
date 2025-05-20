@@ -31,8 +31,8 @@ void Camera_Background_setSize(int width, int height) {
     BACKGROUND_HEIGHT = height;
 }
 
-void Camera_setSize(int width, int height){
-    CAMERA_WIDTH = width;
+void Camera_setSize(int width, int height) {
+    CAMERA_WIDTH  = width;
     CAMERA_HEIGHT = height;
 }
 

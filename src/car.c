@@ -1,6 +1,5 @@
 #include "car.h"
 #include "common.h"
-#include "game.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>

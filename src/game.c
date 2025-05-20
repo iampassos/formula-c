@@ -1,11 +1,9 @@
 #include "game.h"
 #include "arrayList.h"
 #include "camera.h"
-#include "car.h"
 #include "common.h"
 #include "linked_list.h"
 #include "raylib.h"
-#include "stdio.h"
 #include <stdio.h>
 #include <string.h>
 

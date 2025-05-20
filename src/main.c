@@ -97,7 +97,7 @@ int main() {
 
     SetTargetFPS(60);
 
-    Menu_setup();
+    Menu_setup(Game_load);
     Game_setup();
 
     while (!WindowShouldClose()) {
