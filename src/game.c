@@ -114,7 +114,7 @@ void Game_update() {
         updateGhostCar(p1);
     } else {
         if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 5) {
+            if (GetTime() - state.raceTime > 4.2) {
                 state.status = STARTED;
             }
             return;
@@ -478,13 +478,7 @@ static void drawSemaphore(float x, float y, int size) {
     }
 
     // Lógica para desenhar os círculos
-    if (count <= 4) {
-        DrawCircle(x - 3 * size, y, size, count > 1 ? RED : BLACK);
-        DrawCircle(x, y, size, count > 2 ? RED : BLACK);
-        DrawCircle(x + 3 * size, y, size, count > 3 ? RED : BLACK);
-    } else {
-        DrawCircle(x - 3 * size, y, size, GREEN);
-        DrawCircle(x, y, size, GREEN);
-        DrawCircle(x + 3 * size, y, size, GREEN);
-    }
+    DrawCircle(x - 3 * size, y, size, count > 1 ? RED : BLACK);
+    DrawCircle(x, y, size, count > 2 ? RED : BLACK);
+    DrawCircle(x + 3 * size, y, size, count > 3 ? RED : BLACK);
 }
