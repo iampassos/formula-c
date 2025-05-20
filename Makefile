@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS = -Wall -std=c99
+CFLAGS = -Wall -std=c99 -Isrc/libs
 LDFLAGS = -lraylib -lm -lpthread -ldl -lX11
 
 # Alvo padrão para compilar o código
 all: game
 
 # Como compilar o código
-game: $(wildcard src/*.c)
+game: $(wildcard src/libs/*.c) $(wildcard src/*.c)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Como limpar os arquivos compilados
