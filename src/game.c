@@ -471,7 +471,7 @@ static void drawLapTime(Car *player, float x, float y) {
 
 static void drawBestLapTime(Car *player, float x, float y) {
     if (player->lap > -1 && ArrayList_length(bestLap) > 0) {
-        double time = ArrayList_length(bestLap) * 16.67f / 1000;
+        double time = (ArrayList_length(bestLap) - 1) / 60.0f;
         int    mins = time / 60;
         float  secs = time - (mins * 60);
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
