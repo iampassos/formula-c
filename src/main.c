@@ -30,6 +30,7 @@ float GAME_MUSIC_VOLUME       = 0.0f;
 float MENU_MUSIC_VOLUME       = 0.0f;
 
 // Recursos visuais
+char *SEMAPHORE_PATH[]  = {"resources/others/nolight.png", "resources/others/redlight.png"};
 char *BACKGROUND_PATH   = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
                            "resources/cars/laranja.png"};

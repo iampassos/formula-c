@@ -24,8 +24,8 @@ void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as core
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
-Car *Car_create(Vector2 pos, float angle, CarConfig config,
-                const char *texturePath, Color color, bool ghost, int id);
+Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
+                bool ghost, int id);
 
 void Car_free(Car *car); // Libera a memória de um carro
 

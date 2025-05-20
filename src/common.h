@@ -32,12 +32,16 @@ typedef enum { MENU, GAME } Screen;
 
 typedef enum { FIRST_PERSON, THIRD_PERSON } CameraView;
 
+typedef enum { COUNTDOWN, STARTED, ENDED } Status;
+
 typedef struct {
     Screen     screen;
     Mode       mode;
     bool       debug;
     CurrentMap map;
     CameraView cameraView;
+    double     raceTime;
+    Status     status;
 } State;
 
 typedef struct {
@@ -86,6 +90,7 @@ extern Color     OUTSIDE_TRACK_COLOR;
 extern Color     CHECKPOINTS_COLOR;
 
 // Recursos visuais
+extern char *SEMAPHORE_PATH[];
 extern char *BACKGROUND_PATH;
 extern char *CAR_IMAGE_PATH;
 extern char *LOGO_IMAGE_PATH;
