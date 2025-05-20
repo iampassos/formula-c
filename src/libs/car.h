@@ -40,7 +40,7 @@ void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 Car *Car_create(Vector2 pos,   // posição inicial
                 float   angle, // orientação inicial
 
-                CarConfig config,
+                CarConfig   config,
                 const char *texturePath, // path da textura
                 Color color, bool ghost,
                 int id // identificador único

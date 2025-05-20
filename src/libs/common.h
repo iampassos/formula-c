@@ -65,8 +65,8 @@ extern int SCREEN_HEIGHT;
 extern float CAMERA_SMOOTHNESS;
 
 // Informações do jogo
-extern char  GAME_MODES[][100];
-extern int   TOTAL_GAME_MODES;
+extern char GAME_MODES[][100];
+extern int  TOTAL_GAME_MODES;
 
 // Pasta de gravação dos arquivos dos carros fantasmas
 extern char *GHOST_CAR_DATA_PATH;
