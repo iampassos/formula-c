@@ -3,7 +3,6 @@
 #include "game.h"
 #include "raylib.h"
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
 
 #define MAX_BUTTONS 10
@@ -57,7 +56,6 @@ void Menu_setup() {
     height  = SCREEN_HEIGHT / 10;
     padding = SCREEN_HEIGHT / 9;
 
-    titleFontSize  = SCREEN_WIDTH / 20;
     buttonFontSize = SCREEN_WIDTH / 40;
 
     playButton = (Button) {
@@ -92,11 +90,8 @@ void Menu_setup() {
 
     MAPS_BUTTONS[state.map].selected = true;
 
-    textBox.x = (SCREEN_WIDTH - MeasureText(GAME_NAME, titleFontSize)) / 2.0f;
-    textBox.y = (SCREEN_HEIGHT - dy * TOTAL_GAME_MODES) / 2.0f;
-
     Image img = LoadImage(BACKGROUND_PATH);
-    ImageResize(&img, SCREEN_WIDTH, SCREEN_HEIGHT); // redimensiona a imagem
+    ImageResize(&img, SCREEN_WIDTH, SCREEN_HEIGHT);
     background = LoadTextureFromImage(img);
     UnloadImage(img);
 
@@ -114,7 +109,7 @@ void Menu_cleanup() {
 
 static void drawButton(Button btn) {
     Rectangle rect      = (Rectangle) {btn.pos.x, btn.pos.y, width, height};
-    Color     baseColor = btn.hovered ? GOLD : WHITE;
+    Color     baseColor = btn.hovered ? GOLD : (Color) {215, 215, 215, 255};
     if (btn.selected)
         baseColor = RED;
     Color     textColor  = BLACK;
@@ -171,28 +166,13 @@ void Menu_update() {
     pressedButton(&debugButton, mouse);
     pressedButton(&playButton, mouse);
 
-    SetMusicVolume(music, MENU_MUSIC_VOLUME); // Se precisar abaixar o som da música
+    SetMusicVolume(music, MENU_MUSIC_VOLUME);
     UpdateMusicStream(music);
 }
 
 void Menu_draw() {
-    // 1. Fundo
     DrawTexture(background, 0, 0, WHITE);
 
-    // 2. Gradiente por cima (leve transparência)
-    for (int i = 0; i < SCREEN_HEIGHT; i++) {
-        Color grad = ColorLerp(BLACK, RED, (float) i / SCREEN_HEIGHT);
-        grad.a     = 100; // transparência
-        DrawLine(0, i, SCREEN_WIDTH, i, grad);
-    }
-
-    // 3. Título com sombra e cor pulsante
-    float t          = sinf(GetTime()) * 0.5f + 0.5f; // varia de 0 a 1
-    Color pulseColor = ColorLerp(RED, BLUE, t);
-    DrawText(GAME_NAME, textBox.x + 2, textBox.y + 2, titleFontSize, WHITE); // sombra
-    DrawText(GAME_NAME, textBox.x, textBox.y, titleFontSize, pulseColor);
-
-    // 4. Botões
     for (int i = 0; i < TOTAL_GAME_MODES; i++) {
         drawButton(BUTTONS[i]);
     }

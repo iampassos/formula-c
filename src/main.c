@@ -30,7 +30,7 @@ float GAME_MUSIC_VOLUME       = 0.0f;
 float MENU_MUSIC_VOLUME       = 0.0f;
 
 // Recursos visuais
-char *BACKGROUND_PATH   = "resources/menu/f12024.png";
+char *BACKGROUND_PATH   = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
                            "resources/cars/laranja.png"};
 char *LOGO_IMAGE_PATH   = "resources/logo/formula_c-logo.png";
