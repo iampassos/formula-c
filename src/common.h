@@ -13,7 +13,7 @@ typedef struct {
     char      *backgroundPath;
     char      *maskPath;
     char      *minimapPath;
-    Vector2    startCarPos;
+    Vector2    startCarPos[2];
     float      startAngle;
     int        checkpointSize;
     Checkpoint checkpoints[100];

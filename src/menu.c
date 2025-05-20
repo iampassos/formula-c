@@ -3,6 +3,7 @@
 #include "game.h"
 #include "raylib.h"
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX_BUTTONS 10

@@ -39,8 +39,8 @@ Map MAPS[] = {
      "resources/maps/interlagos_map.png",   // backgroundPath
      "resources/masks/interlagos_mask.png", // maskPath
      "resources/minimaps/interlagos_minimap.png",
-     {4721, 1910},
-     2.77f,
+     {{4721, 1910}, {4900, 2061}},
+     2.75f,
      10,
      {
          {/*Vector2*/ {4584, 2078}, 2.73f},

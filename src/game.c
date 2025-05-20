@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 
-static Texture2D   trackBackground; // Armazenam a imagem que vai ser colocada de plano de fundo
+static Texture2D   trackBackground;
 static Texture2D   trackHud;
-static LinkedList *cars; // Variável para armazenar a lista encadeada dos carros da corrida
+static LinkedList *cars;
 
 static Camera2D *camera1;
 static Camera2D *camera2;
@@ -24,7 +24,6 @@ static int minimapHeigth;
 static ArrayList *bestLap    = NULL;
 static ArrayList *currentLap = NULL;
 
-static int lap            = 0;
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
@@ -32,6 +31,11 @@ static Music music;
 static Music carSound;
 
 static Vector2 minimapPos;
+
+int    winner        = -1;
+int    maxLaps       = 3;
+int    countdown     = 3 + 1; // 3 + 1 segundo
+double lastDecrement = -1;
 
 // --- Funções públicas ---
 void Game_setup();
@@ -51,6 +55,7 @@ static void loadBestLap();
 static void updateBestLap();
 static void updateGhostCar(Car *player);
 
+static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawDebugInfo(Car *player, Car *ghost);
 static void drawPlayerInMinimap(Car *player);
 static void drawSpeedometer(Car *player, float x, float y);
@@ -81,10 +86,10 @@ void Game_load() {
 }
 
 void Game_cleanup() {
-    // Se o usuário fechou o jogo em outra tela além do jogo, limpar a memoria do jogo
-    if (state.screen != GAME)
+    if (state.screen != GAME) {
         mapCleanup();
-    LinkedList_free(cars); // Libera a memória da lista encadeada de carros
+    }
+    LinkedList_free(cars);
 }
 
 //----------------------------------------------------------------------------------
@@ -105,9 +110,27 @@ void Game_update() {
         Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
 
         LinkedList_forEach(cars, Car_update);
-
-        Camera_updateTarget(camera1, p1);
     } else {
+        if (countdown > 0) {
+            if (GetTime() - lastDecrement >= 1 || lastDecrement == -1) {
+                countdown--;
+                lastDecrement = GetTime();
+            }
+            return;
+        } else if (winner > 0) {
+            if (countdown == 0) {
+                state.screen = MENU;
+                mapCleanup();
+                return;
+            }
+
+            if (GetTime() - lastDecrement >= 1 || lastDecrement == -1) {
+                countdown--;
+                lastDecrement = GetTime();
+            }
+            return;
+        }
+
         Car *p2 = LinkedList_getCarById(cars, 2);
 
         Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
@@ -115,9 +138,16 @@ void Game_update() {
 
         LinkedList_forEach(cars, Car_update);
 
-        Camera_updateTarget(camera1, p1);
+        if (p1->lap + 1 > maxLaps || p2->lap + 1 > maxLaps) {
+            winner    = p1->lap + 1 > maxLaps ? p1->id : p2->id;
+            countdown = 3 + 1;
+            return;
+        }
+
         Camera_updateTarget(camera2, p2);
     }
+
+    Camera_updateTarget(camera1, p1);
 }
 
 //----------------------------------------------------------------------------------
@@ -157,9 +187,19 @@ void Game_draw() {
 
     drawHud();
 
-    if (IsKeyDown(KEY_Q)) {
-        state.screen = MENU;
-        mapCleanup();
+    if (split && countdown) {
+        char buffer[32];
+        if (winner > 0) {
+            int font = 128;
+            snprintf(buffer, sizeof(buffer), "Jogador %d Ganhou", winner);
+            drawTextWithShadow(buffer, (SCREEN_WIDTH / 2.0f) - (MeasureText(buffer, font) / 2.0f),
+                               SCREEN_HEIGHT / 2.0f - font, font, YELLOW);
+        } else {
+            snprintf(buffer, sizeof(buffer), "%d", countdown);
+            drawTextWithShadow(buffer, SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f - 128, 256, WHITE);
+            drawTextWithShadow(buffer, SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0f - 128, 256,
+                               WHITE);
+        }
     }
 }
 
@@ -168,15 +208,13 @@ void Game_draw() {
 //----------------------------------------------------------------------------------
 
 static void loadMap(Map map) {
-    // Carrega a imagem de fundo
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
 
-    // Carrega a imagem do minimapa
     Image minimap = LoadImage(state.debug ? map.maskPath : map.minimapPath);
     minimapWidth  = SCREEN_WIDTH / 4;
     minimapHeigth = SCREEN_HEIGHT / 4;
-    ImageResize(&minimap, minimapWidth, minimapHeigth); // Redimensiona a imagem
-    trackHud = LoadTextureFromImage(minimap);           // Converte a imagem em textura
+    ImageResize(&minimap, minimapWidth, minimapHeigth);
+    trackHud = LoadTextureFromImage(minimap);
     UnloadImage(minimap);
 
     // Carregando a imagem da máscara de pixels
@@ -196,8 +234,8 @@ static void loadMap(Map map) {
 static void mapCleanup() {
     Track_Unload();
     LinkedList_clear(cars);
-    UnloadTexture(trackBackground); // Liberando a textura da imagem do plano de fundo
-    UnloadTexture(trackHud);        // Liberando a textura da imagem do plano de fundo
+    UnloadTexture(trackBackground);
+    UnloadTexture(trackHud);
     if (state.mode == SINGLEPLAYER) {
         ArrayList_free(bestLap);
         ArrayList_free(currentLap);
@@ -216,22 +254,26 @@ static void mapCleanup() {
 static void loadSingleplayer(Map map) {
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 10;
-    Camera_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
     strcat(ghostCarPath, map.name);
     strcat(ghostCarPath, ".bin");
 
     replayFrameIdx = 0;
     lastLap        = 0;
+    currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
     loadBestLap();
-    currentLap    = ArrayList_create();
+
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
                                WHITE, true, 99);
-    Car *player   = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG,
+    Car *player   = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG,
                                CAR_IMAGES_PATH[0], WHITE, false, 1);
+
     LinkedList_addCar(cars, ghostCar);
-    LinkedList_addCar(cars, player); // Adicionando o carro criado na lista encadeada
+    LinkedList_addCar(cars, player);
+
+    Camera_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
                             0.0f, 0.5f);
 }
@@ -239,15 +281,17 @@ static void loadSingleplayer(Map map) {
 static void loadSplitscreen(Map map) {
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 10;
-    Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-    Car *p1 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
+
+    Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
                          BLUE, false, 1);
 
-    Car *p2 = Car_create(map.startCarPos, map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[2],
+    Car *p2 = Car_create(map.startCarPos[1], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[2],
                          ORANGE, false, 2);
 
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);
+
+    Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
 
     camera1 =
         Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
@@ -313,6 +357,11 @@ static void updateGhostCar(Car *player) {
 // Draw
 //----------------------------------------------------------------------------------
 
+static void drawTextWithShadow(char *text, float x, float y, int size, Color color) {
+    DrawText(text, x + 1, y + 1, size, BLACK);
+    DrawText(text, x, y, size, color);
+}
+
 static void drawDebugInfo(Car *player, Car *ghost) {
     Car_showInfo(player, SCREEN_WIDTH - 400, 300, 20, BLACK);
 
@@ -341,7 +390,7 @@ static void drawPlayerInMinimap(Car *player) {
 
 static void drawHud() {
     if (state.debug) {
-        Car *player = LinkedList_getCarById(cars, 1); // Pegando o carro com id 1 da lista encadeada
+        Car *player = LinkedList_getCarById(cars, 1);
 
         Car *ghost = LinkedList_getCarById(cars, 99);
         drawDebugInfo(player, ghost);
@@ -352,10 +401,8 @@ static void drawHud() {
 }
 
 void drawMap() {
-    DrawTexture(trackBackground, 0, 0, WHITE); // desenha pista como fundo
-    LinkedList_forEach(
-        cars,
-        Car_draw); // Jogando a função Car_draw(Car* car); para cada carro da lista encadeada
+    DrawTexture(trackBackground, 0, 0, WHITE);
+    LinkedList_forEach(cars, Car_draw);
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
@@ -363,16 +410,19 @@ void drawSpeedometer(Car *player, float x, float y) {
     snprintf(buffer, sizeof(buffer), "%.1f km/h",
              3600 * 1.1 * player->vel * 60 / trackBackground.width / 1.5f);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
-    DrawText(buffer, x, y, 64, textColor);
+    drawTextWithShadow(buffer, x, y, 64, textColor);
 }
 
 void drawLaps(Car *player, float x, float y) {
     char buffer[32];
 
-    if (player != NULL && player->lap > -1) {
-        snprintf(buffer, sizeof(buffer), "Lap %d", player->lap + 1);
+    if (player->lap > -1) {
+        if (state.mode == SPLITSCREEN) {
+            snprintf(buffer, sizeof(buffer), "Volta %d/%d", player->lap + 1, maxLaps);
+        } else {
+            snprintf(buffer, sizeof(buffer), "Volta %d", player->lap + 1);
+        }
     }
 
-    DrawText(buffer, x, y, 64, WHITE);
+    drawTextWithShadow(buffer, x, y, 64, WHITE);
 }
-
