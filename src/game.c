@@ -31,6 +31,12 @@ static Sound  semaphoreSound;
 static double lastSoundTime;
 static int    count;
 
+static int flagBestLap = 0;
+
+static double msgStart;
+static int    msgActive;
+static int    msgCount;
+
 static Vector2 minimapPos;
 
 static Car *winner = NULL;
@@ -60,6 +66,7 @@ void        drawView(Camera2D *camera, Rectangle scissor);
 
 static void drawHud();
 
+static void drawMessage(float x, float y, int size, Color color, char *text, int *flag);
 static void drawSemaphore(float x, float y, int size);
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawBestLapTime(Car *player, float x, float y);
@@ -170,12 +177,11 @@ void Game_draw() {
 
         if (winner) {
             snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
-            int textWidth = MeasureText(textBuffer, WINNER_FONT_SIZE);
-            drawTextWithShadow(textBuffer, (SCREEN_WIDTH - textWidth) / 2.0f,
+            drawTextWithShadow(textBuffer,
+                               (SCREEN_WIDTH - MeasureText(textBuffer, WINNER_FONT_SIZE)) / 2.0f,
                                (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
         }
     } else {
-        // Tela única
         BeginMode2D(*camera1);
         drawMap();
         EndMode2D();
@@ -232,6 +238,10 @@ static void mapCleanup() {
 //----------------------------------------------------------------------------------
 
 static void loadSingleplayer(Map map) {
+    flagBestLap    = 0;
+    msgStart       = 0;
+    msgActive      = 0;
+    msgCount       = 0;
     state.status   = STARTED;
     state.raceTime = GetTime();
     minimapPos.x   = SCREEN_WIDTH - trackHud.width;
@@ -261,6 +271,10 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
+    flagBestLap    = 0;
+    msgStart       = 0;
+    msgActive      = 0;
+    msgCount       = 0;
     lastSoundTime  = 0;
     count          = 0;
     state.status   = COUNTDOWN;
@@ -323,6 +337,7 @@ static void updateGhostCar(Car *player) {
             ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
             updateBestLap();
+            flagBestLap = 1;
         }
         ArrayList_clear(currentLap);
     }
@@ -375,14 +390,24 @@ void drawView(Camera2D *camera, Rectangle scissor) {
 //----------------------------------------------------------------------------------
 
 static void drawHud() {
-    if (winner)
+    if (winner) {
         return;
+    }
+
+    // P1
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
     drawLaps(p1, 32, 32);
     drawLapTime(p1, 32, 96);
     if (state.mode == SINGLEPLAYER) {
         drawBestLapTime(p1, 32, 144);
+
+        if (flagBestLap) {
+            snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
+            drawMessage(SCREEN_WIDTH / 2.0f - MeasureText(textBuffer, 64) / 2.0f,
+                        SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255}, textBuffer,
+                        &flagBestLap);
+        }
     }
     if (state.debug) {
         Car_showInfo(p1, 20, 300, 20, BLACK);
@@ -390,6 +415,7 @@ static void drawHud() {
             drawGhostCarDebug();
     }
 
+    // P2
     if (state.mode == SPLITSCREEN) {
         Car *p2 = LinkedList_getCarById(cars, 2);
         drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
@@ -484,4 +510,26 @@ static void drawSemaphore(float x, float y, int size) {
     DrawCircle(x - 3 * size, y, size, count >= 1 ? RED : BLACK);
     DrawCircle(x, y, size, count >= 2 ? RED : BLACK);
     DrawCircle(x + 3 * size, y, size, count >= 3 ? RED : BLACK);
+}
+
+static void drawMessage(float x, float y, int size, Color color, char *text, int *flag) {
+    if (GetTime() - msgStart >= 0.3f) {
+        msgActive = msgActive ? 0 : 1;
+        msgStart  = GetTime();
+
+        if (msgActive) {
+            msgCount++;
+        }
+
+        if (msgCount > 3) {
+            msgActive = 0;
+            msgCount  = 0;
+            *flag     = 0;
+            return;
+        }
+    }
+
+    if (msgActive) {
+        drawTextWithShadow(text, x, y, size, color);
+    }
 }
