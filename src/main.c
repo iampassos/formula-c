@@ -13,8 +13,8 @@ int MAX_LAPS = 3;
 float CAMERA_SMOOTHNESS = 0.05;
 
 // Informações do jogo
-char  GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
-int   TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
+char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
+int  TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
 // Pasta de gravação dos arquivos dos carros fantasmas
 char *GHOST_CAR_DATA_PATH = "./data/";
@@ -24,9 +24,10 @@ char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
 char *CLICK_BUTTON_SOUND_PATH = "resources/sounds/click.mp3";
-float CAR_VOLUME              = 0.0f;
-float GAME_MUSIC_VOLUME       = 0.0f;
-float MENU_MUSIC_VOLUME       = 0.0f;
+char *SMAPHORE_SOUND_PATH     = "resources/sounds/click.mp3";
+float CAR_VOLUME              = 0.1f;
+float GAME_MUSIC_VOLUME       = 0.3f;
+float MENU_MUSIC_VOLUME       = 0.01f;
 
 // Recursos visuais
 char *SEMAPHORE_PATH[]  = {"resources/others/nolight.png", "resources/others/redlight.png"};

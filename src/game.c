@@ -27,6 +27,7 @@ static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 static Music music;
+static Sound semaphoreSound;
 
 static Vector2 minimapPos;
 
@@ -113,7 +114,7 @@ void Game_update() {
         updateGhostCar(p1);
     } else {
         if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 3.5f) {
+            if (GetTime() - state.raceTime > 5) {
                 state.status = STARTED;
             }
             return;
@@ -213,6 +214,7 @@ static void mapCleanup() {
     if (state.mode == SINGLEPLAYER) {
         ArrayList_free(bestLap);
         ArrayList_free(currentLap);
+        UnloadSound(semaphoreSound);
     } else {
         Camera_free(camera2);
     }
@@ -259,6 +261,8 @@ static void loadSplitscreen(Map map) {
     winner         = NULL;
     minimapPos.x   = SCREEN_WIDTH - trackHud.width;
     minimapPos.y   = 10;
+
+    semaphoreSound = LoadSound(SMAPHORE_SOUND_PATH);
 
     Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
                          BLUE, false, 1);
@@ -457,8 +461,30 @@ static void drawLapTime(Car *player, float x, float y) {
 }
 
 static void drawSemaphore(float x, float y, int size) {
-    double passed = GetTime() - state.raceTime;
-    DrawCircle(x - 3 * size, y, size, passed > 0.5f ? RED : BLACK);
-    DrawCircle(x, y, size, passed > 1.5f ? RED : BLACK);
-    DrawCircle(x + 3 * size, y, size, passed > 2.5f ? RED : BLACK);
+    static double lastSoundTime = 0;
+    static int    count         = 0;
+
+    // Lógica para tocar som a cada 1s
+    if (GetTime() - lastSoundTime >= 1.0 && count <= 4) {
+        if (count < 4) {
+            SetSoundPitch(semaphoreSound, 0.8);
+            PlaySound(semaphoreSound);
+        } else if (count == 4) {
+            SetSoundPitch(semaphoreSound, 1.2);
+            PlaySound(semaphoreSound);
+        }
+        lastSoundTime = GetTime();
+        count++;
+    }
+
+    // Lógica para desenhar os círculos
+    if (count <= 4) {
+        DrawCircle(x - 3 * size, y, size, count > 1 ? RED : BLACK);
+        DrawCircle(x, y, size, count > 2 ? RED : BLACK);
+        DrawCircle(x + 3 * size, y, size, count > 3 ? RED : BLACK);
+    } else {
+        DrawCircle(x - 3 * size, y, size, GREEN);
+        DrawCircle(x, y, size, GREEN);
+        DrawCircle(x + 3 * size, y, size, GREEN);
+    }
 }

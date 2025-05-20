@@ -76,6 +76,7 @@ extern char *GAME_MUSIC_PATH;
 extern char *MENU_MUSIC_PATH;
 extern char *CAR_SOUND_PATH;
 extern char *CLICK_BUTTON_SOUND_PATH;
+extern char *SMAPHORE_SOUND_PATH;
 extern float GAME_MUSIC_VOLUME;
 extern float MENU_MUSIC_VOLUME;
 extern float CAR_VOLUME;
