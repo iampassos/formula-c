@@ -103,7 +103,7 @@ void Game_draw() {
 static void loadMap(Map map) {
     state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
-    SPEEDOMETER = LoadTexture("resources/cars/velocimetro.png");
+    SPEEDOMETER     = LoadTexture("resources/cars/velocimetro.png");
 
     Image minimap = LoadImage(state.debug ? map.maskPath : map.minimapPath);
     minimapWidth  = SCREEN_WIDTH / 4;
@@ -188,12 +188,12 @@ void drawPlayerInMinimap(Car *player) {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
-    DrawTexture(SPEEDOMETER, x-SPEEDOMETER.width/2, y-SPEEDOMETER.height/2, WHITE);
+    // DrawTexture(SPEEDOMETER, x - SPEEDOMETER.width / 2, y - SPEEDOMETER.height / 2, WHITE);
 
     snprintf(textBuffer, sizeof(textBuffer), "%.1f km/h",
              3600 * 0.75f * player->vel * 60 / trackBackground.width);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
-    drawTextWithShadow(textBuffer, x, y, 64, textColor, FONTS[0]);
+    drawTextWithShadow(textBuffer, x, y, 64, textColor, FONTS[1]);
 }
 
 void drawLaps(Car *player, float x, float y) {
