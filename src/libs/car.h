@@ -53,6 +53,4 @@ void Car_draw(Car *car);   // Desenhar o carro na tela
 void Car_move(Car *car, int up, int down, int right,
               int left); // Atualiza o carro de acordo com os inputs do usuário
 
-void Car_showInfo(Car *car, int x, int y, int fontSize,
-                  Color fontColor); // Mostra as informações do carro no console (PARA DEBUG)
 #endif

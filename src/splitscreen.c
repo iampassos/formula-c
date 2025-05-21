@@ -136,11 +136,6 @@ void drawHudSplitscreen() {
 
     Car *p2 = LinkedList_getCarById(cars, 2);
     drawPlayerHud(p2, SCREEN_WIDTH / 2);
-
-    if (state.debug) {
-        Car_showInfo(p1, 20, 300, 20, BLACK);
-        Car_showInfo(p2, SCREEN_WIDTH - 400, 300, 20, BLACK);
-    }
 }
 
 //----------------------------------------------------------------------------------

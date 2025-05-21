@@ -33,9 +33,6 @@ void Car_draw(Car *car);   // Desenhar o carro na tela
 void Car_move(Car *car, int up, int down, int right,
               int left); // Atualiza o carro de acordo com os inputs do usuário
 
-void Car_showInfo(Car *car, int x, int y, int fontSize,
-                  Color fontColor); // Mostra as informações do carro no console (PARA DEBUG)
-
 // --- Funções internas ---
 static bool  ColorEquals(Color a, Color b);
 static float vecDist(Vector2 a, Vector2 b);
@@ -177,37 +174,10 @@ void Car_move(Car *car, int up, int down, int right, int left) {
 void Car_draw(Car *car) {
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height}; // A imagem inteira
     Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
-                           car->height};                        // Tamanho e posição do carro
-    Vector2   origin = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
+                           car->height};                           // Tamanho e posição do carro
+    Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
                    car->ghost ? Fade(car->color, 0.5f) : WHITE);
-}
-
-void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
-    char car_info[1000];
-    snprintf(car_info, sizeof(car_info),
-             "ID: %d\n"
-             "Lap: %d\n"
-             "Start Lap Time: %.2f\n"
-             "Current Lap Time: %.2f\n"
-             "Best Lap Time: %.2f\n"
-             "Checkpoint: %d\n"
-             "Position: (%.1f, %.1f)\n"
-             "Velocity: %.2f\n"
-             "Max velocity: %.2f\n"
-             "Acceleration: %.2f\n"
-             "Size: %dx%d\n"
-             "Angle: %.2f\n"
-             "Angular Speed: %.2f\n"
-             "Min Turn Speed: %.2f\n"
-             "Brake Force: %.2f\n"
-             "Drag Force: %.2f\n"
-             "Reverse Force: %.2f\n",
-             car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
-             car->checkpoint, car->pos.x, car->pos.y, car->vel, car->maxVelocity, car->acc,
-             car->width, car->height, car->angle, car->angularSpeed, car->minTurnSpeed,
-             car->breakForce, car->dragForce, car->reverseForce);
-    DrawText(car_info, x, y, fontSize, fontColor);
 }
 
 //----------------------------------------------------------------------------------
@@ -232,7 +202,7 @@ static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
-        return (Color){0, 0, 0};
+        return (Color) {0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 

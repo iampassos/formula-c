@@ -167,6 +167,10 @@ void drawPlayerHud(Car *player, int x) {
     drawLaps(player, x + 32, 32);
     drawLapTime(player, x + 32, 96);
     drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
+
+    if (state.debug) {
+        drawPlayerDebug(player, x + 32, 300);
+    }
 }
 
 void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {
@@ -228,4 +232,40 @@ void drawLapTime(Car *player, float x, float y) {
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
         drawTextWithShadow(textBuffer, x, y, 48, WHITE, FONTS[0]);
     }
+}
+
+//----------------------------------------------------------------------------------
+// Debug
+//----------------------------------------------------------------------------------
+
+void drawPlayerDebug(Car *player, int x, int y) {
+    char textBuffer[1000];
+    snprintf(textBuffer, sizeof(textBuffer),
+             "Current car debug\n"
+             "ID: %d\n"
+             "Lap: %d\n"
+             "Start Lap Time: %.2f\n"
+             "Current Lap Time: %.2f\n"
+             "Best Lap Time: %.2f\n"
+             "Checkpoint: %d\n"
+             "Position: (%.1f, %.1f)\n"
+             "Velocity: %.2f\n"
+             "Max velocity: %.2f\n"
+             "Acceleration: %.2f\n"
+             "Size: %dx%d\n"
+             "Angle: %.2f\n"
+             "Angular Speed: %.2f\n"
+             "Min Turn Speed: %.2f\n"
+             "Brake Force: %.2f\n"
+             "Drag Force: %.2f\n"
+             "Reverse Force: %.2f",
+             player->id, player->lap, player->startLapTime, GetTime() - player->startLapTime,
+             player->bestLapTime, player->checkpoint, player->pos.x, player->pos.y, player->vel,
+             player->maxVelocity, player->acc, player->width, player->height, player->angle,
+             player->angularSpeed, player->minTurnSpeed, player->breakForce, player->dragForce,
+             player->reverseForce);
+
+    Vector2 size = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
+    DrawRectangle(x, y, size.x + 10, size.y + 10, (Color) {196, 196, 196, 200});
+    DrawTextEx(FONTS[0], textBuffer, (Vector2) {x, y}, 20, 1.0f, BLACK);
 }

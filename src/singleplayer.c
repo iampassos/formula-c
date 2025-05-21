@@ -161,7 +161,6 @@ void drawHudSingleplayer() {
     }
 
     if (state.debug) {
-        Car_showInfo(p1, 20, 300, 20, BLACK);
         drawGhostCarDebug();
     }
 }
@@ -204,12 +203,15 @@ static void drawBestLapMessage(float x, float y, int size, Color color, char *te
 }
 
 static void drawGhostCarDebug() {
-    sprintf(textBuffer, "Ghost car debug:\nRecording i: %u\nPlayback i: %u",
-            ArrayList_length(bestLap), replayFrameIdx);
-    DrawText(textBuffer, SCREEN_WIDTH - 200, 500, 20, BLACK);
+    sprintf(
+        textBuffer,
+        "Ghost car debug\nRecording i: %u\nPlayback i: %u\n\nCurrent lap debug\nRecording i: %u",
+        ArrayList_length(bestLap), replayFrameIdx, ArrayList_length(currentLap));
 
-    sprintf(textBuffer, "Current lap debug:\nRecording i: %d", ArrayList_length(currentLap));
-    DrawText(textBuffer, SCREEN_WIDTH - 200, 600, 20, BLACK);
+    Vector2 size = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
+    DrawRectangle(SCREEN_WIDTH - size.x - 10, 500, size.x + 10, size.y + 10,
+                  (Color) {196, 196, 196, 200});
+    DrawTextEx(FONTS[0], textBuffer, (Vector2) {SCREEN_WIDTH - size.x - 10, 500}, 20, 1.0f, BLACK);
 }
 
 //----------------------------------------------------------------------------------
