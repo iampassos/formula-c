@@ -49,4 +49,6 @@ extern Vector2 minimapPos;
 
 extern Car *winner;
 
+extern int MAX_LAPS;
+
 #endif

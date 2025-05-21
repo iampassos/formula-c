@@ -7,6 +7,8 @@
 
 Car *winner = NULL;
 
+int MAX_LAPS = 3;
+
 static Sound  semaphoreSound;
 static double lastSoundTime;
 static int    count;
@@ -119,9 +121,8 @@ void drawSplitscreen() {
 
     if (winner) {
         snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
-        drawTextWithShadow(textBuffer,
-                           (SCREEN_WIDTH - MeasureText(textBuffer, WINNER_FONT_SIZE)) / 2.0f,
-                           (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
+        drawTextWithShadow(textBuffer, (SCREEN_WIDTH - MeasureText(textBuffer, 128)) / 2.0f,
+                           (SCREEN_HEIGHT - 128) / 2.0f, 128, YELLOW);
     }
 }
 
