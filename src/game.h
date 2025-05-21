@@ -7,11 +7,19 @@
 #include "common.h"
 #include "linked_list.h"
 
+//----------------------------------------------------------------------------------
+// Funções públicas
+//----------------------------------------------------------------------------------
+
 void Game_setup();
 void Game_cleanup();
 void Game_load();
 void Game_update();
 void Game_draw();
+
+//----------------------------------------------------------------------------------
+// Funções de uso interno
+//----------------------------------------------------------------------------------
 
 void drawMap();
 void drawPlayerHud(Car *player, int x);
@@ -21,17 +29,32 @@ void drawPlayerInMinimap(Car *player);
 void drawSpeedometer(Car *player, float x, float y);
 void drawLaps(Car *player, float x, float y);
 
+//----------------------------------------------------------------------------------
+// Singleplayer
+//----------------------------------------------------------------------------------
+
 void loadSingleplayer(Map map);
 void updateSingleplayer();
 void drawSingleplayer();
 void drawHudSingleplayer();
 void cleanUpSingleplayer();
 
+//----------------------------------------------------------------------------------
+// Splitscreen
+//----------------------------------------------------------------------------------
+
+extern Car *winner;
+extern int  MAX_LAPS;
+
 void loadSplitscreen(Map map);
 void updateSplitscreen();
 void drawSplitscreen();
 void drawHudSplitscreen();
 void cleanUpSplitscreen();
+
+//----------------------------------------------------------------------------------
+// Variáveis internas
+//----------------------------------------------------------------------------------
 
 extern Texture2D trackBackground;
 extern Texture2D trackHud;
@@ -46,9 +69,5 @@ extern int  minimapWidth;
 extern int  minimapHeigth;
 
 extern Vector2 minimapPos;
-
-extern Car *winner;
-
-extern int MAX_LAPS;
 
 #endif
