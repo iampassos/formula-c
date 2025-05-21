@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "car.h"
+#include "common.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -8,6 +9,8 @@ static int BACKGROUND_HEIGHT;
 
 static int CAMERA_WIDTH;
 static int CAMERA_HEIGHT;
+
+static float START_ZOOM = 1.5f;
 
 Camera2D *Camera_create(Vector2 target, Vector2 offset, float rotation, float zoom) {
     Camera2D *camera = (Camera2D *) malloc(sizeof(Camera2D));
@@ -34,6 +37,7 @@ void Camera_Background_setSize(int width, int height) {
 void Camera_setSize(int width, int height) {
     CAMERA_WIDTH  = width;
     CAMERA_HEIGHT = height;
+    START_ZOOM    = state.mode == SPLITSCREEN ? 1.35f : 1.5f;
 }
 
 static float LerpAngle(float a, float b, float t) {
@@ -57,9 +61,9 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
     if (y > BACKGROUND_HEIGHT - halfH)
         y = BACKGROUND_HEIGHT - halfH;
 
-    camera->target = (Vector2) {x, y};
+    camera->target = (Vector2){x, y};
 
-    float targetZoom = 1.0f - (car->vel / car->maxVelocity) + 0.5;
+    float targetZoom = START_ZOOM - (car->vel / car->maxVelocity);
 
     camera->zoom += (targetZoom - camera->zoom) * 0.1f;
     if (state.cameraView == FIRST_PERSON) {
