@@ -9,7 +9,6 @@ typedef struct {
     int       lap;
     double    startLapTime;
     double    bestLapTime;
-    double    raceTime;
     int       checkpoint;
     Vector2   pos;
     float     vel;
@@ -29,8 +28,6 @@ typedef struct {
     float     dragForce;
     float     reverseForce;
     float     maxVelocity;
-    int       closestCheckpoint;
-    float     closestCheckpointDistance;
 } Car;
 
 void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem

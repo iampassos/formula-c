@@ -59,7 +59,7 @@ int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 TrackArea TRACK_AREAS[] = {
     /* pista  */ {{127, 127, 127}, 0.997},
     /* fraca  */ {{255, 127, 39}, 0.985},
-    /* forte  */ {{163, 73, 164}, 0.98},
+    /* forte  */ {{163, 73, 164}, 0.965},
     /* grama  */ {{34, 177, 76}, 0.991}};
 
 int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);

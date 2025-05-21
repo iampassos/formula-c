@@ -112,9 +112,8 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->lap             = -1;
     car->vel             = 0;
     car->startLapTime    = GetTime();
-    car->raceTime        = GetTime();
     car->bestLapTime     = -1;
-    car->checkpoint      = -1;
+    car->checkpoint      = CHECKPOINTS_SIZE - 1; // COmeca no ultimo check point
     car->sound           = LoadMusicStream(CAR_SOUND_PATH);
     PlayMusicStream(car->sound);
     SetMusicVolume(car->sound, CAR_VOLUME);
@@ -148,7 +147,8 @@ void Car_update(Car *car) {
 
 // Atualiza as propriedades do carro de acordo com o input do player
 void Car_move(Car *car, int up, int down, int right, int left) {
-    if (car == NULL) return;
+    if (car == NULL)
+        return;
     if (IsKeyDown(up)) {
         accelerate(car);
     }
@@ -177,8 +177,8 @@ void Car_move(Car *car, int up, int down, int right, int left) {
 void Car_draw(Car *car) {
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height}; // A imagem inteira
     Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
-                           car->height};                           // Tamanho e posição do carro
-    Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
+                           car->height};                        // Tamanho e posição do carro
+    Vector2   origin = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
                    car->ghost ? Fade(car->color, 0.5f) : WHITE);
 }
@@ -191,7 +191,6 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Start Lap Time: %.2f\n"
              "Current Lap Time: %.2f\n"
              "Best Lap Time: %.2f\n"
-             "Race Time: %.2f\n"
              "Checkpoint: %d\n"
              "Position: (%.1f, %.1f)\n"
              "Velocity: %.2f\n"
@@ -205,9 +204,9 @@ void Car_showInfo(Car *car, int x, int y, int fontSize, Color fontColor) {
              "Drag Force: %.2f\n"
              "Reverse Force: %.2f\n",
              car->id, car->lap, car->startLapTime, GetTime() - car->startLapTime, car->bestLapTime,
-             GetTime() - car->raceTime, car->checkpoint, car->pos.x, car->pos.y, car->vel,
-             car->maxVelocity, car->acc, car->width, car->height, car->angle, car->angularSpeed,
-             car->minTurnSpeed, car->breakForce, car->dragForce, car->reverseForce);
+             car->checkpoint, car->pos.x, car->pos.y, car->vel, car->maxVelocity, car->acc,
+             car->width, car->height, car->angle, car->angularSpeed, car->minTurnSpeed,
+             car->breakForce, car->dragForce, car->reverseForce);
     DrawText(car_info, x, y, fontSize, fontColor);
 }
 
@@ -233,7 +232,7 @@ static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
     if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
-        return (Color) {0, 0, 0};
+        return (Color){0, 0, 0};
     return TRACK_PIXELS[y * IMAGE_WIDTH + x];
 }
 
@@ -273,9 +272,6 @@ static void updateLapStatus(Car *car, Color floorColor) {
 
         double now     = GetTime();
         double lapTime = now - car->startLapTime;
-
-        if (car->lap == 0)
-            car->raceTime = now;
 
         if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
             car->bestLapTime = lapTime;
@@ -323,7 +319,8 @@ static void turn(Car *car, float angle) {
     float speedRatio = car->vel / car->maxVelocity;
 
     // Interpola linearmente entre maxSensitivity e minSensitivity
-    float steeringSensitivity = car->maxAngularSpeed - (car->maxAngularSpeed - car->minAngularSpeed) * speedRatio;
+    float steeringSensitivity =
+        car->maxAngularSpeed - (car->maxAngularSpeed - car->minAngularSpeed) * speedRatio;
 
     // Aplica o ângulo com sensibilidade ajustada
     car->angle += angle * steeringSensitivity;
