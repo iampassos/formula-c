@@ -2,21 +2,20 @@
 #include "game.h"
 #include "menu.h"
 
-// Configurações de tela
+//----------------------------------------------------------------------------------
+// Variáveis globais de configuração
+//----------------------------------------------------------------------------------
+
 int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
-// Suavidade da camera
 float CAMERA_SMOOTHNESS = 0.05;
 
-// Informações do jogo
 char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int  TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
-// Pasta de gravação dos arquivos dos carros fantasmas
 char *GHOST_CAR_DATA_PATH = "./data/";
 
-// Áudio
 char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
@@ -26,7 +25,6 @@ float CAR_VOLUME              = 0.0f;
 float GAME_MUSIC_VOLUME       = 0.0f;
 float MENU_MUSIC_VOLUME       = 0.00f;
 
-// Recursos visuais
 char *SEMAPHORE_PATH[]  = {"resources/others/nolight.png", "resources/others/redlight.png"};
 char *BACKGROUND_PATH   = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
@@ -34,7 +32,6 @@ char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png
 char *LOGO_IMAGE_PATH   = "resources/logo/formula_c-logo.png";
 int   HUD_OPACITY       = 200;
 
-// Mapas
 Map MAPS[] = {
     {"Interlagos",
      "resources/maps/interlagos_map.png",   // backgroundPath
@@ -59,7 +56,6 @@ Map MAPS[] = {
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 
-// Áreas da pista
 TrackArea TRACK_AREAS[] = {
     /* pista  */ {{127, 127, 127}, 0.997},
     /* fraca  */ {{255, 127, 39}, 0.985},
@@ -68,15 +64,16 @@ TrackArea TRACK_AREAS[] = {
 
 int TRACK_AREA_SIZE = sizeof(TRACK_AREAS) / sizeof(TrackArea);
 
-// Cores da pista
 Color OUTSIDE_TRACK_COLOR = {255, 255, 255};
 Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
-// Carro padrão
 CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
-// Estado do jogo
 State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, THIRD_PERSON};
+
+//----------------------------------------------------------------------------------
+// Início do jogo
+//----------------------------------------------------------------------------------
 
 int main() {
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
@@ -116,7 +113,7 @@ int main() {
     Game_cleanup();
     Menu_cleanup();
     CloseAudioDevice();
-    CloseWindow(); // Fechar a janela gráfica 2d
+    CloseWindow();
 
     return 0;
 }

@@ -2,6 +2,8 @@
 #include "raylib.h"
 #include <stdio.h>
 
+// --- Variáveis públicas ---
+
 Texture2D   trackBackground;
 Texture2D   trackHud;
 LinkedList *cars;
@@ -16,27 +18,11 @@ int minimapHeigth;
 
 Vector2 minimapPos;
 
-// --- Funções públicas ---
-void Game_setup();
-void Game_load();
-void Game_update();
-void Game_draw();
-void Game_cleanup();
-
 // --- Funções internas ---
+
+static void drawHud();
 static void loadMap(Map map);
 static void mapCleanup();
-
-void drawMap();
-void drawView(Camera2D *camera, Rectangle scissor);
-
-void drawHud();
-
-void drawPlayerHud(Car *player, int x);
-void drawTextWithShadow(char *text, float x, float y, int size, Color color);
-void drawPlayerInMinimap(Car *player);
-void drawSpeedometer(Car *player, float x, float y);
-void drawLaps(Car *player, float x, float y);
 
 //----------------------------------------------------------------------------------
 // Carregamento do jogo

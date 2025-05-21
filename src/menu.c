@@ -5,35 +5,27 @@
 
 #define MAX_BUTTONS 10
 
-// Botões
+// --- Variáveis internas ---
+
 static Button BUTTONS[MAX_BUTTONS];
 static Button MAPS_BUTTONS[MAX_BUTTONS];
 static Button debugButton;
 static Button playButton;
 
-// Áudio
 static Sound clickSound;
 static Music music;
 
-// Recursos visuais
 static Texture2D background;
 
-// Dimensões e espaçamento
 static int width;
 static int height;
 static int padding;
 static int margin;
 
-// Tamanhos de fonte
 static int buttonFontSize;
 
-// --- Funções públicas ---
-void Menu_setup(void (*play)());
-void Menu_update();
-void Menu_draw();
-void Menu_cleanup();
-
 // --- Funções internas ---
+
 static void setupGameModeButtons();
 static void setupMapButtons();
 static void setupMainButtons(void (*play)());

@@ -5,13 +5,18 @@
 #include <stdio.h>
 #include <string.h>
 
-Car *winner = NULL;
+// --- Variáveis públicas ---
 
-int MAX_LAPS = 3;
+Car *winner   = NULL;
+int  MAX_LAPS = 3;
+
+// --- Variáveis internas ---
 
 static Sound  semaphoreSound;
 static double lastSoundTime;
 static int    count;
+
+// --- Funções internas ---
 
 static void updateSemaphore();
 static void updateWinner(Car *player);

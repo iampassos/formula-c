@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// --- Variáveis internas ---
+
 static ArrayList *bestLap    = NULL;
 static ArrayList *currentLap = NULL;
 
@@ -17,6 +19,8 @@ static bool   flagBestLap = 0;
 static double msgStart;
 static int    msgActive;
 static int    msgCount;
+
+// --- Funções internas ---
 
 static void updateGhostCar(Car *player);
 static void updateBestLap();
