@@ -21,9 +21,9 @@ char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
 char *CAR_SOUND_PATH          = "resources/sounds/f1s.mp3";
 char *CLICK_BUTTON_SOUND_PATH = "resources/sounds/click.mp3";
 char *SMAPHORE_SOUND_PATH     = "resources/sounds/click.mp3";
-float CAR_VOLUME              = 0.0f;
-float GAME_MUSIC_VOLUME       = 0.0f;
-float MENU_MUSIC_VOLUME       = 0.00f;
+float CAR_VOLUME              = 0.02f;
+float GAME_MUSIC_VOLUME       = 0.02f;
+float MENU_MUSIC_VOLUME       = 0.005f;
 
 char *FONTS_PATH[] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
                       "resources/fonts/Formula-Black.ttf"};

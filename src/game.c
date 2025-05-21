@@ -195,16 +195,15 @@ void drawSpeedometer(Car *player, float x, float y) {
     DrawTexture(SPEEDOMETER, x - SPEEDOMETER.width / 2, y - SPEEDOMETER.height / 2,
                 (Color) {255, 255, 255, HUD_OPACITY});
 
-    // Lógica do ponteiro
-    float   angulo = (fabs(player->vel) / player->maxVelocity) * (PI * 1.5) + (PI * 0.75);
-    Vector2 fim    = {cosf(angulo) * 100 + x, sinf(angulo) * 100 + y};
+    float   angle  = (fabs(player->vel) / player->maxVelocity) * (PI * 1.5) + (PI * 0.75);
+    Vector2 endPos = {cosf(angle) * 100 + x, sinf(angle) * 100 + y};
 
-    DrawLineEx((Vector2) {x, y}, fim, 8, RED);
+    DrawLineEx((Vector2) {x, y}, endPos, 8, RED);
     DrawCircle(x, y, 3, RED);
 
     snprintf(textBuffer, sizeof(textBuffer), "%.0f",
              3600 * 0.75f * fabs(player->vel) * 60 / trackBackground.width);
-    Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
+    Color textColor = ColorLerp(GREEN, RED, player->vel / player->maxVelocity);
 
     drawTextWithShadow(textBuffer, x - MeasureTextEx(FONTS[1], textBuffer, 48, 1.0f).x / 2, y + 24,
                        48, textColor, FONTS[1]);
