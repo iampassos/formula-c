@@ -55,7 +55,7 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
-    if (IsKeyDown(KEY_Q) || (winner && GetTime() - winner->startLapTime > 3)) {
+    if (IsKeyDown(KEY_Q) || (winner && GetTime() - winner->startLapTime > 3.5f)) {
         state.screen = MENU;
         mapCleanup();
         return;
@@ -102,12 +102,12 @@ static void loadMap(Map map) {
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
 
     Image temp = LoadImage("resources/cars/velocimetro.png");
-    ImageResize(&temp,  SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
+    ImageResize(&temp, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
     SPEEDOMETER = LoadTextureFromImage(temp);
     UnloadImage(temp);
 
     temp = LoadImage(state.debug ? map.maskPath : map.minimapPath);
-    ImageResize(&temp,  SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+    ImageResize(&temp, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
     trackHud = LoadTextureFromImage(temp);
     UnloadImage(temp);
 
@@ -168,9 +168,9 @@ void drawPlayerHud(Car *player, int x) {
     drawLapTime(player, x + 32, 96);
 }
 
-void drawTextWithShadow(char *text, float x, float y, int size, Color color) {
-    DrawText(text, x + 1, y + 1, size, BLACK);
-    DrawText(text, x, y, size, color);
+void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {
+    DrawTextEx(font, text, (Vector2) {x + 1, y + 1}, size, 1.0f, BLACK);
+    DrawTextEx(font, text, (Vector2) {x, y}, size, 1.0f, color);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -187,12 +187,17 @@ void drawPlayerInMinimap(Car *player) {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
-    DrawTexture(SPEEDOMETER, x-SPEEDOMETER.width/2, y-SPEEDOMETER.height/2, (Color){255, 255, 255, HUD_OPACITY});
+    DrawTexture(SPEEDOMETER, x - SPEEDOMETER.width / 2, y - SPEEDOMETER.height / 2,
+                (Color) {255, 255, 255, HUD_OPACITY});
+
+    // Lógica do ponteiro
 
     snprintf(textBuffer, sizeof(textBuffer), "%.1f",
              3600 * 0.75f * player->vel * 60 / trackBackground.width);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
-    drawTextWithShadow(textBuffer, x - MeasureText(textBuffer, 64) / 2, y - 32, 64, textColor);
+    
+    drawTextWithShadow(textBuffer, x - MeasureTextEx(FONTS[1], textBuffer, 64, 1.0f).x / 2, y - 32, 64,
+                       textColor, FONTS[1]);
 }
 
 void drawLaps(Car *player, float x, float y) {
@@ -202,7 +207,7 @@ void drawLaps(Car *player, float x, float y) {
         } else if (player->lap < MAX_LAPS) {
             snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
         }
-        drawTextWithShadow(textBuffer, x, y, 64, WHITE);
+        drawTextWithShadow(textBuffer, x, y, 64, WHITE, FONTS[0]);
     }
 }
 
@@ -212,6 +217,6 @@ void drawLapTime(Car *player, float x, float y) {
         int    mins = time / 60;
         float  secs = time - (mins * 60);
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
-        drawTextWithShadow(textBuffer, x, y, 48, WHITE);
+        drawTextWithShadow(textBuffer, x, y, 48, WHITE, FONTS[0]);
     }
 }

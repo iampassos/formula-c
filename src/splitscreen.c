@@ -109,25 +109,24 @@ static void updateWinner(Car *player) {
 //----------------------------------------------------------------------------------
 
 void drawSplitscreen() {
-    if (winner) {
-        return;
-    }
 
     drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
     drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
 
     DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
+    if (winner) {
+        snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
+        drawTextWithShadow(textBuffer,
+                           (SCREEN_WIDTH - MeasureTextEx(FONTS[1], textBuffer, 128, 1.0f).x) / 2.0f,
+                           (SCREEN_HEIGHT - 128) * 1.0f / 4.0f, 128, YELLOW, FONTS[1]);
+        return;
+    }
+
     if (state.status == COUNTDOWN) {
         drawSemaphore(SCREEN_WIDTH * 1.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
         drawSemaphore(SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
         return;
-    }
-
-    if (winner) {
-        snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
-        drawTextWithShadow(textBuffer, (SCREEN_WIDTH - MeasureText(textBuffer, 128)) / 2.0f,
-                           (SCREEN_HEIGHT - 128) / 2.0f, 128, YELLOW);
     }
 }
 
