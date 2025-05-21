@@ -72,10 +72,14 @@ void        drawView(Camera2D *camera, Rectangle scissor);
 
 static void drawHud();
 
+static void drawHudSingleplayer();
+static void drawHudSplitscreen();
+
 static void drawSemaphore(float x, float y, int size);
 static void updateSemaphore();
 
-static void drawMessage(float x, float y, int size, Color color, char *text, bool *flag);
+static void drawPlayerHud(Car *player, int x);
+static void drawBestLapMessage(float x, float y, int size, Color color, char *text);
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawBestLapTime(Car *player, float x, float y);
 static void drawLapTime(Car *player, float x, float y);
@@ -420,40 +424,50 @@ static void drawHud() {
         return;
     }
 
-    // P1
-    Car *p1 = LinkedList_getCarById(cars, 1);
-    drawSpeedometer(p1, 128, SCREEN_HEIGHT - 2 * 64);
-    drawLaps(p1, 32, 32);
-    drawLapTime(p1, 32, 96);
-    if (state.mode == SINGLEPLAYER) {
-        drawBestLapTime(p1, 32, 144);
-
-        if (flagBestLap) {
-            snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
-            drawMessage(SCREEN_WIDTH / 2.0f - MeasureText(textBuffer, 64) / 2.0f,
-                        SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255}, textBuffer,
-                        &flagBestLap);
-        }
-    }
-    if (state.debug) {
-        Car_showInfo(p1, 20, 300, 20, BLACK);
-        if (state.mode == SINGLEPLAYER)
-            drawGhostCarDebug();
-    }
-
-    // P2
-    if (state.mode == SPLITSCREEN) {
-        Car *p2 = LinkedList_getCarById(cars, 2);
-        drawSpeedometer(p2, SCREEN_WIDTH / 2.0f + 128, SCREEN_HEIGHT - 2 * 64);
-        drawLaps(p2, SCREEN_WIDTH / 2.0f + 32, 32);
-        drawLapTime(p2, SCREEN_WIDTH / 2.0f + 32, 96);
-        if (state.debug) {
-            Car_showInfo(p2, SCREEN_WIDTH - 400, 300, 20, BLACK);
-        }
+    switch (state.mode) {
+    case SINGLEPLAYER:
+        drawHudSingleplayer();
+        break;
+    case SPLITSCREEN:
+        drawHudSplitscreen();
+        break;
     }
 
     DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
     LinkedList_forEach(cars, drawPlayerInMinimap);
+}
+
+static void drawHudSingleplayer() {
+    // P1
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    drawPlayerHud(p1, 0);
+    drawBestLapTime(p1, 32, 144);
+
+    if (flagBestLap) {
+        snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
+        drawBestLapMessage(SCREEN_WIDTH / 2.0f - MeasureText(textBuffer, 64) / 2.0f,
+                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255},
+                           textBuffer);
+    }
+
+    if (state.debug) {
+        Car_showInfo(p1, 20, 300, 20, BLACK);
+        drawGhostCarDebug();
+    }
+}
+
+static void drawHudSplitscreen() {
+    // P1
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    drawPlayerHud(p1, 0);
+
+    Car *p2 = LinkedList_getCarById(cars, 2);
+    drawPlayerHud(p2, SCREEN_WIDTH / 2);
+
+    if (state.debug) {
+        Car_showInfo(p1, 20, 300, 20, BLACK);
+        Car_showInfo(p2, SCREEN_WIDTH - 400, 300, 20, BLACK);
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -486,6 +500,12 @@ static void updateSemaphore() {
 //----------------------------------------------------------------------------------
 // Funções auxiliares para desenhar a hud
 //----------------------------------------------------------------------------------
+
+static void drawPlayerHud(Car *player, int x) {
+    drawSpeedometer(player, x + 128, SCREEN_HEIGHT - 2 * 64);
+    drawLaps(player, x + 32, 32);
+    drawLapTime(player, x + 32, 96);
+}
 
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color) {
     DrawText(text, x + 1, y + 1, size, BLACK);
@@ -552,7 +572,7 @@ static void drawBestLapTime(Car *player, float x, float y) {
     }
 }
 
-static void drawMessage(float x, float y, int size, Color color, char *text, bool *flag) {
+static void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
     float actualTime = GetTime();
     if (actualTime - msgStart >= 0.3f) {
         msgActive = !msgActive;
@@ -563,9 +583,9 @@ static void drawMessage(float x, float y, int size, Color color, char *text, boo
         }
 
         if (msgCount > 3) {
-            msgActive = 0;
-            msgCount  = 0;
-            *flag     = false;
+            msgActive   = 0;
+            msgCount    = 0;
+            flagBestLap = false;
             return;
         }
     }
