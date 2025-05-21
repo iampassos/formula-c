@@ -31,7 +31,7 @@ static Sound  semaphoreSound;
 static double lastSoundTime;
 static int    count;
 
-static int flagBestLap = 0;
+static bool flagBestLap = 0;
 
 static double msgStart;
 static int    msgActive;
@@ -55,19 +55,27 @@ static void mapCleanup();
 static void loadSingleplayer(Map map);
 static void loadSplitscreen(Map map);
 
+static void updateSingleplayer();
+static void updateSplitscreen();
+
 static void loadBestLap();
 static void updateBestLap();
 static void updateGhostCar(Car *player);
 
 static void updateWinner(Car *player);
 
+static void drawSingleplayer();
+static void drawSplitscreen();
+
 static void drawMap();
 void        drawView(Camera2D *camera, Rectangle scissor);
 
 static void drawHud();
 
-static void drawMessage(float x, float y, int size, Color color, char *text, int *flag);
 static void drawSemaphore(float x, float y, int size);
+static void updateSemaphore();
+
+static void drawMessage(float x, float y, int size, Color color, char *text, bool *flag);
 static void drawTextWithShadow(char *text, float x, float y, int size, Color color);
 static void drawBestLapTime(Car *player, float x, float y);
 static void drawLapTime(Car *player, float x, float y);
@@ -110,7 +118,7 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
-    if (IsKeyDown(KEY_Q)) {
+    if (IsKeyDown(KEY_Q) || (winner && GetTime() - winner->startLapTime > 3)) {
         state.screen = MENU;
         mapCleanup();
         return;
@@ -118,41 +126,14 @@ void Game_update() {
 
     UpdateMusicStream(music);
 
-    Car *p1 = LinkedList_getCarById(cars, 1);
-
-    if (state.mode == SINGLEPLAYER) {
-        updateGhostCar(p1);
-    } else {
-        if (state.status == COUNTDOWN) {
-            if (GetTime() - state.raceTime > 3.5f) {
-                SetSoundPitch(semaphoreSound, 1.2);
-                PlaySound(semaphoreSound);
-                state.status = STARTED;
-            }
-            return;
-        }
-
-        Car *p2 = LinkedList_getCarById(cars, 2);
-
-        if (winner == NULL) {
-            LinkedList_forEach(cars, updateWinner);
-        }
-
-        if (winner) {
-            if (GetTime() - winner->startLapTime > 3) {
-                state.screen = MENU;
-                mapCleanup();
-            }
-            return;
-        }
-
-        Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
-
-        Camera_updateTarget(camera2, p2);
+    switch (state.mode) {
+    case SINGLEPLAYER:
+        updateSingleplayer();
+        break;
+    case SPLITSCREEN:
+        updateSplitscreen();
+        break;
     }
-    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
-    Camera_updateTarget(camera1, p1);
-    LinkedList_forEach(cars, Car_update);
 }
 
 //----------------------------------------------------------------------------------
@@ -163,28 +144,13 @@ void Game_draw() {
     if (state.screen != GAME)
         return;
 
-    if (state.mode == SPLITSCREEN) {
-        drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
-        drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
-
-        DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
-
-        if (state.status == COUNTDOWN) {
-            drawSemaphore(SCREEN_WIDTH * 1.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
-            drawSemaphore(SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
-            return;
-        }
-
-        if (winner) {
-            snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
-            drawTextWithShadow(textBuffer,
-                               (SCREEN_WIDTH - MeasureText(textBuffer, WINNER_FONT_SIZE)) / 2.0f,
-                               (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
-        }
-    } else {
-        BeginMode2D(*camera1);
-        drawMap();
-        EndMode2D();
+    switch (state.mode) {
+    case SINGLEPLAYER:
+        drawSingleplayer();
+        break;
+    case SPLITSCREEN:
+        drawSplitscreen();
+        break;
     }
 
     if (state.status == STARTED) {
@@ -197,6 +163,11 @@ void Game_draw() {
 //----------------------------------------------------------------------------------
 
 static void loadMap(Map map) {
+    flagBestLap     = false;
+    msgStart        = 0;
+    msgActive       = 0;
+    msgCount        = 0;
+    state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
 
     Image minimap = LoadImage(state.debug ? map.maskPath : map.minimapPath);
@@ -238,14 +209,9 @@ static void mapCleanup() {
 //----------------------------------------------------------------------------------
 
 static void loadSingleplayer(Map map) {
-    flagBestLap    = 0;
-    msgStart       = 0;
-    msgActive      = 0;
-    msgCount       = 0;
-    state.status   = STARTED;
-    state.raceTime = GetTime();
-    minimapPos.x   = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y   = 10;
+    state.status = STARTED;
+    minimapPos.x = SCREEN_WIDTH - trackHud.width;
+    minimapPos.y = 10;
 
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
     strcat(ghostCarPath, map.name);
@@ -271,17 +237,12 @@ static void loadSingleplayer(Map map) {
 }
 
 static void loadSplitscreen(Map map) {
-    flagBestLap    = 0;
-    msgStart       = 0;
-    msgActive      = 0;
-    msgCount       = 0;
-    lastSoundTime  = 0;
-    count          = 0;
-    state.status   = COUNTDOWN;
-    state.raceTime = GetTime();
-    winner         = NULL;
-    minimapPos.x   = SCREEN_WIDTH - trackHud.width;
-    minimapPos.y   = 10;
+    lastSoundTime = GetTime() - 0.5;
+    count         = 0;
+    state.status  = COUNTDOWN;
+    winner        = NULL;
+    minimapPos.x  = SCREEN_WIDTH - trackHud.width;
+    minimapPos.y  = 10;
 
     semaphoreSound = LoadSound(SMAPHORE_SOUND_PATH);
 
@@ -300,6 +261,36 @@ static void loadSplitscreen(Map map) {
         Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
     camera2 = Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0f},
                             0.0f, 0.5f);
+}
+
+//----------------------------------------------------------------------------------
+// Atualizando o jogo
+//----------------------------------------------------------------------------------
+
+static void updateSingleplayer() {
+    Car *p1 = LinkedList_getCarById(cars, 1);
+
+    updateGhostCar(p1);
+    Camera_updateTarget(camera1, p1);
+    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+    Car_update(p1);
+}
+
+static void updateSplitscreen() {
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    Car *p2 = LinkedList_getCarById(cars, 2);
+
+    updateSemaphore();
+
+    LinkedList_forEach(cars, updateWinner);
+
+    if (state.status == STARTED) {
+        Camera_updateTarget(camera1, p1);
+        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+        Camera_updateTarget(camera2, p2);
+        Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
+        LinkedList_forEach(cars, Car_update);
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -370,7 +361,6 @@ static void updateWinner(Car *player) {
     if (player->lap == MAX_LAPS) {
         winner       = player;
         state.status = ENDED;
-        return;
     }
 }
 
@@ -389,6 +379,36 @@ void drawView(Camera2D *camera, Rectangle scissor) {
     drawMap();
     EndMode2D();
     EndScissorMode();
+}
+
+//----------------------------------------------------------------------------------
+// Draw modes
+//----------------------------------------------------------------------------------
+
+static void drawSingleplayer() {
+    BeginMode2D(*camera1);
+    drawMap();
+    EndMode2D();
+}
+
+static void drawSplitscreen() {
+    drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
+    drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
+
+    DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
+
+    if (state.status == COUNTDOWN) {
+        drawSemaphore(SCREEN_WIDTH * 1.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
+        drawSemaphore(SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
+        return;
+    }
+
+    if (winner) {
+        snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
+        drawTextWithShadow(textBuffer,
+                           (SCREEN_WIDTH - MeasureText(textBuffer, WINNER_FONT_SIZE)) / 2.0f,
+                           (SCREEN_HEIGHT - WINNER_FONT_SIZE) / 2.0f, WINNER_FONT_SIZE, YELLOW);
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -434,6 +454,33 @@ static void drawHud() {
 
     DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
     LinkedList_forEach(cars, drawPlayerInMinimap);
+}
+
+//----------------------------------------------------------------------------------
+// Semáforo
+//----------------------------------------------------------------------------------
+
+static void drawSemaphore(float x, float y, int size) {
+    DrawCircle(x - 3 * size, y, size, count >= 1 ? RED : BLACK);
+    DrawCircle(x, y, size, count >= 2 ? RED : BLACK);
+    DrawCircle(x + 3 * size, y, size, count >= 3 ? RED : BLACK);
+}
+
+static void updateSemaphore() {
+    if (state.status != COUNTDOWN)
+        return;
+    if (count == 4) {
+        SetSoundPitch(semaphoreSound, 1.2);
+        PlaySound(semaphoreSound);
+        state.status = STARTED;
+    }
+    float actualTime = GetTime();
+    if (actualTime - lastSoundTime > 1.0) {
+        SetSoundPitch(semaphoreSound, 0.8);
+        PlaySound(semaphoreSound);
+        lastSoundTime = actualTime;
+        count++;
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -505,23 +552,11 @@ static void drawBestLapTime(Car *player, float x, float y) {
     }
 }
 
-static void drawSemaphore(float x, float y, int size) {
-    if (GetTime() - state.raceTime >= 0.5f && GetTime() - lastSoundTime >= 1.0) {
-        SetSoundPitch(semaphoreSound, 0.8);
-        PlaySound(semaphoreSound);
-        lastSoundTime = GetTime();
-        count++;
-    }
-
-    DrawCircle(x - 3 * size, y, size, count >= 1 ? RED : BLACK);
-    DrawCircle(x, y, size, count >= 2 ? RED : BLACK);
-    DrawCircle(x + 3 * size, y, size, count >= 3 ? RED : BLACK);
-}
-
-static void drawMessage(float x, float y, int size, Color color, char *text, int *flag) {
-    if (GetTime() - msgStart >= 0.3f) {
-        msgActive = msgActive ? 0 : 1;
-        msgStart  = GetTime();
+static void drawMessage(float x, float y, int size, Color color, char *text, bool *flag) {
+    float actualTime = GetTime();
+    if (actualTime - msgStart >= 0.3f) {
+        msgActive = !msgActive;
+        msgStart  = actualTime;
 
         if (msgActive) {
             msgCount++;
@@ -530,7 +565,7 @@ static void drawMessage(float x, float y, int size, Color color, char *text, int
         if (msgCount > 3) {
             msgActive = 0;
             msgCount  = 0;
-            *flag     = 0;
+            *flag     = false;
             return;
         }
     }

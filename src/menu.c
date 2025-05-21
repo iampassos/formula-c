@@ -99,6 +99,7 @@ void Menu_update() {
         if (pressedButton(BUTTONS + i, mouse)) {
             unselectButtons(BUTTONS);
             BUTTONS[i].selected = true;
+            break;
         }
     }
 
@@ -106,6 +107,7 @@ void Menu_update() {
         if (pressedButton(MAPS_BUTTONS + i, mouse)) {
             unselectButtons(MAPS_BUTTONS);
             MAPS_BUTTONS[i].selected = true;
+            break;
         }
     }
 

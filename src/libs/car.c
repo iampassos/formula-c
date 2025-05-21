@@ -148,6 +148,7 @@ void Car_update(Car *car) {
 
 // Atualiza as propriedades do carro de acordo com o input do player
 void Car_move(Car *car, int up, int down, int right, int left) {
+    if (car == NULL) return;
     if (IsKeyDown(up)) {
         accelerate(car);
     }
