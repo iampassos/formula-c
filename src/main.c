@@ -35,6 +35,7 @@ char *BACKGROUND_PATH   = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
                            "resources/cars/laranja.png"};
 char *LOGO_IMAGE_PATH   = "resources/logo/formula_c-logo.png";
+char *SPEEDOMETER_PATH  = "resources/cars/velocimetro.png";
 int   HUD_OPACITY       = 200;
 
 Map MAPS[] = {
@@ -74,7 +75,7 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
-State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON};
+State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, THIRD_PERSON};
 
 //----------------------------------------------------------------------------------
 // Início do jogo
