@@ -1,6 +1,5 @@
 #include "common.h"
 #include "game.h"
-#include "menu.h"
 #include "raylib.h"
 #include <stdio.h>
 #include <string.h>

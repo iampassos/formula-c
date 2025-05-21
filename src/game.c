@@ -155,7 +155,7 @@ void drawHud() {
         break;
     }
 
-    DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color){255, 255, 255, HUD_OPACITY});
+    DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
     LinkedList_forEach(cars, drawPlayerInMinimap);
 }
 
@@ -164,14 +164,14 @@ void drawHud() {
 //----------------------------------------------------------------------------------
 
 void drawPlayerHud(Car *player, int x) {
-    drawSpeedometer(player, x + SCREEN_WIDTH / 4, SCREEN_HEIGHT - 2 * 64);
     drawLaps(player, x + 32, 32);
     drawLapTime(player, x + 32, 96);
+    drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
 }
 
 void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {
-    DrawTextEx(font, text, (Vector2){x + 1, y + 1}, size, 1.0f, BLACK);
-    DrawTextEx(font, text, (Vector2){x, y}, size, 1.0f, color);
+    DrawTextEx(font, text, (Vector2) {x + 1, y + 1}, size, 1.0f, BLACK);
+    DrawTextEx(font, text, (Vector2) {x, y}, size, 1.0f, color);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -189,20 +189,24 @@ void drawPlayerInMinimap(Car *player) {
 
 void drawSpeedometer(Car *player, float x, float y) {
     DrawTexture(SPEEDOMETER, x - SPEEDOMETER.width / 2, y - SPEEDOMETER.height / 2,
-                (Color){255, 255, 255, HUD_OPACITY});
+                (Color) {255, 255, 255, HUD_OPACITY});
 
     // Lógica do ponteiro
     float   angulo = (fabs(player->vel) / player->maxVelocity) * (PI * 1.5) + (PI * 0.75);
     Vector2 fim    = {cosf(angulo) * 100 + x, sinf(angulo) * 100 + y};
 
-    DrawLineEx((Vector2){x, y}, fim, 8, RED);
+    DrawLineEx((Vector2) {x, y}, fim, 8, RED);
+    DrawCircle(x, y, 3, RED);
 
-    snprintf(textBuffer, sizeof(textBuffer), "%.1f",
+    snprintf(textBuffer, sizeof(textBuffer), "%.0f",
              3600 * 0.75f * fabs(player->vel) * 60 / trackBackground.width);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
 
-    drawTextWithShadow(textBuffer, x - MeasureTextEx(FONTS[1], textBuffer, 48, 1.0f).x / 2, y+24,
+    drawTextWithShadow(textBuffer, x - MeasureTextEx(FONTS[1], textBuffer, 48, 1.0f).x / 2, y + 24,
                        48, textColor, FONTS[1]);
+
+    drawTextWithShadow("KM/H", x - MeasureTextEx(FONTS[0], "KM/H", 16, 1.0f).x / 2, y + 72, 16,
+                       WHITE, FONTS[0]);
 }
 
 void drawLaps(Car *player, float x, float y) {
