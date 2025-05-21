@@ -281,20 +281,21 @@ static void updateSingleplayer() {
 }
 
 static void updateSplitscreen() {
-    Car *p1 = LinkedList_getCarById(cars, 1);
-    Car *p2 = LinkedList_getCarById(cars, 2);
+    if (state.status == COUNTDOWN) {
+        updateSemaphore();
+        return;
+    }
 
-    updateSemaphore();
+    Car *p1 = LinkedList_getCarById(cars, 1);
+    Camera_updateTarget(camera1, p1);
+    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+
+    Car *p2 = LinkedList_getCarById(cars, 2);
+    Camera_updateTarget(camera2, p2);
+    Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
 
     LinkedList_forEach(cars, updateWinner);
-
-    if (state.status == STARTED) {
-        Camera_updateTarget(camera1, p1);
-        Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
-        Camera_updateTarget(camera2, p2);
-        Car_move(p2, KEY_I, KEY_K, KEY_L, KEY_J);
-        LinkedList_forEach(cars, Car_update);
-    }
+    LinkedList_forEach(cars, Car_update);
 }
 
 //----------------------------------------------------------------------------------
@@ -481,8 +482,6 @@ static void drawSemaphore(float x, float y, int size) {
 }
 
 static void updateSemaphore() {
-    if (state.status != COUNTDOWN)
-        return;
     if (count == 4) {
         SetSoundPitch(semaphoreSound, 1.2);
         PlaySound(semaphoreSound);
