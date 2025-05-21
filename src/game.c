@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // --- Variáveis públicas ---
-
+Texture2D   SPEEDOMETER;
 Texture2D   trackBackground;
 Texture2D   trackHud;
 LinkedList *cars;
@@ -103,6 +103,7 @@ void Game_draw() {
 static void loadMap(Map map) {
     state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
+    SPEEDOMETER = LoadTexture("resources/cars/velocimetro.png");
 
     Image minimap = LoadImage(state.debug ? map.maskPath : map.minimapPath);
     minimapWidth  = SCREEN_WIDTH / 4;
@@ -121,6 +122,7 @@ static void mapCleanup() {
     Track_Unload();
     LinkedList_clear(cars);
     UnloadTexture(trackBackground);
+    UnloadTexture(SPEEDOMETER);
     UnloadTexture(trackHud);
     if (state.mode == SINGLEPLAYER) {
         cleanUpSingleplayer();
@@ -186,6 +188,8 @@ void drawPlayerInMinimap(Car *player) {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
+    DrawTexture(SPEEDOMETER, x-SPEEDOMETER.width/2, y-SPEEDOMETER.height/2, WHITE);
+
     snprintf(textBuffer, sizeof(textBuffer), "%.1f km/h",
              3600 * 0.75f * player->vel * 60 / trackBackground.width);
     Color textColor = ColorLerp(WHITE, RED, player->vel / player->maxVelocity);
