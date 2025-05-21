@@ -97,4 +97,8 @@ extern char *LOGO_IMAGE_PATH;
 extern int   HUD_OPACITY;
 extern char *CAR_IMAGES_PATH[];
 
+extern char *FONTS_PATH[];
+extern int   FONTS_N;
+extern Font  FONTS[];
+
 #endif

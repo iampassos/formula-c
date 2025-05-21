@@ -25,6 +25,11 @@ float CAR_VOLUME              = 0.0f;
 float GAME_MUSIC_VOLUME       = 0.0f;
 float MENU_MUSIC_VOLUME       = 0.00f;
 
+char *FONTS_PATH[] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
+                      "resources/fonts/Formula-Black.ttf"};
+int   FONTS_N      = 3;
+Font  FONTS[3];
+
 char *SEMAPHORE_PATH[]  = {"resources/others/nolight.png", "resources/others/redlight.png"};
 char *BACKGROUND_PATH   = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
@@ -88,6 +93,10 @@ int main() {
     UnloadImage(icon);
     InitAudioDevice();
 
+    for (int i = 0; i < FONTS_N; i++) {
+        FONTS[i] = LoadFontEx(FONTS_PATH[i], 256, 0, 0);
+    }
+
     SetTargetFPS(60);
 
     Menu_setup(Game_load);
@@ -112,6 +121,11 @@ int main() {
 
     Game_cleanup();
     Menu_cleanup();
+
+    for (int i = 0; i < FONTS_N; i++) {
+        UnloadFont(FONTS[i]);
+    }
+
     CloseAudioDevice();
     CloseWindow();
 

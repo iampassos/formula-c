@@ -65,7 +65,7 @@ void Menu_setup(void (*play)()) {
     width          = SCREEN_WIDTH / 5;
     height         = SCREEN_HEIGHT / 10;
     padding        = SCREEN_HEIGHT / 9;
-    buttonFontSize = SCREEN_WIDTH / 40;
+    buttonFontSize = SCREEN_WIDTH / 42;
     margin         = SCREEN_WIDTH / 60;
 
     setupGameModeButtons();
@@ -211,8 +211,12 @@ static void drawButton(Button btn) {
     DrawRectangleRounded(shadowRect, 0.3f, 10, Fade(BLACK, 0.2f));
     DrawRectangleRounded(scaled, 0.3f, 10, baseColor);
 
-    DrawText(btn.text, rect.x + (rect.width - MeasureText(btn.text, buttonFontSize)) / 2,
-             rect.y + (rect.height - buttonFontSize) / 2, buttonFontSize, textColor);
+    DrawTextEx(
+        FONTS[1], btn.text,
+        (Vector2) {rect.x +
+                       (rect.width - MeasureTextEx(FONTS[1], btn.text, buttonFontSize, 1.0f).x) / 2,
+                   rect.y + (rect.height - buttonFontSize) / 2},
+        buttonFontSize, 1.0f, textColor);
 }
 
 //----------------------------------------------------------------------------------

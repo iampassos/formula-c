@@ -23,7 +23,7 @@ void Game_draw();
 
 void drawMap();
 void drawPlayerHud(Car *player, int x);
-void drawTextWithShadow(char *text, float x, float y, int size, Color color);
+void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font);
 void drawLapTime(Car *player, float x, float y);
 void drawPlayerInMinimap(Car *player);
 void drawSpeedometer(Car *player, float x, float y);

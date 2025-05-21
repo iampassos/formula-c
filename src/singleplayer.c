@@ -156,9 +156,9 @@ void drawHudSingleplayer() {
 
     if (flagBestLap) {
         snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
-        drawBestLapMessage(SCREEN_WIDTH / 2.0f - MeasureText(textBuffer, 64) / 2.0f,
-                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255},
-                           textBuffer);
+        drawBestLapMessage(
+            SCREEN_WIDTH / 2.0f - MeasureTextEx(FONTS[1], textBuffer, 64, 1.0f).x / 2.0f,
+            SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255}, textBuffer);
     }
 
     if (state.debug) {
@@ -177,7 +177,7 @@ static void drawBestLapTime(Car *player, float x, float y) {
         int    mins = time / 60;
         float  secs = time - (mins * 60);
         snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
-        drawTextWithShadow(textBuffer, x, y, 42, (Color) {158, 24, 181, 255});
+        drawTextWithShadow(textBuffer, x, y, 42, (Color) {158, 24, 181, 255}, FONTS[0]);
     }
 }
 
@@ -200,7 +200,7 @@ static void drawBestLapMessage(float x, float y, int size, Color color, char *te
     }
 
     if (msgActive) {
-        drawTextWithShadow(text, x, y, size, color);
+        drawTextWithShadow(text, x, y, size, color, FONTS[1]);
     }
 }
 
