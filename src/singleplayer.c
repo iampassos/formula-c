@@ -14,7 +14,9 @@ static char ghostCarPath[100];
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
-static bool   flagBestLap = 0;
+bool   flagBestLap = 0;
+double bestLapTime = 0;
+
 static double msgStart;
 static int    msgActive;
 static int    msgCount;
@@ -25,7 +27,6 @@ static void updateGhostCar(Car *player);
 static void updateBestLap();
 static void loadBestLap();
 
-static void drawBestLapTime(Car *player, float x, float y);
 static void drawBestLapMessage(float x, float y, int size, Color color, char *text);
 static void drawGhostCarDebug();
 
@@ -93,6 +94,7 @@ static void updateGhostCar(Car *player) {
             ArrayList_copy(bestLap, currentLap);
             updateBestLap();
             flagBestLap = 1;
+            bestLapTime = (ArrayList_length(bestLap) - 1) / 60.0f;
         }
         ArrayList_clear(currentLap);
     }
@@ -151,13 +153,12 @@ void drawSingleplayer() {
 void drawHudSingleplayer() {
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawPlayerHud(p1, 0);
-    // drawBestLapTime(p1, 32, 144);
 
     if (flagBestLap) {
         snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
-        drawBestLapMessage(
-            SCREEN_WIDTH / 2.0f - MeasureTextEx(FONTS[1], textBuffer, 64, 1.0f).x / 2.0f,
-            SCREEN_HEIGHT * 0.5f / 4.0f, 64, (Color) {158, 24, 181, 255}, textBuffer);
+        drawBestLapMessage(SCREEN_WIDTH / 2.0f -
+                               MeasureTextEx(FONTS[1], textBuffer, 64, 1.0f).x / 2.0f,
+                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, PURPLE, textBuffer);
     }
 
     if (state.debug) {
@@ -168,14 +169,6 @@ void drawHudSingleplayer() {
 //----------------------------------------------------------------------------------
 // Funções complementares para o draw
 //----------------------------------------------------------------------------------
-
-static void drawBestLapTime(Car *player, float x, float y) {
-    if (player->lap > -1 && ArrayList_length(bestLap) > 0) {
-        double time = (ArrayList_length(bestLap) - 1) / 60.0f;
-        stringifyTime(textBuffer, time, 0);
-        drawTextWithShadow(textBuffer, x, y, 42, (Color) {158, 24, 181, 255}, FONTS[0]);
-    }
-}
 
 static void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
     float actualTime = GetTime();

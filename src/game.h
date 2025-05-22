@@ -36,6 +36,7 @@ void drawPlayerList(Car *player, float x, float y);
 //----------------------------------------------------------------------------------
 
 void stringifyTime(char *buffer, double time, int signFlag);
+int  getDifferenceToNext(Car *player);
 
 //----------------------------------------------------------------------------------
 // Singleplayer
@@ -77,5 +78,8 @@ extern int  minimapWidth;
 extern int  minimapHeigth;
 
 extern Vector2 minimapPos;
+
+extern bool   flagBestLap;
+extern double bestLapTime;
 
 #endif

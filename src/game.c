@@ -223,9 +223,12 @@ void drawHud() {
 //----------------------------------------------------------------------------------
 
 void drawPlayerHud(Car *player, int x) {
-    // drawLapTime(player, x + 32, 96);
     drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
-    drawLaps(player, x + 32, 200 - 64);
+
+    DrawRectangle(x + 32, 136, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
+    drawLaps(player, x + 32, 140);
+    drawLapTime(player, x + 32, 144);
+
     drawPlayerList(player, x + 32, 200);
 
     if (state.debug) {
@@ -286,14 +289,25 @@ void drawLaps(Car *player, float x, float y) {
         snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
     }
 
-    DrawRectangle(x, y, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
-    drawCenteredText(textBuffer, x, y, hudPlayerListWidth, 16, 32, WHITE, FONTS[0]);
+    drawCenteredText(textBuffer, x + 4, y, hudPlayerListWidth / 2.0f, 14, 28, WHITE, FONTS[0]);
 }
 
 void drawLapTime(Car *player, float x, float y) {
-    double time = GetTime() - player->startLapTime;
-    stringifyTime(textBuffer, time, 0);
-    drawTextWithShadow(textBuffer, x, y, 48, WHITE, FONTS[0]);
+    Color color = WHITE;
+
+    if (flagBestLap) {
+        stringifyTime(textBuffer, bestLapTime, 0);
+        color = PURPLE;
+    } else {
+        stringifyTime(textBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
+
+        if (state.mode == SINGLEPLAYER) {
+            color = getDifferenceToNext(player) > 0 ? RED : GREEN;
+        }
+    }
+
+    drawCenteredText(textBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f,
+                     12, 24, color, FONTS[0]);
 }
 
 void drawPlayerList(Car *player, float x, float y) {
@@ -390,4 +404,20 @@ void stringifyTime(char *buffer, double time, int signFlag) {
     }
 
     strcpy(buffer, text);
+}
+
+int getDifferenceToNext(Car *player) {
+    Node *prev = cars->head;
+    Node *curr = cars->head;
+
+    while (curr != NULL) {
+        if (curr != cars->head && player == curr->car) {
+            return prev->car->refFrame - curr->car->refFrame;
+        }
+
+        prev = curr;
+        curr = curr->next;
+    }
+
+    return 0;
 }
