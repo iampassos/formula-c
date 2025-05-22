@@ -34,8 +34,8 @@ char *SEMAPHORE_PATH[]   = {"resources/others/nolight.png", "resources/others/re
 char *BACKGROUND_PATH    = "resources/menu/menu.png";
 char *CAR_IMAGES_PATH[]  = {"resources/cars/branco.png", "resources/cars/azul.png",
                             "resources/cars/laranja.png"};
-char *LOGO_BG_IMAGE_PATH = "resources/logo_background.png";
-char *LOGO_IMAGE_PATH    = "resources/logo/formula_c-logo.png";
+char *LOGO_BG_IMAGE_PATH = "resources/logo/logo_background.png";
+char *LOGO_IMAGE_PATH    = "resources/logo/logo_background.png";
 char *SPEEDOMETER_PATH   = "resources/cars/velocimetro.png";
 int   HUD_OPACITY        = 200;
 

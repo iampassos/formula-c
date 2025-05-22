@@ -104,7 +104,7 @@ Cada carro possui um **sensor invisível ao jogador**, que lê a cor da área po
 
 ## 🧐 Curiosidade
 
-O nome **Formula C** surgiu como uma brincadeira com o fato de o jogo ter sido desenvolvido em **C**, durante a disciplina de **PIF** da *CESAR School* ( Que tabem começa com C).  
+O nome **Formula C** surgiu como uma brincadeira com o fato de o jogo ter sido desenvolvido em **C**, durante a disciplina de **PIF** da *CESAR School* ( Que também começa com C).  
 
 Ele também faz referência a um projeto anterior da mesma equipe chamado [**Corridinha**](https://github.com/iampassos/projeto-fp-cesar), criado para a disciplina de *Fundamentos da Programação*, onde foi desenvolvido um CRUD para gerenciamento de um corredor.  
 

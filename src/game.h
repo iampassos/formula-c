@@ -37,7 +37,6 @@ void drawGameLogo(float x, float y);
 //----------------------------------------------------------------------------------
 
 void stringifyTime(char *buffer, double time, int signFlag);
-int  getDifferenceToNext(Car *player);
 
 //----------------------------------------------------------------------------------
 // Singleplayer

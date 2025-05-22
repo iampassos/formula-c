@@ -41,19 +41,18 @@ static float cmp(Car *a, Car *b);
 //----------------------------------------------------------------------------------
 
 void Game_setup() {
-    cars = LinkedList_create();
+    cars         = LinkedList_create();
     referenceLap = ArrayList_create();
+    Image temp   = LoadImage(LOGO_BG_IMAGE_PATH);
+    ImageResize(&temp, 128, 128);
+    logoNoBg = LoadTextureFromImage(temp);
+    UnloadImage(temp);
 }
 
 void Game_load() {
     state.screen = GAME;
     Map map      = MAPS[state.map];
     loadMap(map);
-
-    Image temp = LoadImage(LOGO_BG_IMAGE_PATH);
-    ImageResize(&temp, 128, 128);
-    logoNoBg = LoadTextureFromImage(temp);
-    UnloadImage(temp);
 
     switch (state.mode) {
     case SINGLEPLAYER:
@@ -69,6 +68,7 @@ void Game_cleanup() {
     if (state.screen != GAME) {
         mapCleanup();
     }
+    UnloadTexture(logoNoBg);
     ArrayList_free(referenceLap);
     LinkedList_free(cars);
 }
@@ -180,7 +180,7 @@ static void loadMap(Map map) {
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
     ArrayList_clear(referenceLap);
-    FILE *file   = fopen(map.referencePath, "rb");
+    FILE *file = fopen(map.referencePath, "rb");
     if (file != NULL) {
         CarFrame buffer;
         while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {
