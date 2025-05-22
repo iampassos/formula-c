@@ -40,11 +40,6 @@ void Camera_setSize(int width, int height) {
     START_ZOOM    = state.mode == SPLITSCREEN ? 1.35f : 1.5f;
 }
 
-static float LerpAngle(float a, float b, float t) {
-    float diff = fmodf(b - a + 180.0f, 360.0f) - 180.0f;
-    return a + diff * t;
-}
-
 void Camera_updateTarget(Camera2D *camera, Car *car) {
     float halfW = CAMERA_WIDTH / (2.0f * camera->zoom);
     float halfH = CAMERA_HEIGHT / (2.0f * camera->zoom);
@@ -61,7 +56,7 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
     if (y > BACKGROUND_HEIGHT - halfH)
         y = BACKGROUND_HEIGHT - halfH;
 
-    camera->target = (Vector2){x, y};
+    camera->target = (Vector2) {x, y};
 
     float targetZoom = START_ZOOM - (car->vel / car->maxVelocity);
 

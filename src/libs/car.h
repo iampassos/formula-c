@@ -37,8 +37,6 @@ void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para 
 void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
-//
-float vecDist(Vector2 a, Vector2 b);
 
 Car *Car_create(Vector2 pos,   // posição inicial
                 float   angle, // orientação inicial

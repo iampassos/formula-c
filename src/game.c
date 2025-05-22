@@ -105,7 +105,7 @@ static void updateCarReference(Car *car) {
     int   low_i  = 0;
 
     for (int i = 0; i < ArrayList_length(referenceLap); i++) {
-        float dist = vecDist(ArrayList_get(referenceLap, i).pos, car->pos);
+        float dist = Vector2_dist(ArrayList_get(referenceLap, i).pos, car->pos);
 
         if (lowest > dist) {
             lowest = dist;
@@ -302,8 +302,8 @@ void drawLapTime(Car *player, float x, float y) {
         stringifyTime(textBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
 
         if (state.mode == SINGLEPLAYER) {
-            Car* ghost = LinkedList_getCarById(cars, 99);
-            color = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
+            Car *ghost = LinkedList_getCarById(cars, 99);
+            color      = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
         }
     }
 

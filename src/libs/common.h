@@ -103,4 +103,9 @@ extern char *FONTS_PATH[];
 extern int   FONTS_N;
 extern Font  FONTS[];
 
+// Funções extras
+bool Color_equals(Color a, Color b);
+float Vector2_dist(Vector2 a, Vector2 b);
+float LerpAngle(float a, float b, float t);
+
 #endif

@@ -35,8 +35,6 @@ void Car_move(Car *car, int up, int down, int right,
               int left); // Atualiza o carro de acordo com os inputs do usuário
 
 // --- Funções internas ---
-static bool ColorEquals(Color a, Color b);
-
 static Color getFloorColor(Car *car);
 
 static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor);
@@ -140,7 +138,7 @@ void Car_update(Car *car) {
     applyDragForce(car, floorColor); // Atualiza a força de atrito
     applyMovementPhysics(car);
 
-    if (ColorEquals(floorColor, OUTSIDE_TRACK_COLOR))
+    if (Color_equals(floorColor, OUTSIDE_TRACK_COLOR))
         returnToLastCheckpoint(car);
 }
 
@@ -183,20 +181,6 @@ void Car_draw(Car *car) {
 }
 
 //----------------------------------------------------------------------------------
-// Funções extras das structs da raylib
-//----------------------------------------------------------------------------------
-
-static bool ColorEquals(Color a, Color b) { // Verifica se uma cor é igual a outra
-    return a.r == b.r && a.g == b.g && a.b == b.b;
-}
-
-float vecDist(Vector2 a, Vector2 b) {
-    float deltaX = b.x - a.x;
-    float deltaY = b.y - a.y;
-    return sqrtf(deltaX * deltaX + deltaY * deltaY);
-}
-
-//----------------------------------------------------------------------------------
 // Sensor do carro
 //----------------------------------------------------------------------------------
 
@@ -213,10 +197,10 @@ static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
 //----------------------------------------------------------------------------------
 
 static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor) {
-    if (!ColorEquals(floorColor, CHECKPOINTS_COLOR))
+    if (!Color_equals(floorColor, CHECKPOINTS_COLOR))
         return false;
 
-    return vecDist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
+    return Vector2_dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
 }
 
 static void returnToLastCheckpoint(Car *car) {
@@ -259,7 +243,7 @@ static void updateLapStatus(Car *car, Color floorColor) {
 
 static void applyDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
     for (int i = 0; i < TRACK_AREA_SIZE; i++) {
-        if (ColorEquals(floorColor, TRACK_AREAS[i].color)) {
+        if (Color_equals(floorColor, TRACK_AREAS[i].color)) {
             car->dragForce = TRACK_AREAS[i].dragForce;
             return;
         }
