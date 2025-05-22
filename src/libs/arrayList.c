@@ -2,35 +2,35 @@
 #include <stdlib.h>
 
 ArrayList *ArrayList_create() {
-    ArrayList *arr = (ArrayList *) malloc(sizeof(ArrayList));
-    arr->length    = 0;
-    arr->capacity  = 1024;
-    arr->data      = (CarFrame *) malloc(sizeof(CarFrame) * arr->capacity);
-    return arr;
+    ArrayList *array = (ArrayList *) malloc(sizeof(ArrayList));
+    array->length    = 0;
+    array->capacity  = 1024;
+    array->data      = (CarFrame *) malloc(sizeof(CarFrame) * array->capacity);
+    return array;
 }
 
-void ArrayList_free(ArrayList *arr) {
-    free(arr->data);
-    free(arr);
+void ArrayList_free(ArrayList *array) {
+    free(array->data);
+    free(array);
 }
 
-void ArrayList_growth(ArrayList *arr) {
-    arr->capacity = (arr->capacity >> 1) + arr->capacity;
-    arr->data     = realloc(arr->data, sizeof(CarFrame) * arr->capacity);
+void ArrayList_growth(ArrayList *array) {
+    array->capacity += (array->capacity/2); // aumenta em escala exponencial menor que 2
+    array->data     = realloc(array->data, sizeof(CarFrame) * array->capacity);
 }
 
-void ArrayList_push(ArrayList *arr, CarFrame car) {
-    if (arr->length == arr->capacity)
-        ArrayList_growth(arr);
-    arr->data[arr->length++] = car;
+void ArrayList_push(ArrayList *array, CarFrame car) {
+    if (array->length == array->capacity)
+        ArrayList_growth(array);
+    array->data[array->length++] = car;
 }
 
-unsigned int ArrayList_length(ArrayList *arr) {
-    return arr->length;
+unsigned int ArrayList_length(ArrayList *array) {
+    return array->length;
 }
 
-void ArrayList_clear(ArrayList *arr) {
-    arr->length = 0;
+void ArrayList_clear(ArrayList *array) {
+    array->length = 0;
 }
 
 void ArrayList_copy(ArrayList *a, ArrayList *b) {
@@ -44,8 +44,8 @@ void ArrayList_copy(ArrayList *a, ArrayList *b) {
     }
 }
 
-CarFrame ArrayList_get(ArrayList *arr, unsigned int idx) {
-    if (idx >= arr->length)
+CarFrame ArrayList_get(ArrayList *array, unsigned int idx) {
+    if (idx >= array->length)
         return (CarFrame) {0};
-    return arr->data[idx];
+    return array->data[idx];
 }

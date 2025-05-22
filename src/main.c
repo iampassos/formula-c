@@ -98,7 +98,7 @@ State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON};
 //----------------------------------------------------------------------------------
 
 int main() {
-    SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    //SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
 
     SCREEN_WIDTH  = GetScreenWidth();

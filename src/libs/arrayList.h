@@ -15,14 +15,14 @@ typedef struct {
 } ArrayList;
 
 ArrayList *ArrayList_create();
-void       ArrayList_free(ArrayList *arr);
+void       ArrayList_free(ArrayList *array);
 
-void         ArrayList_push(ArrayList *arr, CarFrame car);
-unsigned int ArrayList_length(ArrayList *arr);
+void         ArrayList_push(ArrayList *array, CarFrame car);
+unsigned int ArrayList_length(ArrayList *array);
 
-void ArrayList_clear(ArrayList *arr);
+void ArrayList_clear(ArrayList *array);
 void ArrayList_copy(ArrayList *a, ArrayList *b);
 
-CarFrame ArrayList_get(ArrayList *arr, unsigned int idx);
+CarFrame ArrayList_get(ArrayList *array, unsigned int idx);
 
 #endif
