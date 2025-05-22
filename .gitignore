@@ -3,3 +3,4 @@ raylib-5.5_win64_mingw-w64
 game.exe
 .vscode
 data/best_laps/*
+!data/best_laps/.gitkeep
