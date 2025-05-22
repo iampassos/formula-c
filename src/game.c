@@ -22,16 +22,18 @@ Vector2 minimapPos;
 
 // --- Variáveis internas ---
 
-static ArrayList *referenceLap = NULL;
-static double     last         = 0;
-static Car       *ranking;
+static ArrayList *referenceLap       = NULL;
+static double     last               = 0;
 static float      hudPlayerListWidth = 330;
 
 // --- Funções internas ---
 
-static void drawHud();
-static void loadMap(Map map);
-static void mapCleanup();
+static void  drawHud();
+static void  loadMap(Map map);
+static void  mapCleanup();
+static void  updateCarRanking();
+static void  updateCarReference(Car *car);
+static float cmp(Car *a, Car *b);
 
 //----------------------------------------------------------------------------------
 // Carregamento do jogo
@@ -74,6 +76,8 @@ void Game_update() {
         return;
     }
 
+    updateCarRanking();
+
     switch (state.mode) {
     case SINGLEPLAYER:
         updateSingleplayer();
@@ -82,6 +86,39 @@ void Game_update() {
         updateSplitscreen();
         break;
     }
+}
+
+//----------------------------------------------------------------------------------
+// Funções complementares para o update
+//----------------------------------------------------------------------------------
+
+static void updateCarRanking() {
+    if (ArrayList_length(referenceLap) > 0 && GetTime() - last > 0.5f) {
+        LinkedList_forEach(cars, updateCarReference);
+        LinkedList_sort(cars, cmp);
+        last = GetTime();
+    }
+}
+
+static void updateCarReference(Car *car) {
+    float lowest = FLT_MAX;
+    int   low_i  = 0;
+
+    for (int i = 0; i < ArrayList_length(referenceLap); i++) {
+        float dist = vecDist(ArrayList_get(referenceLap, i).pos, car->pos);
+
+        if (lowest > dist) {
+            lowest = dist;
+            low_i  = i;
+        }
+    }
+
+    car->refFrame =
+        state.mode == SINGLEPLAYER ? low_i : ArrayList_length(referenceLap) * car->lap + low_i;
+}
+
+static float cmp(Car *a, Car *b) {
+    return b->refFrame - a->refFrame;
 }
 
 //----------------------------------------------------------------------------------
@@ -259,73 +296,40 @@ void drawLapTime(Car *player, float x, float y) {
     drawTextWithShadow(textBuffer, x, y, 48, WHITE, FONTS[0]);
 }
 
-static int cmp(const void *a, const void *b) {
-    return ((Car *) b)->refFrame - ((Car *) a)->refFrame;
-}
-
 void drawPlayerList(Car *player, float x, float y) {
-    if (ArrayList_length(referenceLap) == 0) {
-        return;
-    }
-
-    Car *list = LinkedList_toCarsArray(cars);
-
-    if (GetTime() - last > 0.5f) {
-        int change = 0;
-
-        for (int i = 0; i < cars->length; i++) {
-            float lowest = FLT_MAX;
-            for (int j = 0; j < ArrayList_length(referenceLap); j++) {
-                float dist = vecDist(ArrayList_get(referenceLap, j).pos, list[i].pos);
-                if (lowest > dist) {
-                    change           = 1;
-                    lowest           = dist;
-                    list[i].refFrame = state.mode == SINGLEPLAYER
-                                           ? j
-                                           : ArrayList_length(referenceLap) * list[i].lap + j;
-
-                    // Debug apenas
-                    if (player->id == list[i].id) {
-                        player->refFrame = list[i].refFrame;
-                    }
-                }
-            }
-        }
-
-        if (change) {
-            qsort(list, cars->length, sizeof(Car), cmp);
-            ranking = list;
-        }
-
-        last = GetTime();
-    }
-
     char refBuf[32];
     stringifyTime(refBuf, 599.999f, 1);
     Vector2 referenceSize = MeasureTextEx(FONTS[0], refBuf, 20, 1.0f);
 
-    for (int i = 0; i < cars->length; i++) {
-        DrawRectangle(x, y + 32 * i, hudPlayerListWidth, 32, (Color) {51, 51, 51, 255});
+    int   idx  = 0;
+    Node *prev = cars->head;
+    Node *curr = cars->head;
+    while (curr != NULL) {
+        DrawRectangle(x, y + 32 * idx, hudPlayerListWidth, 32, (Color) {51, 51, 51, 255});
 
-        int     isOwn = ranking[i].id == player->id;
-        Vector2 size  = MeasureTextEx(FONTS[isOwn], ranking[i].name, 20, 1.0f);
-        float   yx    = y + (i * size.y);
+        int     isOwn = curr->car->id == player->id;
+        Vector2 size  = MeasureTextEx(FONTS[isOwn], curr->car->name, 20, 1.0f);
+        float   yx    = y + (idx * size.y);
 
-        snprintf(textBuffer, sizeof(textBuffer), "%d", i + 1);
+        snprintf(textBuffer, sizeof(textBuffer), "%d", idx + 1);
         drawCenteredText(textBuffer, x, yx, 36, 20, 20, WHITE, FONTS[isOwn]);
 
-        DrawRectangle(x + 36, yx + 12.5f, 2, 15, ranking[i].color);
+        DrawRectangle(x + 36, yx + 12.5f, 2, 15, curr->car->color);
 
-        DrawTextEx(FONTS[isOwn], ranking[i].name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
+        DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
 
-        if (i == 0) {
+        if (curr == cars->head) {
             strcpy(textBuffer, "-:--.---");
         } else {
-            stringifyTime(textBuffer, (ranking[i - 1].refFrame - ranking[i].refFrame) / 60.0f, 1);
+            stringifyTime(textBuffer, (prev->car->refFrame - curr->car->refFrame) / 60.0f, 1);
         }
 
         drawCenteredText(textBuffer, x + hudPlayerListWidth - referenceSize.x, yx, referenceSize.x,
                          20, 20, WHITE, FONTS[isOwn]);
+
+        prev = curr;
+        curr = curr->next;
+        idx++;
     }
 }
 

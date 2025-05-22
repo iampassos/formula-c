@@ -101,7 +101,7 @@ void LinkedList_sort(LinkedList *list, Car_compare function) {
     while (cur != NULL) {
         temp = cur->next;
         while (temp != NULL) {
-            if (function(cur->car, temp->car) < 0)
+            if (function(cur->car, temp->car) > 0)
                 swap(cur, temp);
             temp = temp->next;
         }
