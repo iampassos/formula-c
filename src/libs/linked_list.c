@@ -117,3 +117,15 @@ void LinkedList_forEach(LinkedList *list, Car_function function) {
         cur = cur->next;
     }
 }
+
+Car *LinkedList_toCarsArray(LinkedList *list) {
+    Node *cur   = list->head;
+    Car  *array = malloc(sizeof(Car) * list->length);
+
+    for (int i = 0; i < list->length; i++) {
+        array[i] = *cur->car;
+        cur      = cur->next;
+    }
+
+    return array;
+}

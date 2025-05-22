@@ -39,10 +39,10 @@ void loadSplitscreen(Map map) {
     semaphoreSound = LoadSound(SMAPHORE_SOUND_PATH);
 
     Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
-                         BLUE, false, 1);
+                         BLUE, false, 1, "Player 1");
 
     Car *p2 = Car_create(map.startCarPos[1], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[2],
-                         ORANGE, false, 2);
+                         ORANGE, false, 2, "Player 2");
 
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);

@@ -39,4 +39,6 @@ void LinkedList_forEach(LinkedList  *list,
                         Car_function function); // Itera por cada carro e aplica uma função que
                                                 // possui apenas Car* car como variável
 
+Car *LinkedList_toCarsArray(LinkedList *list);
+
 #endif

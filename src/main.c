@@ -43,6 +43,7 @@ Map MAPS[] = {
      "resources/maps/interlagos_map.png",   // backgroundPath
      "resources/masks/interlagos_mask.png", // maskPath
      "resources/minimaps/interlagos_minimap.png",
+     "data/interlagos_reference.bin",
      {{4721, 1910}, {4900, 2061}},
      2.75f,
      10,
@@ -58,10 +59,11 @@ Map MAPS[] = {
          {/*Vector2*/ {14136, 3216}, -1.87f},
          {/*Vector2*/ {9357, 341}, -3.57f},
      }},
-     {"Secret",
-     "resources/masks/secret_mask.png",   // backgroundPath
+    {"Secret",
+     "resources/masks/secret_mask.png", // backgroundPath
      "resources/masks/secret_mask.png", // maskPath
      "resources/masks/secret_mask.png",
+     "",
      {{7329, 1358}, {7329, 1358}},
      3.21f,
      4,

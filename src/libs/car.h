@@ -28,6 +28,8 @@ typedef struct {
     float     dragForce;
     float     reverseForce;
     float     maxVelocity;
+    char      name[32];
+    int       refFrame;
 } Car;
 
 void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
@@ -35,6 +37,8 @@ void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para 
 void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
+//
+float vecDist(Vector2 a, Vector2 b);
 
 Car *Car_create(Vector2 pos,   // posição inicial
                 float   angle, // orientação inicial
@@ -42,8 +46,8 @@ Car *Car_create(Vector2 pos,   // posição inicial
                 CarConfig   config,
                 const char *texturePath, // path da textura
                 Color color, bool ghost,
-                int id // identificador único
-);
+                int   id, // identificador único
+                char *name);
 
 void Car_free(Car *car); // Libera a memória de um carro
 

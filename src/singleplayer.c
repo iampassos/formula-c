@@ -53,9 +53,9 @@ void loadSingleplayer(Map map) {
     loadBestLap();
 
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
-                               WHITE, true, 99);
+                               WHITE, true, 99, "Melhor Volta");
     Car *player   = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG,
-                               CAR_IMAGES_PATH[0], WHITE, false, 1);
+                               CAR_IMAGES_PATH[0], WHITE, false, 1, "Player 1");
 
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player);
@@ -87,7 +87,7 @@ static void updateGhostCar(Car *player) {
     if (player->lap > lastLap) {
         lastLap        = player->lap;
         replayFrameIdx = 0;
-        ArrayList_push(currentLap, (GhostCarFrame) {(Vector2) {-1000, -1000}, 0});
+        ArrayList_push(currentLap, (CarFrame) {(Vector2) {-1000, -1000}, 0});
         if (ArrayList_length(currentLap) < ArrayList_length(bestLap) ||
             ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
@@ -100,13 +100,13 @@ static void updateGhostCar(Car *player) {
     if (player->lap >= 0) {
         // Replay
         if (replayFrameIdx < ArrayList_length(bestLap)) {
-            GhostCarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
-            ghost->pos              = frameData.pos;
-            ghost->angle            = frameData.angle;
+            CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
+            ghost->pos         = frameData.pos;
+            ghost->angle       = frameData.angle;
         }
 
         // Grava
-        GhostCarFrame frameData = {player->pos, player->angle};
+        CarFrame frameData = {player->pos, player->angle};
         ArrayList_push(currentLap, frameData);
     }
 }
@@ -120,8 +120,8 @@ static void loadBestLap() {
 
     file = fopen(ghostCarPath, "rb");
     if (file != NULL) {
-        GhostCarFrame buffer;
-        while (fread(&buffer, sizeof(GhostCarFrame), 1, file) == 1) {
+        CarFrame buffer;
+        while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {
             ArrayList_push(bestLap, buffer);
         }
         fclose(file);
@@ -132,7 +132,7 @@ static void updateBestLap() {
     FILE *file = fopen(ghostCarPath, "wb");
     if (file != NULL) {
         for (int i = 0; i < bestLap->length; i++) {
-            fwrite(&bestLap->data[i], sizeof(GhostCarFrame), 1, file);
+            fwrite(&bestLap->data[i], sizeof(CarFrame), 1, file);
         }
         fclose(file);
     }
@@ -172,9 +172,7 @@ void drawHudSingleplayer() {
 static void drawBestLapTime(Car *player, float x, float y) {
     if (player->lap > -1 && ArrayList_length(bestLap) > 0) {
         double time = (ArrayList_length(bestLap) - 1) / 60.0f;
-        int    mins = time / 60;
-        float  secs = time - (mins * 60);
-        snprintf(textBuffer, sizeof(textBuffer), "%d:%05.2fs", mins, secs);
+        stringifyTime(textBuffer, time, 0);
         drawTextWithShadow(textBuffer, x, y, 42, (Color) {158, 24, 181, 255}, FONTS[0]);
     }
 }

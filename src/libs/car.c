@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Checkpoints
 static Checkpoint CHECKPOINTS[100];
@@ -23,7 +24,7 @@ void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as core
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
 Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
-                bool ghost, int id);
+                bool ghost, int id, char *name);
 
 void Car_free(Car *car); // Libera a memória de um carro
 
@@ -34,8 +35,7 @@ void Car_move(Car *car, int up, int down, int right,
               int left); // Atualiza o carro de acordo com os inputs do usuário
 
 // --- Funções internas ---
-static bool  ColorEquals(Color a, Color b);
-static float vecDist(Vector2 a, Vector2 b);
+static bool ColorEquals(Color a, Color b);
 
 static Color getFloorColor(Car *car);
 
@@ -85,7 +85,7 @@ void Track_Unload() { // Função para descarregar as variáveis associadas a pi
 //----------------------------------------------------------------------------------
 
 Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
-                bool ghost, int id) {
+                bool ghost, int id, char *name) {
     Car *car = (Car *) malloc(sizeof(Car));
     if (car == NULL)
         return NULL;
@@ -112,6 +112,8 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->bestLapTime     = -1;
     car->checkpoint      = CHECKPOINTS_SIZE - 1; // COmeca no ultimo check point
     car->sound           = LoadMusicStream(CAR_SOUND_PATH);
+    car->refFrame        = 0;
+    strcpy(car->name, name);
     PlayMusicStream(car->sound);
     SetMusicVolume(car->sound, CAR_VOLUME);
     return car;
@@ -188,7 +190,7 @@ static bool ColorEquals(Color a, Color b) { // Verifica se uma cor é igual a ou
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-static float vecDist(Vector2 a, Vector2 b) {
+float vecDist(Vector2 a, Vector2 b) {
     float deltaX = b.x - a.x;
     float deltaY = b.y - a.y;
     return sqrtf(deltaX * deltaX + deltaY * deltaY);

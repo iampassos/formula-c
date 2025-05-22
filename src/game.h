@@ -29,6 +29,13 @@ void drawPlayerInMinimap(Car *player);
 void drawLaps(Car *player, float x, float y);
 void drawSpeedometer(Car *player, float x, float y);
 void drawPlayerDebug(Car *player, int x, int y);
+void drawPlayerList(Car *player, float x, float y);
+
+//----------------------------------------------------------------------------------
+// Úteis
+//----------------------------------------------------------------------------------
+
+void stringifyTime(char *buffer, double time, int signFlag);
 
 //----------------------------------------------------------------------------------
 // Singleplayer
