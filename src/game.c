@@ -41,6 +41,7 @@ static float cmp(Car *a, Car *b);
 
 void Game_setup() {
     cars = LinkedList_create();
+    referenceLap = ArrayList_create();
 }
 
 void Game_load() {
@@ -171,7 +172,7 @@ static void loadMap(Map map) {
 
     Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
-    referenceLap = ArrayList_create();
+    ArrayList_clear(referenceLap);
     FILE *file   = fopen(map.referencePath, "rb");
     if (file != NULL) {
         CarFrame buffer;
