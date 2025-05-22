@@ -58,6 +58,19 @@ Map MAPS[] = {
          {/*Vector2*/ {14136, 3216}, -1.87f},
          {/*Vector2*/ {9357, 341}, -3.57f},
      }},
+     {"Secret",
+     "resources/masks/secret_mask.png",   // backgroundPath
+     "resources/masks/secret_mask.png", // maskPath
+     "resources/masks/secret_mask.png",
+     {{7329, 1358}, {7329, 1358}},
+     3.21f,
+     4,
+     {
+         {/*Vector2*/ {7329, 1358}, 3.21f},
+         {/*Vector2*/ {2520, 4478}, 8.59f},
+         {/*Vector2*/ {6169, 5707}, 14.13f},
+         {/*Vector2*/ {10700, 4978}, 9.07f},
+     }},
 };
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);

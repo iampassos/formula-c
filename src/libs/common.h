@@ -24,7 +24,7 @@ typedef struct {
     float dragForce;
 } TrackArea;
 
-typedef enum { INTERLAGOS } CurrentMap;
+typedef enum { INTERLAGOS, SECRET } CurrentMap;
 
 typedef enum { SINGLEPLAYER, SPLITSCREEN } Mode;
 

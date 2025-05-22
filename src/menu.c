@@ -44,6 +44,10 @@ static void interlagosMapButtonAction() {
     state.map = INTERLAGOS;
 }
 
+static void secretMapButtonAction() {
+    state.map = SECRET;
+}
+
 static void debugButtonAction() {
     state.debug          = !state.debug;
     debugButton.selected = state.debug;
@@ -144,8 +148,8 @@ static void setupGameModeButtons() {
         y += dy;
     }
 
-    BUTTONS[0].action = singleplayerButtonAction;
-    BUTTONS[1].action = splitscreenButtonAction;
+    BUTTONS[SINGLEPLAYER].action = singleplayerButtonAction;
+    BUTTONS[SPLITSCREEN].action = splitscreenButtonAction;
 }
 
 static void setupMapButtons() {
@@ -159,7 +163,8 @@ static void setupMapButtons() {
         y += dy;
     }
 
-    MAPS_BUTTONS[0].action = interlagosMapButtonAction;
+    MAPS_BUTTONS[INTERLAGOS].action = interlagosMapButtonAction;
+    MAPS_BUTTONS[SECRET].action = secretMapButtonAction;
 }
 
 static void setupMainButtons(void (*play)()) {
