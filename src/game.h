@@ -30,6 +30,7 @@ void drawLaps(Car *player, float x, float y);
 void drawSpeedometer(Car *player, float x, float y);
 void drawPlayerDebug(Car *player, int x, int y);
 void drawPlayerList(Car *player, float x, float y);
+void drawGameLogo(float x, float y);
 
 //----------------------------------------------------------------------------------
 // Úteis

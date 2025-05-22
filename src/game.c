@@ -8,6 +8,7 @@
 
 // --- Variáveis públicas ---
 
+Texture2D   logoNoBg;
 Texture2D   SPEEDOMETER;
 Texture2D   trackBackground;
 Texture2D   trackHud;
@@ -48,6 +49,12 @@ void Game_load() {
     state.screen = GAME;
     Map map      = MAPS[state.map];
     loadMap(map);
+
+    Image temp = LoadImage(LOGO_BG_IMAGE_PATH);
+    ImageResize(&temp, 128, 128);
+    logoNoBg = LoadTextureFromImage(temp);
+    UnloadImage(temp);
+
     switch (state.mode) {
     case SINGLEPLAYER:
         loadSingleplayer(map);
@@ -231,11 +238,13 @@ void drawHud() {
 void drawPlayerHud(Car *player, int x) {
     drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
 
-    DrawRectangle(x + 32, 136, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
-    drawLaps(player, x + 32, 140);
-    drawLapTime(player, x + 32, 144);
+    drawGameLogo(x + 32, 32);
 
-    drawPlayerList(player, x + 32, 200);
+    DrawRectangle(x + 32, 166, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
+    drawLaps(player, x + 32, 170);
+    drawLapTime(player, x + 32, 174);
+
+    drawPlayerList(player, x + 32, 220);
 
     if (state.debug) {
         drawPlayerDebug(player, x + 32, 300);
@@ -252,6 +261,11 @@ void drawCenteredText(char *text, float x, float y, float width, float heigth, i
     Vector2 vec = MeasureTextEx(font, text, size, 1.0f);
     DrawTextEx(font, text, (Vector2) {((x * 2) + width - vec.x) / 2.0f, ((y * 2) + heigth) / 2.0f},
                size, 1.0f, color);
+}
+
+void drawGameLogo(float x, float y) {
+    DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, 255});
+    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2.0f - 64, y, WHITE);
 }
 
 void drawPlayerInMinimap(Car *player) {
