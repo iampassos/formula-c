@@ -59,6 +59,7 @@ void Game_cleanup() {
     if (state.screen != GAME) {
         mapCleanup();
     }
+    ArrayList_free(referenceLap);
     LinkedList_free(cars);
 }
 
