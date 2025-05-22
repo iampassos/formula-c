@@ -101,6 +101,11 @@ static void updateCarRanking() {
 }
 
 static void updateCarReference(Car *car) {
+    if (car->lap == -1 && car->ghost == 0) {
+        car->refFrame = 0;
+        return;
+    }
+
     float lowest = FLT_MAX;
     int   low_i  = 0;
 
@@ -332,7 +337,7 @@ void drawPlayerList(Car *player, float x, float y) {
 
         DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
 
-        if (curr == cars->head) {
+        if (curr == cars->head || (curr->car->ghost && curr->car->pos.x == -1000)) {
             strcpy(textBuffer, "-:--.---");
         } else {
             stringifyTime(textBuffer, (prev->car->refFrame - curr->car->refFrame) / 60.0f, 1);
