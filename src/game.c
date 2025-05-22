@@ -302,7 +302,8 @@ void drawLapTime(Car *player, float x, float y) {
         stringifyTime(textBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
 
         if (state.mode == SINGLEPLAYER) {
-            color = getDifferenceToNext(player) > 0 ? RED : GREEN;
+            Car* ghost = LinkedList_getCarById(cars, 99);
+            color = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
         }
     }
 
@@ -311,9 +312,8 @@ void drawLapTime(Car *player, float x, float y) {
 }
 
 void drawPlayerList(Car *player, float x, float y) {
-    char refBuf[32];
-    stringifyTime(refBuf, 599.999f, 1);
-    Vector2 referenceSize = MeasureTextEx(FONTS[0], refBuf, 20, 1.0f);
+    stringifyTime(textBuffer, 599.999f, 1);
+    Vector2 referenceSize = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
 
     int   idx  = 0;
     Node *prev = cars->head;
@@ -389,35 +389,18 @@ void drawPlayerDebug(Car *player, int x, int y) {
 //----------------------------------------------------------------------------------
 
 void stringifyTime(char *buffer, double time, int signFlag) {
-    char  text[32] = {0};
-    int   mins     = time / 60;
-    float secs     = time - (mins * 60);
+    int   mins = time / 60;
+    float secs = time - (mins * 60);
 
     if (signFlag) {
-        text[0] = time > 0 ? '+' : '-';
+        textBuffer[0] = time > 0 ? '+' : '-';
     }
 
     if (mins > 0) {
-        snprintf(text + signFlag, 32, "%d:%06.3fs", mins, secs);
+        snprintf(textBuffer + signFlag, 32, "%d:%06.3fs", mins, secs);
     } else {
-        snprintf(text + signFlag, 32, "%05.3fs", secs);
+        snprintf(textBuffer + signFlag, 32, "%05.3fs", secs);
     }
 
-    strcpy(buffer, text);
-}
-
-int getDifferenceToNext(Car *player) {
-    Node *prev = cars->head;
-    Node *curr = cars->head;
-
-    while (curr != NULL) {
-        if (curr != cars->head && player == curr->car) {
-            return prev->car->refFrame - curr->car->refFrame;
-        }
-
-        prev = curr;
-        curr = curr->next;
-    }
-
-    return 0;
+    strcpy(buffer, textBuffer);
 }

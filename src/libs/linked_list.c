@@ -48,34 +48,6 @@ int LinkedList_addCar(LinkedList *list, Car *car) {
     return 1;
 }
 
-Car *LinkedList_removeCarById(LinkedList *list, int id) {
-    Node *cur  = list->head;
-    Node *last = NULL;
-
-    while (cur != NULL && cur->car->id != id) {
-        last = cur;
-        cur  = cur->next;
-    }
-
-    if (cur == NULL)
-        return NULL;
-    Car *car = cur->car;
-
-    if (last == NULL) {
-        list->head = cur->next;
-    } else {
-        last->next = cur->next;
-    }
-
-    free(cur);
-    list->length--;
-    return car;
-}
-
-int LinkedList_size(LinkedList *list) {
-    return list->length;
-}
-
 Car *LinkedList_getCarById(LinkedList *list, int id) {
     Node *cur = list->head;
 
@@ -116,16 +88,4 @@ void LinkedList_forEach(LinkedList *list, Car_function function) {
         function(cur->car);
         cur = cur->next;
     }
-}
-
-Car *LinkedList_toCarsArray(LinkedList *list) {
-    Node *cur   = list->head;
-    Car  *array = malloc(sizeof(Car) * list->length);
-
-    for (int i = 0; i < list->length; i++) {
-        array[i] = *cur->car;
-        cur      = cur->next;
-    }
-
-    return array;
 }
