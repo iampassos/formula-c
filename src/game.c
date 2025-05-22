@@ -260,6 +260,10 @@ static int cmp(const void *a, const void *b) {
 }
 
 void drawPlayerList(Car *player, float x, float y) {
+    if (ArrayList_length(referenceLap) == 0) {
+        return;
+    }
+
     Car *list = LinkedList_toCarsArray(cars);
 
     if (GetTime() - last > 0.5f) {
