@@ -14,7 +14,7 @@ float CAMERA_SMOOTHNESS = 0.05;
 char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
 int  TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
-char *GHOST_CAR_DATA_PATH = "./data/";
+char *GHOST_CAR_DATA_PATH = "./data/best_laps/";
 
 char *GAME_MUSIC_PATH         = "resources/sounds/game-music.mp3";
 char *MENU_MUSIC_PATH         = "resources/sounds/menu-music.mp3";
@@ -43,7 +43,7 @@ Map MAPS[] = {
      "resources/maps/interlagos_map.png",   // backgroundPath
      "resources/masks/interlagos_mask.png", // maskPath
      "resources/minimaps/interlagos_minimap.png",
-     "data/interlagos_reference.bin",
+     "data/references/interlagos_reference.bin",
      {{4721, 1910}, {4900, 2061}},
      2.75f,
      10,
