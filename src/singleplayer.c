@@ -151,7 +151,7 @@ void drawSingleplayer() {
 void drawHudSingleplayer() {
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawPlayerHud(p1, 0);
-    drawBestLapTime(p1, 32, 144);
+    // drawBestLapTime(p1, 32, 144);
 
     if (flagBestLap) {
         snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");

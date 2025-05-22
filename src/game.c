@@ -25,7 +25,7 @@ Vector2 minimapPos;
 static ArrayList *referenceLap = NULL;
 static double     last         = 0;
 static Car       *ranking;
-static float      hudPlayerListWidth = 432;
+static float      hudPlayerListWidth = 330;
 
 // --- Funções internas ---
 
@@ -186,12 +186,10 @@ void drawHud() {
 //----------------------------------------------------------------------------------
 
 void drawPlayerHud(Car *player, int x) {
-    if (player->lap > -1) {
-        drawLaps(player, x + 32, 32);
-        drawLapTime(player, x + 32, 96);
-        drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
-        drawPlayerList(player, x + 32, 200);
-    }
+    // drawLapTime(player, x + 32, 96);
+    drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
+    drawLaps(player, x + 32, 200 - 64);
+    drawPlayerList(player, x + 32, 200);
 
     if (state.debug) {
         drawPlayerDebug(player, x + 32, 300);
@@ -201,6 +199,13 @@ void drawPlayerHud(Car *player, int x) {
 void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {
     DrawTextEx(font, text, (Vector2) {x + 1, y + 1}, size, 1.0f, BLACK);
     DrawTextEx(font, text, (Vector2) {x, y}, size, 1.0f, color);
+}
+
+void drawCenteredText(char *text, float x, float y, float width, float heigth, int size,
+                      Color color, Font font) {
+    Vector2 vec = MeasureTextEx(font, text, size, 1.0f);
+    DrawTextEx(font, text, (Vector2) {((x * 2) + width - vec.x) / 2.0f, ((y * 2) + heigth) / 2.0f},
+               size, 1.0f, color);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -244,10 +249,8 @@ void drawLaps(Car *player, float x, float y) {
         snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
     }
 
-    Vector2 size = MeasureTextEx(FONTS[0], textBuffer, 48, 1.0f);
-    DrawRectangle(x, y, hudPlayerListWidth, size.y, (Color) {51, 51, 51, 255});
-    drawTextWithShadow(textBuffer, x + (hudPlayerListWidth - size.x) / 2.0f, y, 48, WHITE,
-                       FONTS[0]);
+    DrawRectangle(x, y, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
+    drawCenteredText(textBuffer, x, y, hudPlayerListWidth, 16, 32, WHITE, FONTS[0]);
 }
 
 void drawLapTime(Car *player, float x, float y) {
@@ -299,14 +302,21 @@ void drawPlayerList(Car *player, float x, float y) {
 
     char refBuf[32];
     stringifyTime(refBuf, 599.999f, 1);
-    Vector2 referenceSize = MeasureTextEx(FONTS[0], refBuf, 32, 1.0f);
+    Vector2 referenceSize = MeasureTextEx(FONTS[0], refBuf, 20, 1.0f);
 
     for (int i = 0; i < cars->length; i++) {
         DrawRectangle(x, y + 32 * i, hudPlayerListWidth, 32, (Color) {51, 51, 51, 255});
 
-        char   *name = ranking[i].id == player->id ? "Seu carro" : ranking[i].name;
-        Vector2 size = MeasureTextEx(FONTS[0], name, 28, 1.0f);
-        drawTextWithShadow(name, x + 4, y + (i * size.y) + 4, 28, WHITE, FONTS[0]);
+        int     isOwn = ranking[i].id == player->id;
+        Vector2 size  = MeasureTextEx(FONTS[isOwn], ranking[i].name, 20, 1.0f);
+        float   yx    = y + (i * size.y);
+
+        snprintf(textBuffer, sizeof(textBuffer), "%d", i + 1);
+        drawCenteredText(textBuffer, x, yx, 36, 20, 20, WHITE, FONTS[isOwn]);
+
+        DrawRectangle(x + 36, yx + 12.5f, 2, 15, ranking[i].color);
+
+        DrawTextEx(FONTS[isOwn], ranking[i].name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
 
         if (i == 0) {
             strcpy(textBuffer, "-:--.---");
@@ -314,8 +324,8 @@ void drawPlayerList(Car *player, float x, float y) {
             stringifyTime(textBuffer, (ranking[i - 1].refFrame - ranking[i].refFrame) / 60.0f, 1);
         }
 
-        drawTextWithShadow(textBuffer, x + hudPlayerListWidth - referenceSize.x,
-                           y + (i * size.y) + 4, 28, WHITE, FONTS[0]);
+        drawCenteredText(textBuffer, x + hudPlayerListWidth - referenceSize.x, yx, referenceSize.x,
+                         20, 20, WHITE, FONTS[isOwn]);
     }
 }
 

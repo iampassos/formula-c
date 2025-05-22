@@ -90,7 +90,7 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
-State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, THIRD_PERSON};
+State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON};
 
 //----------------------------------------------------------------------------------
 // Início do jogo
