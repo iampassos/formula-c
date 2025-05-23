@@ -98,7 +98,6 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->ghost           = ghost;
     car->maxVelocity     = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
     car->minTurnSpeed    = car->maxVelocity / 50;
-    car->dragForce       = 1;
     car->id              = id;
     car->lap             = -1;
     car->vel             = 0;
@@ -168,23 +167,31 @@ void Car_move(Car *car, int up, int down, int right, int left) {
 //----------------------------------------------------------------------------------
 
 void Car_draw(Car *car) {
-    Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height}; // A imagem inteira
-    Rectangle destRec   = {car->pos.x, car->pos.y, car->width,
-                           car->height};                           // Tamanho e posição do carro
-    Vector2   origin    = {car->width * 0.5f, car->height * 0.5f}; // Centro da imagem para rotação
+
+    // Retangulo da imagem do carro
+    Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height};
+
+    // Tamanho e posição do carro
+    Rectangle destRec = {car->pos.x, car->pos.y, car->width, car->height};
+
+    // Centro da imagem para rotação
+    Vector2 origin = {car->width * 0.5f, car->height * 0.5f};
+
     DrawTexturePro(car->texture, sourceRec, destRec, origin, car->angle * RAD2DEG,
-                   car->ghost ? Fade(car->color, 0.5f) : WHITE);
+                   car->ghost ? (Color) {255, 255, 255, 127} : WHITE);
 }
 
 //----------------------------------------------------------------------------------
 // Sensor do carro
 //----------------------------------------------------------------------------------
 
-static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
+// Retorna a cor embaixo do carro
+static Color getFloorColor(Car *car) { 
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
+
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
-        return (Color) {0, 0, 0};
+        return OUTSIDE_TRACK_COLOR;
     return TRACK_PIXELS[y * MAP_WIDTH + x];
 }
 
