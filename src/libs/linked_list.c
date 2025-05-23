@@ -6,7 +6,6 @@ LinkedList *LinkedList_create() {
     if (list == NULL)
         return NULL;
     list->head   = NULL;
-    list->length = 0;
     return list;
 }
 
@@ -34,18 +33,15 @@ void LinkedList_clear(LinkedList *list) {
         free(temp);
     }
     list->head   = NULL;
-    list->length = 0;
 }
 
-int LinkedList_addCar(LinkedList *list, Car *car) {
+void LinkedList_addCar(LinkedList *list, Car *car) {
     Node *node = (Node *) malloc(sizeof(Node));
     if (node == NULL)
-        return 0;
+        return;
     node->car  = car;
     node->next = list->head;
     list->head = node;
-    list->length++;
-    return 1;
 }
 
 Car *LinkedList_getCarById(LinkedList *list, int id) {

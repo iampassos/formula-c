@@ -3,10 +3,11 @@
 
 #include "car.h"
 
-typedef void (*Car_function)(
-    Car *); // Definindo uma função que possui apenas Car* car como variável
-typedef float (*Car_compare)(Car *,
-                             Car *); // Função de comparação que será usada no LinkedList_sort()
+// Definindo uma função que possui apenas Car* car como variável
+typedef void (*Car_function)(Car *);
+
+// Função de comparação que será usada no LinkedList_sort()
+typedef float (*Car_compare)(Car *, Car *);
 
 typedef struct Node {
     Car         *car;
@@ -15,24 +16,27 @@ typedef struct Node {
 
 typedef struct {
     Node *head;
-    int   length;
 } LinkedList;
 
-LinkedList *LinkedList_create();               // Cria uma lista duplamente encadeada
-void        LinkedList_free(LinkedList *list); // Libera a memória da lista encadeada
+// Cria uma lista encadeada
+LinkedList *LinkedList_create();
 
-void LinkedList_clear(LinkedList *list); // Limpa todos os elementos da lista encadeada
+// Libera a memória da lista encadeada
+void LinkedList_free(LinkedList *list);
 
-int LinkedList_addCar(LinkedList *list, Car *car); // Adiciona um carro no começo da lista encadeada
+// Limpa todos os elementos da lista encadeada
+void LinkedList_clear(LinkedList *list);
 
-Car *LinkedList_getCarById(LinkedList *list,
-                           int id); // Procura um carro e retorna (Caso não haja retorna NULL)
+// Adiciona um carro no começo da lista encadeada
+void LinkedList_addCar(LinkedList *list, Car *car);
 
-void LinkedList_sort(LinkedList *list,
-                     Car_compare function); // Ordena pelo critério definido pela função Car_compare
+// Procura um carro e retorna (Caso não haja retorna NULL)
+Car *LinkedList_getCarById(LinkedList *list, int id);
 
-void LinkedList_forEach(LinkedList  *list,
-                        Car_function function); // Itera por cada carro e aplica uma função que
-                                                // possui apenas Car* car como variável
+// Ordena pelo critério definido pela função Car_compare
+void LinkedList_sort(LinkedList *list, Car_compare function);
+
+// Aplica uma função para todos os carros da lista
+void LinkedList_forEach(LinkedList *list, Car_function function);
 
 #endif

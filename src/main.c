@@ -119,7 +119,7 @@ char *REFERENCE_DATA_PATH = "./data/references/";
 //----------------------------------------------------------------------------------
 
 int main() {
-    SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    //SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
 
     SCREEN_WIDTH  = GetScreenWidth();

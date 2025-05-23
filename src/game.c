@@ -388,7 +388,7 @@ void drawPlayerDebug(Car *player, int x, int y) {
              "Reference Frame i: %d",
              player->id, player->lap, player->startLapTime, GetTime() - player->startLapTime,
              player->bestLapTime, player->checkpoint, player->pos.x, player->pos.y, player->vel,
-             player->maxVelocity, player->acc, player->width, player->height, player->angle,
+             player->maxVelocity, player->acc, player->width, player->height, fmod(player->angle, 2*PI),
              player->angularSpeed, player->minTurnSpeed, player->breakForce, player->dragForce,
              player->reverseForce, player->refFrame);
 
