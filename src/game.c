@@ -13,15 +13,15 @@ LinkedList *cars;
 Camera2D *camera1;
 Camera2D *camera2;
 
-int  hudPlayerListWidth = 330;
+int hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
 
 // --- Variáveis internas ---
 
-static Texture2D   trackBackground;
-static Texture2D   SPEEDOMETER;
-static Texture2D   logoNoBg;
+static Texture2D  trackBackground;
+static Texture2D  SPEEDOMETER;
+static Texture2D  logoNoBg;
 static ArrayList *referenceLap = NULL;
 static double     last         = 0;
 
@@ -160,6 +160,7 @@ void Game_draw() {
 //----------------------------------------------------------------------------------
 
 static void loadMap(Map map) {
+    state.maxLaps   = map.maxLaps;
     state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
     MAP_WIDTH = trackBackground.width;
@@ -255,6 +256,25 @@ void drawGameLogo(float x, float y) {
     DrawTexture(logoNoBg, x + hudPlayerListWidth / 2 - 64, y, WHITE);
 }
 
+void drawLapTime(Car *player, float x, float y) {
+    Color color = WHITE;
+
+    if (flagBestLap) {
+        stringifyTime(strBuffer, bestLapTime, 0);
+        color = PURPLE;
+    } else {
+        stringifyTime(strBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
+
+        if (state.mode == SINGLEPLAYER) {
+            Car *ghost = LinkedList_getCarById(cars, 99);
+            color      = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
+        }
+    }
+
+    drawCenteredText(strBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f, 12,
+                     24, color, FONTS[0]);
+}
+
 void drawPlayerInMinimap(Car *player) {
     float x = trackHud.width * player->pos.x / trackBackground.width + minimapPos.x;
     float y = trackHud.height * player->pos.y / trackBackground.height + minimapPos.y;
@@ -292,8 +312,8 @@ void drawSpeedometer(Car *player, float x, float y) {
 void drawLaps(Car *player, float x, float y) {
     if (state.mode == SINGLEPLAYER) {
         snprintf(strBuffer, sizeof(strBuffer), "Volta %d", player->lap + 1);
-    } else if (player->lap < MAX_LAPS) {
-        snprintf(strBuffer, sizeof(strBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
+    } else if (player->lap < state.maxLaps) {
+        snprintf(strBuffer, sizeof(strBuffer), "Volta %d/%d", player->lap + 1, state.maxLaps);
     }
 
     drawCenteredText(strBuffer, x + 4, y, hudPlayerListWidth / 2.0f, 14, 28, WHITE, FONTS[0]);

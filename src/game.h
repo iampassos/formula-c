@@ -66,4 +66,7 @@ extern Vector2 minimapPos;
 
 extern int hudPlayerListWidth;
 
+extern bool   flagBestLap;
+extern double bestLapTime;
+
 #endif

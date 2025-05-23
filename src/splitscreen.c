@@ -97,7 +97,7 @@ static void updateSemaphore() {
 }
 
 static void updateWinner(Car *player) {
-    if (!winner && player->lap == MAX_LAPS) {
+    if (!winner && player->lap == state.maxLaps) {
         winner = player;
     }
 }
@@ -129,11 +129,13 @@ void drawSplitscreen() {
 }
 
 void drawHudSplitscreen() {
-    Car *p1 = LinkedList_getCarById(cars, 1);
-    drawPlayerHud(p1, 0);
+    if (!winner) {
+        Car *p1 = LinkedList_getCarById(cars, 1);
+        drawPlayerHud(p1, 0);
 
-    Car *p2 = LinkedList_getCarById(cars, 2);
-    drawPlayerHud(p2, SCREEN_WIDTH / 2);
+        Car *p2 = LinkedList_getCarById(cars, 2);
+        drawPlayerHud(p2, SCREEN_WIDTH / 2);
+    }
 }
 
 //----------------------------------------------------------------------------------

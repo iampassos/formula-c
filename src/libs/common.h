@@ -17,6 +17,7 @@ typedef struct {
     Vector2    startCarPos[2];
     float      startAngle;
     int        checkpointSize;
+    int        maxLaps;
     Checkpoint checkpoints[100];
 } Map;
 
@@ -43,6 +44,7 @@ typedef struct {
     CameraView cameraView;
     double     raceTime;
     Status     status;
+    int        maxLaps;
 } State;
 
 typedef struct {

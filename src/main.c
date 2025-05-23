@@ -9,8 +9,6 @@
 int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
-int MAX_LAPS = 3;
-
 float CAMERA_SMOOTHNESS = 0.05;
 
 char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
@@ -50,6 +48,7 @@ Map MAPS[] = {
      {{4721, 1910}, {4900, 2061}},
      2.75f,
      10,
+     3,
      {
          {/*Vector2*/ {4584, 2078}, 2.73f},
          {/*Vector2*/ {1816, 6076}, 1.75f},
@@ -70,6 +69,7 @@ Map MAPS[] = {
      {{7329, 1358}, {7329, 1358}},
      3.21f,
      4,
+     1,
      {
          {/*Vector2*/ {7329, 1358}, 3.21f},
          {/*Vector2*/ {2520, 4478}, 8.59f},
@@ -93,7 +93,7 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 
 CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
-State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON};
+State state = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON, 0};
 
 //----------------------------------------------------------------------------------
 // Início do jogo
