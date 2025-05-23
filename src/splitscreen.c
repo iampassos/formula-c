@@ -1,3 +1,4 @@
+#include "camera.h"
 #include "car.h"
 #include "common.h"
 #include "game.h"
@@ -98,7 +99,8 @@ static void updateSemaphore() {
 }
 
 static void updateWinner(Car *player) {
-    if (!winner && player->lap == state.maxLaps) {
+    // if (!winner && player->lap == state.maxLaps) {
+    if (!winner && player->lap == 0) {
         winner = player;
     }
 }
@@ -113,18 +115,24 @@ static void updateExtras(Car *player) {
 //----------------------------------------------------------------------------------
 
 void drawSplitscreen() {
-    drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
-    drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
-
-    DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
-
     if (winner) {
+        Camera_updateTarget(camera1, winner);
+        camera1->offset = (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
+        BeginMode2D(*camera1);
+        drawMap();
+        EndMode2D();
+
         snprintf(strBuffer, sizeof(strBuffer), "Jogador %d Ganhou", winner->id);
         drawTextWithShadow(strBuffer,
                            (SCREEN_WIDTH - MeasureTextEx(FONTS[1], strBuffer, 128, 1.0f).x) / 2.0f,
                            (SCREEN_HEIGHT - 128) * 1.0f / 4.0f, 128, YELLOW, FONTS[1]);
         return;
     }
+
+    drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+    drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
+
+    DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
     if (state.status == COUNTDOWN) {
         drawSemaphore(SCREEN_WIDTH * 1.0f / 4.0f, SCREEN_HEIGHT / 2.0, 48);
