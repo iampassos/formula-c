@@ -1,7 +1,6 @@
 #include "car.h"
 #include "raylib.h"
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -97,6 +96,7 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->color           = color;
     car->ghost           = ghost;
     car->ghostActive     = false;
+    car->changeLapFlag   = false;
     car->maxVelocity     = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
     car->minTurnSpeed    = car->maxVelocity / 50;
     car->id              = id;
@@ -187,7 +187,7 @@ void Car_draw(Car *car) {
 //----------------------------------------------------------------------------------
 
 // Retorna a cor embaixo do carro
-static Color getFloorColor(Car *car) { 
+static Color getFloorColor(Car *car) {
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
 
@@ -228,6 +228,7 @@ static void updateLapStatus(Car *car, Color floorColor) {
     car->checkpoint = nextExpected;
 
     if (nextExpected == 0) { // completou a volta
+        car->changeLapFlag = true;
         car->lap++;
 
         double now     = GetTime();

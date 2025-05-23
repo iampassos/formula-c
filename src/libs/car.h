@@ -18,6 +18,7 @@ typedef struct {
     Color     color;
     bool      ghost;
     bool      ghostActive;
+    bool      changeLapFlag;
     int       width;
     int       height;
     float     angle;

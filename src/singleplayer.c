@@ -1,3 +1,4 @@
+#include "arrayList.h"
 #include "common.h"
 #include "game.h"
 #include "raylib.h"
@@ -11,20 +12,17 @@ static ArrayList *currentLap = NULL;
 
 static char ghostCarPath[100];
 
-static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
 // --- Funções internas ---
 
 static void updateGhostCar(Car *player);
-static void checkForBestLap(Car *player);
 static void recordLap(Car *player);
 static void showReplayBestLap();
 
 static void updateBestLap();
 static void loadBestLap();
 
-static void drawBestLapMessage(float x, float y, int size, Color color, char *text);
 static void drawGhostCarDebug();
 
 //----------------------------------------------------------------------------------
@@ -41,7 +39,6 @@ void loadSingleplayer(Map map) {
     strcat(ghostCarPath, ".bin");
 
     replayFrameIdx = 0;
-    lastLap        = 0;
     currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
     loadBestLap();
@@ -77,27 +74,21 @@ void updateSingleplayer() {
 //----------------------------------------------------------------------------------
 
 static void updateGhostCar(Car *player) {
-    checkForBestLap(player);
-    if (player->lap >= 0) {
-        recordLap(player);
-        showReplayBestLap();
-    }
-}
+    if (player->lap > 0 && player->changeLapFlag) {
+        player->changeLapFlag = false;
+        replayFrameIdx        = 0;
 
-static void checkForBestLap(Car *player) {
-    if (player->lap > lastLap) {
-        lastLap        = player->lap;
-        replayFrameIdx = 0;
-        ArrayList_push(currentLap, (CarFrame) {(Vector2) {-1000, -1000}, 0});
         if (ArrayList_length(currentLap) < ArrayList_length(bestLap) ||
             ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
             updateBestLap();
-            flagBestLap                    = 1;
-            bestLapTimePlayer              = player;
-            bestLapTimePlayer->bestLapTime = (ArrayList_length(bestLap) - 1) / 60.0f;
+            bestLapTimePlayer = player;
         }
+
         ArrayList_clear(currentLap);
+    } else if (player->lap >= 0) {
+        recordLap(player);
+        showReplayBestLap();
     }
 }
 
@@ -157,7 +148,7 @@ void drawHudSingleplayer() {
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawPlayerHud(p1, 0);
 
-    if (flagBestLap) {
+    if (bestLapTimePlayer) {
         snprintf(strBuffer, sizeof(strBuffer), "Melhor Volta");
         drawBestLapMessage(SCREEN_WIDTH / 2.0f -
                                MeasureTextEx(FONTS[1], strBuffer, 64, 1.0f).x / 2.0f,
@@ -170,7 +161,7 @@ void drawHudSingleplayer() {
 }
 
 //----------------------------------------------------------------------------------
-// Funções complementares para o draw
+// Debug
 //----------------------------------------------------------------------------------
 
 static void drawGhostCarDebug() {

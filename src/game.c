@@ -1,5 +1,6 @@
 #include "game.h"
 #include "common.h"
+#include "linked_list.h"
 #include "raylib.h"
 #include <float.h>
 #include <math.h>
@@ -17,9 +18,9 @@ int hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
 
-bool   flagBestLap       = 0;
 Car   *bestLapTimePlayer = NULL;
 double bestLapTime       = 0;
+double bestLapLastTick   = 0;
 
 // --- Variáveis internas ---
 
@@ -35,12 +36,12 @@ static int    msgCount;
 
 // --- Funções internas ---
 
-static void  drawHud();
-static void  loadMap(Map map);
-static void  mapCleanup();
-static void  updateCarRanking();
-static void  updateCarReference(Car *car);
-static float cmp(Car *a, Car *b);
+static void drawHud();
+static void loadMap(Map map);
+static void mapCleanup();
+static void updateBestLap();
+static void updateCarRanking();
+static void updateCarReference(Car *car);
 
 //----------------------------------------------------------------------------------
 // Carregamento do jogo
@@ -60,7 +61,6 @@ void Game_load() {
     Map map      = MAPS[state.map];
     loadMap(map);
 
-    flagBestLap       = false;
     bestLapTimePlayer = NULL;
     msgStart          = 0;
     msgActive         = 0;
@@ -96,6 +96,7 @@ void Game_update() {
         return;
     }
 
+    updateBestLap();
     updateCarRanking();
 
     switch (state.mode) {
@@ -111,6 +112,31 @@ void Game_update() {
 //----------------------------------------------------------------------------------
 // Funções complementares para o update
 //----------------------------------------------------------------------------------
+
+static void checkBestLap(Car *player) {
+    if (player->lap < 1 || !player->changeLapFlag) {
+        return;
+    }
+
+    if (player->bestLapTime < bestLapTime || bestLapTime == 0) {
+        bestLapTimePlayer = player;
+        bestLapLastTick   = GetTime();
+        bestLapTime       = player->bestLapTime;
+    }
+}
+
+static void updateBestLap() {
+    if (bestLapTimePlayer && GetTime() - bestLapLastTick >= 3.0f) {
+        bestLapTimePlayer->changeLapFlag = false;
+        bestLapTimePlayer                = NULL;
+    }
+
+    LinkedList_forEach(cars, checkBestLap);
+}
+
+static float cmp(Car *a, Car *b) {
+    return b->refFrame - a->refFrame;
+}
 
 static void updateCarRanking() {
     double actualTime = GetTime();
@@ -141,10 +167,6 @@ static void updateCarReference(Car *car) {
 
     car->refFrame =
         state.mode == SINGLEPLAYER ? low_i : ArrayList_length(referenceLap) * car->lap + low_i;
-}
-
-static float cmp(Car *a, Car *b) {
-    return b->refFrame - a->refFrame;
 }
 
 //----------------------------------------------------------------------------------
@@ -265,9 +287,9 @@ void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
         }
 
         if (msgCount > 10) {
-            msgActive   = 0;
-            msgCount    = 0;
-            flagBestLap = false;
+            msgActive         = 0;
+            msgCount          = 0;
+            bestLapTimePlayer = NULL;
             return;
         }
     }
@@ -301,7 +323,7 @@ void drawGameLogo(float x, float y) {
 void drawLapTime(Car *player, float x, float y) {
     Color color = WHITE;
 
-    if (flagBestLap && player == bestLapTimePlayer) {
+    if (player == bestLapTimePlayer) {
         stringifyTime(strBuffer, bestLapTimePlayer->bestLapTime, 0);
         color = PURPLE;
     } else {
@@ -385,9 +407,8 @@ void drawPlayerList(Car *player, float x, float y) {
         bool  isOwn = curr->car->id == player->id;
         float yx    = y + idx * height;
 
-        Color bgColor =
-            (flagBestLap && bestLapTimePlayer == curr->car) ? PURPLE : (Color) {51, 51, 51, 255};
-        Rectangle rect = {x, yx, hudPlayerListWidth, height};
+        Color     bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, 255};
+        Rectangle rect    = {x, yx, hudPlayerListWidth, height};
         DrawRectangle(rect.x, rect.y, rect.width, rect.height, bgColor);
 
         float fontSize = 20;
@@ -443,12 +464,14 @@ void drawPlayerDebug(Car *player, int x, int y) {
              "Brake Force: %.2f\n"
              "Drag Force: %.2f\n"
              "Reverse Force: %.2f\n"
-             "Reference Frame i: %d",
+             "Reference Frame i: %d\n"
+             "Game best lap: %.3f",
              player->id, player->lap, player->startLapTime, GetTime() - player->startLapTime,
              player->bestLapTime, player->checkpoint, player->pos.x, player->pos.y, player->vel,
-             player->maxVelocity, player->acc, player->width, player->height, fmod(player->angle, 2*PI),
-             player->angularSpeed, player->minTurnSpeed, player->breakForce, player->dragForce,
-             player->reverseForce, player->refFrame);
+             player->maxVelocity, player->acc, player->width, player->height,
+             fmod(player->angle, 2 * PI), player->angularSpeed, player->minTurnSpeed,
+             player->breakForce, player->dragForce, player->reverseForce, player->refFrame,
+             bestLapTime);
 
     Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(x, y, size.x + 10, size.y + 10, (Color) {196, 196, 196, 200});

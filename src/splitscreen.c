@@ -16,10 +16,7 @@ static int    count;
 // --- Funções internas ---
 
 static void updateSemaphore();
-
 static void updateExtras(Car *player);
-static void updateBestLap(Car *player);
-static void updateWinner(Car *player);
 
 static void drawSemaphore(float x, float y, int size);
 static void drawView(Camera2D *camera, Rectangle scissor);
@@ -84,27 +81,6 @@ void updateSplitscreen() {
 // Funções complementares para o update
 //----------------------------------------------------------------------------------
 
-static void updateExtras(Car *player) {
-    updateBestLap(player);
-    updateWinner(player);
-    Car_update(player);
-}
-
-static void updateBestLap(Car *player) {
-    if (player->lap < 1) {
-        return;
-    }
-
-    if (!bestLapTimePlayer || player->bestLapTime < bestLapTimePlayer->bestLapTime) {
-        bestLapTimePlayer = player;
-        flagBestLap       = 1;
-        bestLapTime       = GetTime();
-    } else if (GetTime() - bestLapTime >= 3.0f) {
-        bestLapTimePlayer = 0;
-        flagBestLap       = 0;
-    }
-}
-
 static void updateSemaphore() {
     if (count == 4) {
         SetSoundPitch(semaphoreSound, 1.2);
@@ -125,6 +101,11 @@ static void updateWinner(Car *player) {
     if (!winner && player->lap == state.maxLaps) {
         winner = player;
     }
+}
+
+static void updateExtras(Car *player) {
+    updateWinner(player);
+    Car_update(player);
 }
 
 //----------------------------------------------------------------------------------
