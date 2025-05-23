@@ -1,7 +1,6 @@
 #include "camera.h"
 #include "car.h"
 #include "common.h"
-#include <math.h>
 #include <stdlib.h>
 
 static int CAMERA_WIDTH;
