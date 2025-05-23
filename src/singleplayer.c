@@ -14,8 +14,8 @@ static char ghostCarPath[100];
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
-bool   flagBestLap = 0;
-double bestLapTime = 0;
+static bool flagBestLap = 0;
+double      bestLapTime = 0;
 
 static double msgStart;
 static int    msgActive;
@@ -144,6 +144,25 @@ static void updateBestLap() {
 // Draw
 //----------------------------------------------------------------------------------
 
+void drawLapTime(Car *player, float x, float y) {
+    Color color = WHITE;
+
+    if (flagBestLap) {
+        stringifyTime(strBuffer, bestLapTime, 0);
+        color = PURPLE;
+    } else {
+        stringifyTime(strBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
+
+        if (state.mode == SINGLEPLAYER) {
+            Car *ghost = LinkedList_getCarById(cars, 99);
+            color      = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
+        }
+    }
+
+    drawCenteredText(strBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f,
+                     12, 24, color, FONTS[0]);
+}
+
 void drawSingleplayer() {
     BeginMode2D(*camera1);
     drawMap();
@@ -155,10 +174,10 @@ void drawHudSingleplayer() {
     drawPlayerHud(p1, 0);
 
     if (flagBestLap) {
-        snprintf(textBuffer, sizeof(textBuffer), "Melhor Volta");
+        snprintf(strBuffer, sizeof(strBuffer), "Melhor Volta");
         drawBestLapMessage(SCREEN_WIDTH / 2.0f -
-                               MeasureTextEx(FONTS[1], textBuffer, 64, 1.0f).x / 2.0f,
-                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, PURPLE, textBuffer);
+                               MeasureTextEx(FONTS[1], strBuffer, 64, 1.0f).x / 2.0f,
+                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, PURPLE, strBuffer);
     }
 
     if (state.debug) {
@@ -195,14 +214,14 @@ static void drawBestLapMessage(float x, float y, int size, Color color, char *te
 
 static void drawGhostCarDebug() {
     sprintf(
-        textBuffer,
+        strBuffer,
         "Ghost car debug\nRecording i: %u\nPlayback i: %u\n\nCurrent lap debug\nRecording i: %u",
         ArrayList_length(bestLap), replayFrameIdx, ArrayList_length(currentLap));
 
-    Vector2 size = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
+    Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(SCREEN_WIDTH - size.x - 10, 500, size.x + 10, size.y + 10,
                   (Color) {196, 196, 196, 200});
-    DrawTextEx(FONTS[0], textBuffer, (Vector2) {SCREEN_WIDTH - size.x - 10, 500}, 20, 1.0f, BLACK);
+    DrawTextEx(FONTS[0], strBuffer, (Vector2) {SCREEN_WIDTH - size.x - 10, 500}, 20, 1.0f, BLACK);
 }
 
 //----------------------------------------------------------------------------------

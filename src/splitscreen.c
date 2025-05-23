@@ -116,9 +116,9 @@ void drawSplitscreen() {
     DrawRectangle(SCREEN_WIDTH / 2.0f - 5, 0, 10, SCREEN_HEIGHT, (Color) {51, 51, 51, 255});
 
     if (winner) {
-        snprintf(textBuffer, sizeof(textBuffer), "Jogador %d Ganhou", winner->id);
-        drawTextWithShadow(textBuffer,
-                           (SCREEN_WIDTH - MeasureTextEx(FONTS[1], textBuffer, 128, 1.0f).x) / 2.0f,
+        snprintf(strBuffer, sizeof(strBuffer), "Jogador %d Ganhou", winner->id);
+        drawTextWithShadow(strBuffer,
+                           (SCREEN_WIDTH - MeasureTextEx(FONTS[1], strBuffer, 128, 1.0f).x) / 2.0f,
                            (SCREEN_HEIGHT - 128) * 1.0f / 4.0f, 128, YELLOW, FONTS[1]);
         return;
     }

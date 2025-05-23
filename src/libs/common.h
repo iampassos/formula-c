@@ -104,9 +104,18 @@ extern char *FONTS_PATH[];
 extern int   FONTS_N;
 extern Font  FONTS[];
 
+extern char strBuffer[1000];
+
 // Funções extras
-bool Color_equals(Color a, Color b);
+bool  Color_equals(Color a, Color b);
 float Vector2_dist(Vector2 a, Vector2 b);
 float LerpAngle(float a, float b, float t);
+
+void drawCenteredText(char *text, float x, float y, float width, float heigth, int size,
+                      Color color, Font font);
+
+void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font);
+
+void stringifyTime(char *buffer, double time, int signFlag);
 
 #endif

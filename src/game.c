@@ -7,25 +7,23 @@
 #include <string.h>
 
 // --- Variáveis públicas ---
-
-Texture2D   logoNoBg;
-Texture2D   SPEEDOMETER;
-Texture2D   trackBackground;
 Texture2D   trackHud;
 LinkedList *cars;
 
 Camera2D *camera1;
 Camera2D *camera2;
 
-char textBuffer[1000];
+int  hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
 
 // --- Variáveis internas ---
 
-static ArrayList *referenceLap       = NULL;
-static double     last               = 0;
-static float      hudPlayerListWidth = 330;
+static Texture2D   trackBackground;
+static Texture2D   SPEEDOMETER;
+static Texture2D   logoNoBg;
+static ArrayList *referenceLap = NULL;
+static double     last         = 0;
 
 // --- Funções internas ---
 
@@ -251,21 +249,9 @@ void drawPlayerHud(Car *player, int x) {
     }
 }
 
-void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {
-    DrawTextEx(font, text, (Vector2) {x + 1, y + 1}, size, 1.0f, BLACK);
-    DrawTextEx(font, text, (Vector2) {x, y}, size, 1.0f, color);
-}
-
-void drawCenteredText(char *text, float x, float y, float width, float heigth, int size,
-                      Color color, Font font) {
-    Vector2 vec = MeasureTextEx(font, text, size, 1.0f);
-    DrawTextEx(font, text, (Vector2) {((x * 2) + width - vec.x) / 2.0f, ((y * 2) + heigth) / 2.0f},
-               size, 1.0f, color);
-}
-
 void drawGameLogo(float x, float y) {
     DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, 255});
-    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2.0f - 64, y, WHITE);
+    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2 - 64, y, WHITE);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -291,11 +277,11 @@ void drawSpeedometer(Car *player, float x, float y) {
     DrawLineEx((Vector2) {x, y}, endPos, 8, RED);
     DrawCircle(x, y, 3, RED);
 
-    snprintf(textBuffer, sizeof(textBuffer), "%.0f",
+    snprintf(strBuffer, sizeof(strBuffer), "%.0f",
              3600 * 0.75f * fabs(player->vel) * 60 / trackBackground.width);
     Color textColor = ColorLerp(GREEN, RED, player->vel / player->maxVelocity);
 
-    drawTextWithShadow(textBuffer, x - MeasureTextEx(FONTS[1], textBuffer, 48, 1.0f).x / 2, y + 24,
+    drawTextWithShadow(strBuffer, x - MeasureTextEx(FONTS[1], strBuffer, 48, 1.0f).x / 2, y + 24,
                        48, textColor, FONTS[1]);
 
     drawTextWithShadow("KM/H", x - MeasureTextEx(FONTS[0], "KM/H", 16, 1.0f).x / 2, y + 72, 16,
@@ -304,36 +290,17 @@ void drawSpeedometer(Car *player, float x, float y) {
 
 void drawLaps(Car *player, float x, float y) {
     if (state.mode == SINGLEPLAYER) {
-        snprintf(textBuffer, sizeof(textBuffer), "Volta %d", player->lap + 1);
+        snprintf(strBuffer, sizeof(strBuffer), "Volta %d", player->lap + 1);
     } else if (player->lap < MAX_LAPS) {
-        snprintf(textBuffer, sizeof(textBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
+        snprintf(strBuffer, sizeof(strBuffer), "Volta %d/%d", player->lap + 1, MAX_LAPS);
     }
 
-    drawCenteredText(textBuffer, x + 4, y, hudPlayerListWidth / 2.0f, 14, 28, WHITE, FONTS[0]);
-}
-
-void drawLapTime(Car *player, float x, float y) {
-    Color color = WHITE;
-
-    if (flagBestLap) {
-        stringifyTime(textBuffer, bestLapTime, 0);
-        color = PURPLE;
-    } else {
-        stringifyTime(textBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
-
-        if (state.mode == SINGLEPLAYER) {
-            Car *ghost = LinkedList_getCarById(cars, 99);
-            color      = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
-        }
-    }
-
-    drawCenteredText(textBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f,
-                     12, 24, color, FONTS[0]);
+    drawCenteredText(strBuffer, x + 4, y, hudPlayerListWidth / 2.0f, 14, 28, WHITE, FONTS[0]);
 }
 
 void drawPlayerList(Car *player, float x, float y) {
-    stringifyTime(textBuffer, 599.999f, 1);
-    Vector2 referenceSize = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
+    stringifyTime(strBuffer, 599.999f, 1);
+    Vector2 referenceSize = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
 
     int   idx  = 0;
     Node *prev = cars->head;
@@ -345,20 +312,20 @@ void drawPlayerList(Car *player, float x, float y) {
         Vector2 size  = MeasureTextEx(FONTS[isOwn], curr->car->name, 20, 1.0f);
         float   yx    = y + (idx * size.y);
 
-        snprintf(textBuffer, sizeof(textBuffer), "%d", idx + 1);
-        drawCenteredText(textBuffer, x, yx, 36, 20, 20, WHITE, FONTS[isOwn]);
+        snprintf(strBuffer, sizeof(strBuffer), "%d", idx + 1);
+        drawCenteredText(strBuffer, x, yx, 36, 20, 20, WHITE, FONTS[isOwn]);
 
         DrawRectangle(x + 36, yx + 12.5f, 2, 15, curr->car->color);
 
         DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
 
         if (curr == cars->head || (curr->car->ghost && curr->car->pos.x == -1000)) {
-            strcpy(textBuffer, "-:--.---");
+            strcpy(strBuffer, "-:--.---");
         } else {
-            stringifyTime(textBuffer, (prev->car->refFrame - curr->car->refFrame) / 60.0f, 1);
+            stringifyTime(strBuffer, (prev->car->refFrame - curr->car->refFrame) / 60.0f, 1);
         }
 
-        drawCenteredText(textBuffer, x + hudPlayerListWidth - referenceSize.x, yx, referenceSize.x,
+        drawCenteredText(strBuffer, x + hudPlayerListWidth - referenceSize.x, yx, referenceSize.x,
                          20, 20, WHITE, FONTS[isOwn]);
 
         prev = curr;
@@ -372,8 +339,8 @@ void drawPlayerList(Car *player, float x, float y) {
 //----------------------------------------------------------------------------------
 
 void drawPlayerDebug(Car *player, int x, int y) {
-    char textBuffer[1000];
-    snprintf(textBuffer, sizeof(textBuffer),
+    char strBuffer[1000];
+    snprintf(strBuffer, sizeof(strBuffer),
              "Current car debug\n"
              "ID: %d\n"
              "Lap: %d\n"
@@ -399,28 +366,7 @@ void drawPlayerDebug(Car *player, int x, int y) {
              player->angularSpeed, player->minTurnSpeed, player->breakForce, player->dragForce,
              player->reverseForce, player->refFrame);
 
-    Vector2 size = MeasureTextEx(FONTS[0], textBuffer, 20, 1.0f);
+    Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(x, y, size.x + 10, size.y + 10, (Color) {196, 196, 196, 200});
-    DrawTextEx(FONTS[0], textBuffer, (Vector2) {x, y}, 20, 1.0f, BLACK);
-}
-
-//----------------------------------------------------------------------------------
-// Úteis
-//----------------------------------------------------------------------------------
-
-void stringifyTime(char *buffer, double time, int signFlag) {
-    int   mins = time / 60;
-    float secs = time - (mins * 60);
-
-    if (signFlag) {
-        textBuffer[0] = time > 0 ? '+' : '-';
-    }
-
-    if (mins > 0) {
-        snprintf(textBuffer + signFlag, 32, "%d:%06.3fs", mins, secs);
-    } else {
-        snprintf(textBuffer + signFlag, 32, "%05.3fs", secs);
-    }
-
-    strcpy(buffer, textBuffer);
+    DrawTextEx(FONTS[0], strBuffer, (Vector2) {x, y}, 20, 1.0f, BLACK);
 }

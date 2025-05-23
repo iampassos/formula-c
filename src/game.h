@@ -23,7 +23,6 @@ void Game_draw();
 
 void drawMap();
 void drawPlayerHud(Car *player, int x);
-void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font);
 void drawLapTime(Car *player, float x, float y);
 void drawPlayerInMinimap(Car *player);
 void drawLaps(Car *player, float x, float y);
@@ -31,12 +30,6 @@ void drawSpeedometer(Car *player, float x, float y);
 void drawPlayerDebug(Car *player, int x, int y);
 void drawPlayerList(Car *player, float x, float y);
 void drawGameLogo(float x, float y);
-
-//----------------------------------------------------------------------------------
-// Úteis
-//----------------------------------------------------------------------------------
-
-void stringifyTime(char *buffer, double time, int signFlag);
 
 //----------------------------------------------------------------------------------
 // Singleplayer
@@ -65,7 +58,6 @@ void cleanUpSplitscreen();
 // Variáveis internas
 //----------------------------------------------------------------------------------
 
-extern Texture2D trackBackground;
 extern Texture2D trackHud;
 
 extern LinkedList *cars;
@@ -73,13 +65,9 @@ extern LinkedList *cars;
 extern Camera2D *camera1;
 extern Camera2D *camera2;
 
-extern char textBuffer[1000];
-extern int  minimapWidth;
-extern int  minimapHeigth;
-
 extern Vector2 minimapPos;
 
-extern bool   flagBestLap;
+extern int    hudPlayerListWidth;
 extern double bestLapTime;
 
 #endif
