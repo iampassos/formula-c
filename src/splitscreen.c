@@ -5,12 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-// --- Variáveis públicas ---
-
-Car *winner   = NULL;
-int  MAX_LAPS = 3;
-
 // --- Variáveis internas ---
+static Car *winner;
 
 static Sound  semaphoreSound;
 static double lastSoundTime;
@@ -75,6 +71,9 @@ void updateSplitscreen() {
 
     LinkedList_forEach(cars, updateWinner);
     LinkedList_forEach(cars, Car_update);
+
+    if (winner && GetTime() - winner->startLapTime > 3.5f)
+        state.status = ENDED;
 }
 
 //----------------------------------------------------------------------------------
@@ -98,9 +97,8 @@ static void updateSemaphore() {
 }
 
 static void updateWinner(Car *player) {
-    if (player->lap == MAX_LAPS) {
-        winner       = player;
-        state.status = ENDED;
+    if (!winner && player->lap == MAX_LAPS) {
+        winner = player;
     }
 }
 

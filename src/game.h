@@ -45,9 +45,6 @@ void cleanUpSingleplayer();
 // Splitscreen
 //----------------------------------------------------------------------------------
 
-extern Car *winner;
-extern int  MAX_LAPS;
-
 void loadSplitscreen(Map map);
 void updateSplitscreen();
 void drawSplitscreen();
@@ -67,7 +64,6 @@ extern Camera2D *camera2;
 
 extern Vector2 minimapPos;
 
-extern int    hudPlayerListWidth;
-extern double bestLapTime;
+extern int hudPlayerListWidth;
 
 #endif

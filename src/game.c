@@ -76,7 +76,7 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
-    if (IsKeyDown(KEY_Q) || (winner && GetTime() - winner->startLapTime > 3.5f)) {
+    if (IsKeyDown(KEY_Q) || state.status == ENDED) {
         state.screen = MENU;
         mapCleanup();
         return;

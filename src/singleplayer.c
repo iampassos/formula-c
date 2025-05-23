@@ -14,8 +14,8 @@ static char ghostCarPath[100];
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
 
-static bool flagBestLap = 0;
-double      bestLapTime = 0;
+static bool   flagBestLap = 0;
+static double bestLapTime = 0;
 
 static double msgStart;
 static int    msgActive;
@@ -159,8 +159,8 @@ void drawLapTime(Car *player, float x, float y) {
         }
     }
 
-    drawCenteredText(strBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f,
-                     12, 24, color, FONTS[0]);
+    drawCenteredText(strBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f, 12,
+                     24, color, FONTS[0]);
 }
 
 void drawSingleplayer() {

@@ -9,6 +9,8 @@
 int SCREEN_WIDTH  = 0;
 int SCREEN_HEIGHT = 0;
 
+int MAX_LAPS = 3;
+
 float CAMERA_SMOOTHNESS = 0.05;
 
 char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
