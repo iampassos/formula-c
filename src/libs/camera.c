@@ -4,9 +4,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-static int BACKGROUND_WIDTH;
-static int BACKGROUND_HEIGHT;
-
 static int CAMERA_WIDTH;
 static int CAMERA_HEIGHT;
 
@@ -29,11 +26,6 @@ void Camera_free(Camera2D *camera) {
     free(camera);
 }
 
-void Camera_Background_setSize(int width, int height) {
-    BACKGROUND_WIDTH  = width;
-    BACKGROUND_HEIGHT = height;
-}
-
 void Camera_setSize(int width, int height) {
     CAMERA_WIDTH  = width;
     CAMERA_HEIGHT = height;
@@ -51,10 +43,10 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
         x = halfW;
     if (y < halfH)
         y = halfH;
-    if (x > BACKGROUND_WIDTH - halfW)
-        x = BACKGROUND_WIDTH - halfW;
-    if (y > BACKGROUND_HEIGHT - halfH)
-        y = BACKGROUND_HEIGHT - halfH;
+    if (x > MAP_WIDTH - halfW)
+        x = MAP_WIDTH - halfW;
+    if (y > MAP_HEIGHT - halfH)
+        y = MAP_HEIGHT - halfH;
 
     camera->target = (Vector2) {x, y};
 

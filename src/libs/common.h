@@ -61,6 +61,8 @@ extern State state;
 // Configurações de tela
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
+extern int MAP_WIDTH;
+extern int MAP_HEIGHT;
 
 // Suavidade da camera
 extern float CAMERA_SMOOTHNESS;

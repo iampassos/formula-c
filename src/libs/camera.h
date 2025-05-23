@@ -8,8 +8,6 @@ Camera2D *Camera_create(Vector2 target, Vector2 offset, float rotation, float zo
 
 void Camera_free(Camera2D *camera);
 
-void Camera_Background_setSize(int width, int height);
-
 void Camera_setSize(int width, int height);
 
 void Camera_updateTarget(Camera2D *camera, Car *car);

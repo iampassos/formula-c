@@ -10,8 +10,6 @@ static Checkpoint CHECKPOINTS[100];
 static int        CHECKPOINTS_SIZE;
 
 // Pixels da imagem da pista
-static int    IMAGE_WIDTH;
-static int    IMAGE_HEIGHT;
 static Color *TRACK_PIXELS;
 
 static float MIN_DIST_TO_DETECT;
@@ -59,11 +57,9 @@ static void accelerate(Car *car);
 
 void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de pixels
     Image trackMask = LoadImage(track_mask_path);
-    IMAGE_WIDTH     = trackMask.width;
-    IMAGE_HEIGHT    = trackMask.height;
     TRACK_PIXELS    = LoadImageColors(trackMask);
     UnloadImage(trackMask);
-    MIN_DIST_TO_DETECT = IMAGE_WIDTH / 30;
+    MIN_DIST_TO_DETECT = MAP_WIDTH / 30;
 }
 
 // Definindo as cores dos checkpoints
@@ -187,9 +183,9 @@ void Car_draw(Car *car) {
 static Color getFloorColor(Car *car) { // Retorna a cor embaixo do carro
     int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
     int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
-    if (x < 0 || x >= IMAGE_WIDTH || y < 0 || y >= IMAGE_HEIGHT)
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
         return (Color) {0, 0, 0};
-    return TRACK_PIXELS[y * IMAGE_WIDTH + x];
+    return TRACK_PIXELS[y * MAP_WIDTH + x];
 }
 
 //----------------------------------------------------------------------------------

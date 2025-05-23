@@ -99,10 +99,11 @@ void Game_update() {
 //----------------------------------------------------------------------------------
 
 static void updateCarRanking() {
-    if (ArrayList_length(referenceLap) > 0 && GetTime() - last > 0.5f) {
+    double actualTime = GetTime();
+    if (ArrayList_length(referenceLap) > 0 && actualTime - last > 0.5f) {
         LinkedList_forEach(cars, updateCarReference);
         LinkedList_sort(cars, cmp);
-        last = GetTime();
+        last = actualTime;
     }
 }
 
@@ -161,6 +162,8 @@ void Game_draw() {
 static void loadMap(Map map) {
     state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
+    MAP_WIDTH = trackBackground.width;
+    MAP_HEIGHT = trackBackground.height;
 
     Image temp = LoadImage(SPEEDOMETER_PATH);
     ImageResize(&temp, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
@@ -174,8 +177,6 @@ static void loadMap(Map map) {
 
     Track_setMask(map.maskPath);
     Track_setCheckpoints(map.checkpoints, map.checkpointSize);
-
-    Camera_Background_setSize(trackBackground.width, trackBackground.height);
 
     ArrayList_clear(referenceLap);
     FILE *file = fopen(map.referencePath, "rb");
