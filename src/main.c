@@ -38,8 +38,8 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                "resources/minimaps/interlagos_minimap.png", // Path para mini mapa
                {{4721, 1910}, {4900, 2061}},                // Inicial Spawn Car
                2.75f,                                       // Cars Spawn angle
+               1,                                           // Max laps
                10,                                          // Quantidade de checkpoint
-               3,                                           // Max laps
                {
                    // Checkpoint Spawn
                    {{4584, 2078}, 2.73f},
@@ -59,8 +59,8 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                "resources/masks/secret_mask.png",
                {{7329, 1358}, {7329, 1358}},
                3.21f,
-               4,
                1,
+               4,
                {
                    {{7329, 1358}, 3.21f},
                    {{2520, 4478}, 8.59f},

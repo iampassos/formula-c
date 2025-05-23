@@ -16,6 +16,7 @@ typedef struct {
     Texture2D texture;
     Music     sound;
     Color     color;
+    Color     floorColor;
     bool      ghost;
     bool      ghostActive;
     bool      changeLapFlag;

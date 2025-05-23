@@ -19,8 +19,8 @@ typedef struct {
     char      *minimapPath;
     Vector2    startCarPos[2];
     float      startAngle;
-    int        checkpointSize;
     int        maxLaps;
+    int        checkpointSize;
     Checkpoint checkpoints[100];
 } Map;
 

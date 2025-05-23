@@ -471,7 +471,7 @@ void drawPlayerDebug(Car *player, int x, int y) {
              "Angular Speed: %.2f\n"
              "Min Turn Speed: %.2f\n"
              "Brake Force: %.2f\n"
-             "Drag Force: %.2f\n"
+             "Drag Force: %.3f\n"
              "Reverse Force: %.2f\n"
              "Reference Frame i: %d\n"
              "Game best lap: %.3f",

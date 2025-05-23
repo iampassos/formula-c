@@ -32,13 +32,13 @@ void Car_move(Car *car, int up, int down, int right,
               int left); // Atualiza o carro de acordo com os inputs do usuário
 
 // --- Funções internas ---
-static Color getFloorColor(Car *car);
+static void updateFloorColor(Car *car);
 
 static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor);
-static void returnToLastCheckpoint(Car *car);
-static void updateLapStatus(Car *car, Color floorColor);
+static void returnIfIsOutside(Car *car);
+static void updateLapStatus(Car *car);
 
-static void applyDragForce(Car *car, Color floorColor);
+static void applyDragForce(Car *car);
 static void applyMovementPhysics(Car *car);
 
 static bool canTurn(Car *car);
@@ -128,14 +128,12 @@ void Car_update(Car *car) {
         return;
     SetMusicPitch(car->sound, 0.6 + car->vel / 13.0f);
     UpdateMusicStream(car->sound);
-    Color floorColor = getFloorColor(car); // Pega a cor do chão embaixo do carro
+    updateFloorColor(car);
 
-    updateLapStatus(car, floorColor);
-    applyDragForce(car, floorColor); // Atualiza a força de atrito
+    updateLapStatus(car);
+    applyDragForce(car); // Atualiza a força de atrito
     applyMovementPhysics(car);
-
-    if (Color_equals(floorColor, OUTSIDE_TRACK_COLOR))
-        returnToLastCheckpoint(car);
+    returnIfIsOutside(car);
 }
 
 // Atualiza as propriedades do carro de acordo com o input do player
@@ -186,14 +184,18 @@ void Car_draw(Car *car) {
 // Sensor do carro
 //----------------------------------------------------------------------------------
 
-// Retorna a cor embaixo do carro
-static Color getFloorColor(Car *car) {
-    int x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
-    int y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
+// Atualiza o que o carro esta lendo
+static void updateFloorColor(Car *car) {
+    Color temp;
+    int   x = (int) (car->pos.x + cosf(car->angle) * car->width * 0.4f);
+    int   y = (int) (car->pos.y + sinf(car->angle) * car->width * 0.4f);
 
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
-        return OUTSIDE_TRACK_COLOR;
-    return TRACK_PIXELS[y * MAP_WIDTH + x];
+        temp = OUTSIDE_TRACK_COLOR;
+    else
+        temp = TRACK_PIXELS[y * MAP_WIDTH + x];
+
+    car->floorColor = temp;
 }
 
 //----------------------------------------------------------------------------------
@@ -207,11 +209,12 @@ static bool isValidCheckpoint(Car *car, int nextExpected, Color floorColor) {
     return Vector2_dist(car->pos, CHECKPOINTS[nextExpected].pos) < MIN_DIST_TO_DETECT;
 }
 
-static void returnToLastCheckpoint(Car *car) {
-    car->vel       = 10;
-    car->dragForce = 1;
-    car->pos       = CHECKPOINTS[car->checkpoint].pos;
-    car->angle     = CHECKPOINTS[car->checkpoint].angle;
+static void returnIfIsOutside(Car *car) {
+    if (!Color_equals(car->floorColor, OUTSIDE_TRACK_COLOR))
+        return;
+    car->vel   = 10;
+    car->pos   = CHECKPOINTS[car->checkpoint].pos;
+    car->angle = CHECKPOINTS[car->checkpoint].angle;
 }
 
 //----------------------------------------------------------------------------------
@@ -219,10 +222,10 @@ static void returnToLastCheckpoint(Car *car) {
 //----------------------------------------------------------------------------------
 
 // Verifica se passou por um checkpoint e atualiza tempos do carro
-static void updateLapStatus(Car *car, Color floorColor) {
+static void updateLapStatus(Car *car) {
     int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
 
-    if (!isValidCheckpoint(car, nextExpected, floorColor))
+    if (!isValidCheckpoint(car, nextExpected, car->floorColor))
         return;
 
     car->checkpoint = nextExpected;
@@ -246,9 +249,9 @@ static void updateLapStatus(Car *car, Color floorColor) {
 // Aplicando física no carro
 //----------------------------------------------------------------------------------
 
-static void applyDragForce(Car *car, Color floorColor) { // Atualiza a força de atrito
+static void applyDragForce(Car *car) { // Atualiza a força de atrito
     for (int i = 0; i < TRACK_AREA_SIZE; i++) {
-        if (Color_equals(floorColor, TRACK_AREAS[i].color)) {
+        if (Color_equals(car->floorColor, TRACK_AREAS[i].color)) {
             car->dragForce = TRACK_AREAS[i].dragForce;
             return;
         }

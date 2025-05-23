@@ -99,10 +99,8 @@ static void updateSemaphore() {
 }
 
 static void updateWinner(Car *player) {
-    // if (!winner && player->lap == state.maxLaps) {
-    if (!winner && player->lap == 0) {
+    if (!winner && player->lap == state.maxLaps)
         winner = player;
-    }
 }
 
 static void updateExtras(Car *player) {
