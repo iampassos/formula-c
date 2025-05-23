@@ -28,7 +28,7 @@ static int    msgCount;
 static void updateGhostCar(Car *player);
 static void checkForBestLap(Car *player);
 static void recordLap(Car *player);
-static void showReplayBestLap(Car *player);
+static void showReplayBestLap();
 
 static void updateBestLap();
 static void loadBestLap();
@@ -91,9 +91,9 @@ void updateSingleplayer() {
 
 static void updateGhostCar(Car *player) {
     checkForBestLap(player);
-    if (player->lap > 0) {
+    if (player->lap >= 0) {
         recordLap(player);
-        showReplayBestLap(player);
+        showReplayBestLap();
     }
 }
 
@@ -118,7 +118,7 @@ static void recordLap(Car *player) {
     ArrayList_push(currentLap, frameData);
 }
 
-static void showReplayBestLap(Car *player) {
+static void showReplayBestLap() {
     Car *ghost = LinkedList_getCarById(cars, 99);
     if (replayFrameIdx < ArrayList_length(bestLap)) {
         CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
