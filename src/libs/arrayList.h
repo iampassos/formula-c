@@ -25,5 +25,6 @@ void ArrayList_clear(ArrayList *array);
 void ArrayList_copy(ArrayList *a, ArrayList *b);
 
 CarFrame ArrayList_get(ArrayList *array, unsigned int idx);
+CarFrame ArrayList_getLast(ArrayList *array);
 
 #endif

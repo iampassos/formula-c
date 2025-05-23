@@ -42,8 +42,9 @@ void loadSingleplayer(Map map) {
     currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
     loadBestLap();
+
     if (ArrayList_length(bestLap) > 0) {
-        bestLapTime = ArrayList_get(bestLap, ArrayList_length(bestLap) - 1).time;
+        bestLapTime = ArrayList_getLast(bestLap).time;
     }
 
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],

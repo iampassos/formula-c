@@ -15,8 +15,8 @@ void ArrayList_free(ArrayList *array) {
 }
 
 void ArrayList_growth(ArrayList *array) {
-    array->capacity += (array->capacity/2); // aumenta em escala exponencial menor que 2
-    array->data     = realloc(array->data, sizeof(CarFrame) * array->capacity);
+    array->capacity += (array->capacity / 2); // aumenta em escala exponencial menor que 2
+    array->data = realloc(array->data, sizeof(CarFrame) * array->capacity);
 }
 
 void ArrayList_push(ArrayList *array, CarFrame car) {
@@ -48,4 +48,8 @@ CarFrame ArrayList_get(ArrayList *array, unsigned int idx) {
     if (idx >= array->length)
         return (CarFrame) {0};
     return array->data[idx];
+}
+
+CarFrame ArrayList_getLast(ArrayList *array) {
+    return ArrayList_get(array, ArrayList_length(array) - 1);
 }
