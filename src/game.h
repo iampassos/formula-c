@@ -37,6 +37,7 @@ void drawBestLapMessage(float x, float y);
 //----------------------------------------------------------------------------------
 
 void loadSingleplayer(Map map);
+void updateBestLapFile();
 void updateSingleplayer();
 void drawSingleplayer();
 void drawHudSingleplayer();

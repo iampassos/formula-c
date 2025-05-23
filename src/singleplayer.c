@@ -20,8 +20,7 @@ static void updateGhostCar(Car *player);
 static void recordLap(Car *player);
 static void showReplayBestLap();
 
-static void updateBestLap();
-static void loadBestLap();
+static void loadBestLapFile();
 
 static void drawGhostCarDebug();
 
@@ -41,7 +40,7 @@ void loadSingleplayer(Map map) {
     replayFrameIdx = 0;
     currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
-    loadBestLap();
+    loadBestLapFile();
 
     if (ArrayList_length(bestLap) > 0) {
         bestLapTime = ArrayList_getLast(bestLap).time;
@@ -78,21 +77,15 @@ void updateSingleplayer() {
 //----------------------------------------------------------------------------------
 
 static void updateGhostCar(Car *player) {
-    if (player->lap > 0 && player->changeLapFlag) {
+    if (player->changeLapFlag) {
         player->changeLapFlag = false;
         replayFrameIdx        = 0;
-
-        if (ArrayList_length(bestLap) == 0 ||
-            ArrayList_getLast(currentLap).time < ArrayList_getLast(bestLap).time) {
-            ArrayList_copy(bestLap, currentLap);
-            updateBestLap();
-            bestLapTimePlayer = player;
-        }
-
         ArrayList_clear(currentLap);
-    } else if (player->lap >= 0) {
-        recordLap(player);
+    }
+
+    if (player->lap >= 0) {
         showReplayBestLap();
+        recordLap(player);
     }
 }
 
@@ -111,7 +104,7 @@ static void showReplayBestLap() {
     }
 }
 
-static void loadBestLap() {
+static void loadBestLapFile() {
     FILE *file = fopen(ghostCarPath, "rb");
 
     if (!file) {
@@ -128,9 +121,10 @@ static void loadBestLap() {
     }
 }
 
-static void updateBestLap() {
+void updateBestLapFile() {
     FILE *file = fopen(ghostCarPath, "wb");
     if (file != NULL) {
+        ArrayList_copy(bestLap, currentLap);
         for (int i = 0; i < bestLap->length; i++) {
             fwrite(&bestLap->data[i], sizeof(CarFrame), 1, file);
         }

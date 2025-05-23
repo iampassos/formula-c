@@ -123,6 +123,10 @@ static void checkBestLap(Car *player) {
         bestLapTimePlayer = player;
         bestLapLastTick   = GetTime();
         bestLapTime       = player->bestLapTime;
+
+        if (state.mode == SINGLEPLAYER) {
+            updateBestLapFile();
+        }
     }
 }
 
