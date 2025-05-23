@@ -7,6 +7,10 @@ char strBuffer[1000];
 int  MAP_WIDTH;
 int  MAP_HEIGHT;
 
+// 📐 Dimensões da Tela
+int SCREEN_WIDTH;
+int SCREEN_HEIGHT;
+
 //----------------------------------------------------------------------------------
 // Funções extras das structs da raylib
 //----------------------------------------------------------------------------------

@@ -6,14 +6,11 @@
 // 🧠 VARIÁVEIS GLOBAIS
 //----------------------------------------------------------------------------------
 
-// 📐 Dimensões da Tela
-int SCREEN_WIDTH  = 0;
-int SCREEN_HEIGHT = 0;
-
 // 🎮 Estado e Configurações do Jogo
-State state             = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON, 0};
-float CAMERA_SMOOTHNESS = 0.05;
-int   HUD_OPACITY       = 200;
+State     state              = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON, 0};
+float     CAMERA_SMOOTHNESS  = 0.05;
+int       HUD_OPACITY        = 200;
+CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
 
 //----------------------------------------------------------------------------------
 // 🔊 ÁUDIO
@@ -91,10 +88,9 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 //----------------------------------------------------------------------------------
 
 // 🏎️ Carros
-CarConfig DEFAULT_CAR_CONFIG = {0.1, 0.2, 0.988, 0.035, 150, 75};
-char     *CAR_IMAGES_PATH[]  = {"resources/cars/branco.png", "resources/cars/azul.png",
-                                "resources/cars/laranja.png"};
-char     *SPEEDOMETER_PATH   = "resources/cars/velocimetro.png";
+char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
+                           "resources/cars/laranja.png"};
+char *SPEEDOMETER_PATH  = "resources/cars/velocimetro.png";
 
 // 🧠 Modos de Jogo
 char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
