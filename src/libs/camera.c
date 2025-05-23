@@ -7,7 +7,7 @@
 static int CAMERA_WIDTH;
 static int CAMERA_HEIGHT;
 
-static float START_ZOOM = 1.5f;
+static float START_ZOOM;
 
 Camera2D *Camera_create(Vector2 target, Vector2 offset, float rotation, float zoom) {
     Camera2D *camera = (Camera2D *) malloc(sizeof(Camera2D));

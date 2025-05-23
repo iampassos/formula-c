@@ -4,7 +4,7 @@ CFLAGS = -Wall -std=c99 -Iraylib-5.5_win64_mingw-w64/include -Isrc/libs
 LDFLAGS = -Lraylib-5.5_win64_mingw-w64/lib -lraylib -lopengl32 -lgdi32 -lwinmm -mconsole
 
 # Arquivos-fonte e destino
-SRC = $(wildcard src/libs/*.c) $(wildcard src/*.c)
+SRC = $(wildcard src/*.c src/libs/*.c)
 OUT = game.exe
 
 # Alvo padrão
