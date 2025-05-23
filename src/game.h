@@ -30,7 +30,7 @@ void drawSpeedometer(Car *player, float x, float y);
 void drawPlayerDebug(Car *player, int x, int y);
 void drawPlayerList(Car *player, float x, float y);
 void drawGameLogo(float x, float y);
-void drawBestLapMessage(float x, float y, int size, Color color, char *text);
+void drawBestLapMessage(float x, float y);
 
 //----------------------------------------------------------------------------------
 // Singleplayer

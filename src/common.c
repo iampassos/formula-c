@@ -36,6 +36,7 @@ float LerpAngle(float a, float b, float t) { // Interpolando angulo
 //----------------------------------------------------------------------------------
 
 void drawTextCenteredInRect(char *text, Rectangle rect, int fontSize, Color color, Font font) {
+    // DrawRectangle(rect.x, rect.y, rect.width, rect.height, BLUE); // Debug
     Vector2 textSize = MeasureTextEx(font, text, fontSize, 1.0f);
     float   textX    = rect.x + (rect.width - textSize.x) / 2.0f;
     float   textY    = rect.y + (rect.height - textSize.y) / 2.0f;

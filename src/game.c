@@ -61,6 +61,7 @@ void Game_load() {
     Map map      = MAPS[state.map];
     loadMap(map);
 
+    bestLapTime       = 0;
     bestLapTimePlayer = NULL;
     msgStart          = 0;
     msgActive         = 0;
@@ -276,26 +277,33 @@ void drawHud() {
 // Funções auxiliares para desenhar a hud
 //----------------------------------------------------------------------------------
 
-void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
-    float actualTime = GetTime();
-    if (actualTime - msgStart >= 0.3f) {
-        msgActive = !msgActive;
-        msgStart  = actualTime;
+void drawBestLapMessage(float x, float y) {
+    if (bestLapTimePlayer) {
+        float actualTime = GetTime();
+        if (actualTime - msgStart >= 0.3f) {
+            msgActive = !msgActive;
+            msgStart  = actualTime;
+
+            if (msgActive) {
+                msgCount++;
+            }
+
+            if (msgCount > 10) {
+                msgActive = 0;
+                msgCount  = 0;
+            }
+        }
 
         if (msgActive) {
-            msgCount++;
-        }
+            Rectangle rect = {x, y, SCREEN_WIDTH, 0};
 
-        if (msgCount > 10) {
-            msgActive         = 0;
-            msgCount          = 0;
-            bestLapTimePlayer = NULL;
-            return;
-        }
-    }
+            if (state.mode == SPLITSCREEN) {
+                rect.width  = SCREEN_WIDTH / 2.0f;
+                rect.height = SCREEN_HEIGHT / 4.0f;
+            }
 
-    if (msgActive) {
-        drawTextWithShadow(text, x, y, size, color, FONTS[1]);
+            drawTextCenteredInRect("Melhor Volta", rect, 64, PURPLE, FONTS[1]);
+        }
     }
 }
 
@@ -309,6 +317,7 @@ void drawPlayerHud(Car *player, int x) {
     drawLapTime(player, x + 32, 166);
 
     drawPlayerList(player, x + 32, 220);
+    drawBestLapMessage(x, SCREEN_HEIGHT / 4.0f);
 
     if (state.debug) {
         drawPlayerDebug(player, x + 32, 300);

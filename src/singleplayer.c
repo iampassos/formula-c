@@ -148,13 +148,6 @@ void drawHudSingleplayer() {
     Car *p1 = LinkedList_getCarById(cars, 1);
     drawPlayerHud(p1, 0);
 
-    if (bestLapTimePlayer) {
-        snprintf(strBuffer, sizeof(strBuffer), "Melhor Volta");
-        drawBestLapMessage(SCREEN_WIDTH / 2.0f -
-                               MeasureTextEx(FONTS[1], strBuffer, 64, 1.0f).x / 2.0f,
-                           SCREEN_HEIGHT * 0.5f / 4.0f, 64, PURPLE, strBuffer);
-    }
-
     if (state.debug) {
         drawGhostCarDebug();
     }

@@ -32,17 +32,17 @@ float CAR_VOLUME        = 0.02f;
 //----------------------------------------------------------------------------------
 
 // 🏁 Mapas e Pistas
-Map MAPS[] = {{"Interlagos", //Nome da pista
-               "resources/maps/interlagos_map.png", //Path pista final
-               "resources/masks/interlagos_mask.png", //Path mask pista
-               "resources/minimaps/interlagos_minimap.png", //Path para mini mapa
-               {{4721, 1910}, {4900, 2061}}, //Inicial Spawn Car
-               2.75f, // Cars Spawn angle
-               10, //Quantidade de checkpoint
-               3, //Max laps
-               {    
-                    // Checkpoint Spawn
-                   {{4584, 2078}, 2.73f}, 
+Map MAPS[] = {{"Interlagos",                                // Nome da pista
+               "resources/maps/interlagos_map.png",         // Path pista final
+               "resources/masks/interlagos_mask.png",       // Path mask pista
+               "resources/minimaps/interlagos_minimap.png", // Path para mini mapa
+               {{4721, 1910}, {4900, 2061}},                // Inicial Spawn Car
+               2.75f,                                       // Cars Spawn angle
+               10,                                          // Quantidade de checkpoint
+               3,                                           // Max laps
+               {
+                   // Checkpoint Spawn
+                   {{4584, 2078}, 2.73f},
                    {{1816, 6076}, 1.75f},
                    {{3838, 8251}, 0.0f},
                    {{10380, 8239}, 0.0f},
@@ -120,7 +120,7 @@ char *REFERENCE_DATA_PATH = "./data/references/";
 //----------------------------------------------------------------------------------
 
 int main() {
-    //SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    // SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
 
     SCREEN_WIDTH  = GetScreenWidth();
