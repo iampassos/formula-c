@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-char strBuffer[1000];
+char strBuffer[2000];
 int  MAP_WIDTH;
 int  MAP_HEIGHT;
 

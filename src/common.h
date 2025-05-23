@@ -17,7 +17,7 @@ typedef struct {
     char      *backgroundPath;
     char      *maskPath;
     char      *minimapPath;
-    Vector2    startCarPos[2];
+    Vector2    startCarPos[20];
     float      startAngle;
     int        maxLaps;
     int        checkpointSize;
@@ -122,12 +122,12 @@ extern char *SPEEDOMETER_PATH;
 extern int HUD_OPACITY;
 
 // Fontes
-extern char *FONTS_PATH[];
+extern char FONTS_PATH[][1000];
 extern int   FONTS_N;
 extern Font  FONTS[];
 
 // Buffer auxiliar
-extern char strBuffer[1000];
+extern char strBuffer[2000];
 
 //----------------------------------------------------------------------------------
 // 🛠️ FUNÇÕES UTILITÁRIAS
