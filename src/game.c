@@ -312,7 +312,7 @@ void drawPlayerHud(Car *player, int x) {
 
     drawGameLogo(x + 32, 32);
 
-    DrawRectangle(x + 32, 166, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
+    DrawRectangle(x + 32, 166, hudPlayerListWidth, 48, (Color) {51, 51, 51, HUD_OPACITY});
     drawLaps(player, x + 32, 166);
     drawLapTime(player, x + 32, 166);
 
@@ -325,8 +325,8 @@ void drawPlayerHud(Car *player, int x) {
 }
 
 void drawGameLogo(float x, float y) {
-    DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, 255});
-    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2 - 64, y, WHITE);
+    DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, HUD_OPACITY});
+    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2 - 64, y, (Color) {255, 255, 255, HUD_OPACITY});
 }
 
 void drawLapTime(Car *player, float x, float y) {
@@ -416,7 +416,7 @@ void drawPlayerList(Car *player, float x, float y) {
         bool  isOwn = curr->car->id == player->id;
         float yx    = y + idx * height;
 
-        Color     bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, 255};
+        Color     bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, HUD_OPACITY};
         Rectangle rect    = {x, yx, hudPlayerListWidth, height};
         DrawRectangle(rect.x, rect.y, rect.width, rect.height, bgColor);
 
