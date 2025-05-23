@@ -103,7 +103,7 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->lap             = -1;
     car->vel             = 0;
     car->startLapTime    = GetTime();
-    car->bestLapTime     = -1;
+    car->bestLapTime     = INFINITY;
     car->checkpoint      = CHECKPOINTS_SIZE - 1; // COmeca no ultimo check point
     car->sound           = LoadMusicStream(CAR_SOUND_PATH);
     car->refFrame        = 0;
@@ -237,7 +237,7 @@ static void updateLapStatus(Car *car) {
         double now     = GetTime();
         double lapTime = now - car->startLapTime;
 
-        if ((car->bestLapTime < 0 || lapTime < car->bestLapTime) && car->lap > 0) {
+        if (lapTime < car->bestLapTime && car->lap > 0) {
             car->bestLapTime = lapTime;
         }
 

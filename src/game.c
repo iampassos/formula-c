@@ -19,7 +19,7 @@ int hudPlayerListWidth = 330;
 Vector2 minimapPos;
 
 Car   *bestLapTimePlayer = NULL;
-double bestLapTime       = 0;
+double bestLapTime       = INFINITY;
 double bestLapLastTick   = 0;
 
 // --- Variáveis internas ---
@@ -61,7 +61,7 @@ void Game_load() {
     Map map      = MAPS[state.map];
     loadMap(map);
 
-    bestLapTime       = 0;
+    bestLapTime       = INFINITY;
     bestLapTimePlayer = NULL;
     msgStart          = 0;
     msgActive         = 0;
@@ -119,7 +119,7 @@ static void checkBestLap(Car *player) {
         return;
     }
 
-    if (player->bestLapTime < bestLapTime || bestLapTime == 0) {
+    if (player->bestLapTime < bestLapTime) {
         bestLapTimePlayer = player;
         bestLapLastTick   = GetTime();
         bestLapTime       = player->bestLapTime;

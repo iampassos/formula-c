@@ -6,6 +6,7 @@
 typedef struct {
     Vector2 pos;
     float   angle;
+    double  time;
 } CarFrame;
 
 typedef struct {

@@ -42,6 +42,9 @@ void loadSingleplayer(Map map) {
     currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
     loadBestLap();
+    if (ArrayList_length(bestLap) > 0) {
+        bestLapTime = ArrayList_get(bestLap, ArrayList_length(bestLap) - 1).time;
+    }
 
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
                                WHITE, true, 99, "Melhor Volta");
@@ -93,7 +96,7 @@ static void updateGhostCar(Car *player) {
 }
 
 static void recordLap(Car *player) {
-    CarFrame frameData = {player->pos, player->angle};
+    CarFrame frameData = {player->pos, player->angle, GetTime() - player->startLapTime};
     ArrayList_push(currentLap, frameData);
 }
 
