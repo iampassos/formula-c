@@ -82,8 +82,8 @@ static void updateGhostCar(Car *player) {
         player->changeLapFlag = false;
         replayFrameIdx        = 0;
 
-        if (ArrayList_length(currentLap) < ArrayList_length(bestLap) ||
-            ArrayList_length(bestLap) == 0) {
+        if (ArrayList_length(bestLap) == 0 ||
+            ArrayList_getLast(currentLap).time < ArrayList_getLast(bestLap).time) {
             ArrayList_copy(bestLap, currentLap);
             updateBestLap();
             bestLapTimePlayer = player;
