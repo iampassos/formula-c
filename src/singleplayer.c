@@ -26,6 +26,10 @@ static int    msgCount;
 // --- Funções internas ---
 
 static void updateGhostCar(Car *player);
+static void checkForBestLap(Car *player);
+static void recordLap(Car *player);
+static void showReplayBestLap(Car *player);
+
 static void updateBestLap();
 static void loadBestLap();
 
@@ -86,7 +90,14 @@ void updateSingleplayer() {
 //----------------------------------------------------------------------------------
 
 static void updateGhostCar(Car *player) {
-    Car *ghost = LinkedList_getCarById(cars, 99);
+    checkForBestLap(player);
+    if (player->lap > 0) {
+        recordLap(player);
+        showReplayBestLap(player);
+    }
+}
+
+static void checkForBestLap(Car *player) {
     if (player->lap > lastLap) {
         lastLap        = player->lap;
         replayFrameIdx = 0;
@@ -100,18 +111,19 @@ static void updateGhostCar(Car *player) {
         }
         ArrayList_clear(currentLap);
     }
+}
 
-    if (player->lap >= 0) {
-        // Replay
-        if (replayFrameIdx < ArrayList_length(bestLap)) {
-            CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
-            ghost->pos         = frameData.pos;
-            ghost->angle       = frameData.angle;
-        }
+static void recordLap(Car *player) {
+    CarFrame frameData = {player->pos, player->angle};
+    ArrayList_push(currentLap, frameData);
+}
 
-        // Grava
-        CarFrame frameData = {player->pos, player->angle};
-        ArrayList_push(currentLap, frameData);
+static void showReplayBestLap(Car *player) {
+    Car *ghost = LinkedList_getCarById(cars, 99);
+    if (replayFrameIdx < ArrayList_length(bestLap)) {
+        CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
+        ghost->pos         = frameData.pos;
+        ghost->angle       = frameData.angle;
     }
 }
 

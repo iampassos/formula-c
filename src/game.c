@@ -179,8 +179,13 @@ static void loadMap(Map map) {
     Track_setMask(map.maskPath);
     Track_setCheckpoints(map.checkpoints, map.checkpointSize);
 
+    char referencePath[200];
+    strcpy(referencePath, REFERENCE_DATA_PATH);
+    strcat(referencePath, map.name);
+    strcat(referencePath, "_reference.bin");
+
     ArrayList_clear(referenceLap);
-    FILE *file = fopen(map.referencePath, "rb");
+    FILE *file = fopen(referencePath, "rb");
     if (file != NULL) {
         CarFrame buffer;
         while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {

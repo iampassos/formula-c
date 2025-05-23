@@ -36,7 +36,6 @@ Map MAPS[] = {{"Interlagos",
                "resources/maps/interlagos_map.png",
                "resources/masks/interlagos_mask.png",
                "resources/minimaps/interlagos_minimap.png",
-               "data/references/interlagos_reference.bin",
                {{4721, 1910}, {4900, 2061}},
                2.75f,
                10,
@@ -57,7 +56,6 @@ Map MAPS[] = {{"Interlagos",
                "resources/masks/secret_mask.png",
                "resources/masks/secret_mask.png",
                "resources/masks/secret_mask.png",
-               "",
                {{7329, 1358}, {7329, 1358}},
                3.21f,
                4,
@@ -110,8 +108,11 @@ char *FONTS_PATH[] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Fo
 int  FONTS_N = 3;
 Font FONTS[3];
 
+//----------------------------------------------------------------------------------
 // 📁 Arquivos de Dados
+//----------------------------------------------------------------------------------
 char *GHOST_CAR_DATA_PATH = "./data/best_laps/";
+char *REFERENCE_DATA_PATH = "./data/references/";
 
 //----------------------------------------------------------------------------------
 // Início do jogo

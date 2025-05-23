@@ -17,7 +17,6 @@ typedef struct {
     char      *backgroundPath;
     char      *maskPath;
     char      *minimapPath;
-    char      *referencePath;
     Vector2    startCarPos[2];
     float      startAngle;
     int        checkpointSize;
@@ -78,8 +77,9 @@ extern char GAME_MODES[][100];
 extern int  TOTAL_GAME_MODES;
 extern int  MAX_LAPS;
 
-// Caminho de arquivos de replay
+// 📁 Arquivos de Dados
 extern char *GHOST_CAR_DATA_PATH;
+extern char *REFERENCE_DATA_PATH;
 
 //----------------------------------------------------------------------------------
 // 🔊 ÁUDIO
