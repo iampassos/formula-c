@@ -9,7 +9,7 @@
 // 🎮 Estado e Configurações do Jogo
 State     state              = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON, 0};
 float     CAMERA_SMOOTHNESS  = 0.05;
-int       HUD_OPACITY        = 200;
+int       HUD_OPACITY        = 255;
 CarConfig DEFAULT_CAR_CONFIG = {
     0.1,   // Aceleração
     0.2,   // Força da macha ré
@@ -45,7 +45,7 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                "resources/minimaps/interlagos_minimap.png", // Path para mini mapa
                {{4721, 1910}, {4900, 2061}},                // Inicial Spawn Car
                2.75f,                                       // Cars Spawn angle
-               1,                                           // Max laps
+               3,                                           // Max laps
                10,                                          // Quantidade de checkpoint
                {
                    // Checkpoint Spawn , posição e angulo
@@ -113,11 +113,11 @@ char *LOGO_BG_IMAGE_PATH = "resources/logo/logo_background.png";
 char *LOGO_IMAGE_PATH    = "resources/logo/formula_c-logo.png";
 
 // 🔤 Fontes
-char FONTS_PATH[][1000] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
-                      "resources/fonts/Formula-Black.ttf"};
+char FONTS_PATH[][100] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
+                          "resources/fonts/Formula-Black.ttf"};
 
-int  FONTS_N = sizeof(FONTS_PATH)/sizeof(FONTS_PATH[0]);
-Font FONTS[100];
+int  FONTS_N = sizeof(FONTS_PATH) / sizeof(FONTS_PATH[0]);
+Font FONTS[3];
 
 //----------------------------------------------------------------------------------
 // 📁 Arquivos de Dados
@@ -143,7 +143,7 @@ int main() {
     InitAudioDevice();
 
     for (int i = 0; i < FONTS_N; i++) {
-        FONTS[i] = LoadFontEx(FONTS_PATH[i], 256, 0 , 0);
+        FONTS[i] = LoadFontEx(FONTS_PATH[i], 256, 0, 0);
     }
 
     SetTargetFPS(60);

@@ -51,7 +51,7 @@ void Game_setup() {
     cars         = LinkedList_create();
     referenceLap = ArrayList_create();
     Image temp   = LoadImage(LOGO_BG_IMAGE_PATH);
-    ImageResize(&temp, 128, 128);
+    ImageResize(&temp, 256, 256);
     logoNoBg = LoadTextureFromImage(temp);
     UnloadImage(temp);
 }
@@ -326,7 +326,8 @@ void drawPlayerHud(Car *player, int x) {
 
 void drawGameLogo(float x, float y) {
     DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, HUD_OPACITY});
-    DrawTexture(logoNoBg, x + hudPlayerListWidth / 2 - 64, y, (Color) {255, 255, 255, HUD_OPACITY});
+    DrawTexture(logoNoBg, x + (hudPlayerListWidth - 256) / 2.0f, y - (252 - 128) / 2.0f,
+                (Color) {255, 255, 255, HUD_OPACITY});
 }
 
 void drawLapTime(Car *player, float x, float y) {
@@ -416,8 +417,8 @@ void drawPlayerList(Car *player, float x, float y) {
         bool  isOwn = curr->car->id == player->id;
         float yx    = y + idx * height;
 
-        Color     bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, HUD_OPACITY};
-        Rectangle rect    = {x, yx, hudPlayerListWidth, height};
+        Color bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, HUD_OPACITY};
+        Rectangle rect = {x, yx, hudPlayerListWidth, height};
         DrawRectangle(rect.x, rect.y, rect.width, rect.height, bgColor);
 
         float fontSize = 20;

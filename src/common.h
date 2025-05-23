@@ -122,9 +122,9 @@ extern char *SPEEDOMETER_PATH;
 extern int HUD_OPACITY;
 
 // Fontes
-extern char FONTS_PATH[][1000];
-extern int   FONTS_N;
-extern Font  FONTS[];
+extern char FONTS_PATH[][100];
+extern int  FONTS_N;
+extern Font FONTS[];
 
 // Buffer auxiliar
 extern char strBuffer[2000];
