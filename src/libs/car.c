@@ -96,6 +96,7 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->reverseForce    = config.reverseForce;
     car->color           = color;
     car->ghost           = ghost;
+    car->ghostActive     = false;
     car->maxVelocity     = TRACK_AREAS[0].dragForce / (1 - TRACK_AREAS[0].dragForce) * car->acc;
     car->minTurnSpeed    = car->maxVelocity / 50;
     car->id              = id;

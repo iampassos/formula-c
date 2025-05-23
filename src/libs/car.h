@@ -17,6 +17,7 @@ typedef struct {
     Music     sound;
     Color     color;
     bool      ghost;
+    bool      ghostActive;
     int       width;
     int       height;
     float     angle;

@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// --- Variáveis públicas ---
-
-bool   flagBestLap = 0;
-double bestLapTime = 0;
-
 // --- Variáveis internas ---
 
 static ArrayList *bestLap    = NULL;
@@ -18,10 +13,6 @@ static char ghostCarPath[100];
 
 static int lastLap        = 0;
 static int replayFrameIdx = 0;
-
-static double msgStart;
-static int    msgActive;
-static int    msgCount;
 
 // --- Funções internas ---
 
@@ -41,10 +32,6 @@ static void drawGhostCarDebug();
 //----------------------------------------------------------------------------------
 
 void loadSingleplayer(Map map) {
-    flagBestLap  = false;
-    msgStart     = 0;
-    msgActive    = 0;
-    msgCount     = 0;
     state.status = STARTED;
     minimapPos.x = SCREEN_WIDTH - trackHud.width;
     minimapPos.y = 10;
@@ -106,8 +93,9 @@ static void checkForBestLap(Car *player) {
             ArrayList_length(bestLap) == 0) {
             ArrayList_copy(bestLap, currentLap);
             updateBestLap();
-            flagBestLap = 1;
-            bestLapTime = (ArrayList_length(bestLap) - 1) / 60.0f;
+            flagBestLap                    = 1;
+            bestLapTimePlayer              = player;
+            bestLapTimePlayer->bestLapTime = (ArrayList_length(bestLap) - 1) / 60.0f;
         }
         ArrayList_clear(currentLap);
     }
@@ -124,6 +112,7 @@ static void showReplayBestLap() {
         CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
         ghost->pos         = frameData.pos;
         ghost->angle       = frameData.angle;
+        ghost->ghostActive = true;
     }
 }
 
@@ -183,29 +172,6 @@ void drawHudSingleplayer() {
 //----------------------------------------------------------------------------------
 // Funções complementares para o draw
 //----------------------------------------------------------------------------------
-
-static void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
-    float actualTime = GetTime();
-    if (actualTime - msgStart >= 0.3f) {
-        msgActive = !msgActive;
-        msgStart  = actualTime;
-
-        if (msgActive) {
-            msgCount++;
-        }
-
-        if (msgCount > 3) {
-            msgActive   = 0;
-            msgCount    = 0;
-            flagBestLap = false;
-            return;
-        }
-    }
-
-    if (msgActive) {
-        drawTextWithShadow(text, x, y, size, color, FONTS[1]);
-    }
-}
 
 static void drawGhostCarDebug() {
     sprintf(

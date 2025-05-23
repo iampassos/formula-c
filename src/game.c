@@ -1,9 +1,9 @@
 #include "game.h"
+#include "common.h"
 #include "raylib.h"
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 // --- Variáveis públicas ---
@@ -17,6 +17,10 @@ int hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
 
+bool   flagBestLap       = 0;
+Car   *bestLapTimePlayer = NULL;
+double bestLapTime       = 0;
+
 // --- Variáveis internas ---
 
 static Texture2D  trackBackground;
@@ -24,6 +28,10 @@ static Texture2D  SPEEDOMETER;
 static Texture2D  logoNoBg;
 static ArrayList *referenceLap = NULL;
 static double     last         = 0;
+
+static double msgStart;
+static int    msgActive;
+static int    msgCount;
 
 // --- Funções internas ---
 
@@ -51,6 +59,12 @@ void Game_load() {
     state.screen = GAME;
     Map map      = MAPS[state.map];
     loadMap(map);
+
+    flagBestLap       = false;
+    bestLapTimePlayer = NULL;
+    msgStart          = 0;
+    msgActive         = 0;
+    msgCount          = 0;
 
     switch (state.mode) {
     case SINGLEPLAYER:
@@ -163,8 +177,8 @@ static void loadMap(Map map) {
     state.maxLaps   = map.maxLaps;
     state.raceTime  = GetTime();
     trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
-    MAP_WIDTH = trackBackground.width;
-    MAP_HEIGHT = trackBackground.height;
+    MAP_WIDTH       = trackBackground.width;
+    MAP_HEIGHT      = trackBackground.height;
 
     Image temp = LoadImage(SPEEDOMETER_PATH);
     ImageResize(&temp, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
@@ -240,14 +254,37 @@ void drawHud() {
 // Funções auxiliares para desenhar a hud
 //----------------------------------------------------------------------------------
 
+void drawBestLapMessage(float x, float y, int size, Color color, char *text) {
+    float actualTime = GetTime();
+    if (actualTime - msgStart >= 0.3f) {
+        msgActive = !msgActive;
+        msgStart  = actualTime;
+
+        if (msgActive) {
+            msgCount++;
+        }
+
+        if (msgCount > 10) {
+            msgActive   = 0;
+            msgCount    = 0;
+            flagBestLap = false;
+            return;
+        }
+    }
+
+    if (msgActive) {
+        drawTextWithShadow(text, x, y, size, color, FONTS[1]);
+    }
+}
+
 void drawPlayerHud(Car *player, int x) {
     drawSpeedometer(player, x + 192, SCREEN_HEIGHT - 192);
 
     drawGameLogo(x + 32, 32);
 
     DrawRectangle(x + 32, 166, hudPlayerListWidth, 48, (Color) {51, 51, 51, 255});
-    drawLaps(player, x + 32, 170);
-    drawLapTime(player, x + 32, 174);
+    drawLaps(player, x + 32, 166);
+    drawLapTime(player, x + 32, 166);
 
     drawPlayerList(player, x + 32, 220);
 
@@ -264,20 +301,22 @@ void drawGameLogo(float x, float y) {
 void drawLapTime(Car *player, float x, float y) {
     Color color = WHITE;
 
-    if (flagBestLap) {
-        stringifyTime(strBuffer, bestLapTime, 0);
+    if (flagBestLap && player == bestLapTimePlayer) {
+        stringifyTime(strBuffer, bestLapTimePlayer->bestLapTime, 0);
         color = PURPLE;
     } else {
         stringifyTime(strBuffer, player->lap == -1 ? 0 : GetTime() - player->startLapTime, 0);
 
         if (state.mode == SINGLEPLAYER) {
             Car *ghost = LinkedList_getCarById(cars, 99);
-            color      = ghost->refFrame - player->refFrame > 0 ? RED : GREEN;
+            color =
+                ghost->ghostActive ? ghost->refFrame - player->refFrame > 0 ? RED : GREEN : WHITE;
         }
     }
 
-    drawCenteredText(strBuffer, x + hudPlayerListWidth / 2.0f + 4, y, hudPlayerListWidth / 2.0f, 12,
-                     24, color, FONTS[0]);
+    drawTextCenteredInRect(
+        strBuffer, (Rectangle) {x + hudPlayerListWidth / 2.0f, y, hudPlayerListWidth / 2.0f, 48},
+        24, color, FONTS[0]);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -321,38 +360,57 @@ void drawLaps(Car *player, float x, float y) {
         snprintf(strBuffer, sizeof(strBuffer), "Volta %d/%d", player->lap + 1, state.maxLaps);
     }
 
-    drawCenteredText(strBuffer, x + 4, y, hudPlayerListWidth / 2.0f, 14, 28, WHITE, FONTS[0]);
+    drawTextCenteredInRect(strBuffer, (Rectangle) {x, y, hudPlayerListWidth / 2.0f, 48}, 24, WHITE,
+                           FONTS[0]);
 }
 
 void drawPlayerList(Car *player, float x, float y) {
     stringifyTime(strBuffer, 599.999f, 1);
-    Vector2 referenceSize = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
+    Vector2 lapTimeSize = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
+
+    int height  = 36;
+    int padding = 9;
 
     int   idx  = 0;
     Node *prev = cars->head;
     Node *curr = cars->head;
-    while (curr != NULL) {
-        DrawRectangle(x, y + 32 * idx, hudPlayerListWidth, 32, (Color) {51, 51, 51, 255});
 
-        int     isOwn = curr->car->id == player->id;
-        Vector2 size  = MeasureTextEx(FONTS[isOwn], curr->car->name, 20, 1.0f);
-        float   yx    = y + (idx * size.y);
+    while (curr != NULL) {
+        if (curr->car->ghost && !curr->car->ghostActive) {
+            prev = curr;
+            curr = curr->next;
+            continue;
+        }
+
+        bool  isOwn = curr->car->id == player->id;
+        float yx    = y + idx * height;
+
+        Color bgColor =
+            (flagBestLap && bestLapTimePlayer == curr->car) ? PURPLE : (Color) {51, 51, 51, 255};
+        Rectangle rect = {x, yx, hudPlayerListWidth, height};
+        DrawRectangle(rect.x, rect.y, rect.width, rect.height, bgColor);
+
+        float fontSize = 20;
 
         snprintf(strBuffer, sizeof(strBuffer), "%d", idx + 1);
-        drawCenteredText(strBuffer, x, yx, 36, 20, 20, WHITE, FONTS[isOwn]);
+        DrawTextEx(FONTS[isOwn], strBuffer, (Vector2) {x + padding, yx + (height - fontSize) / 2},
+                   fontSize, 1.0f, WHITE);
 
-        DrawRectangle(x + 36, yx + 12.5f, 2, 15, curr->car->color);
+        DrawRectangle(x + 36, yx + padding + 2.5f, 2, height / 2.5f, curr->car->color);
 
-        DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + 10}, 20, 1.0f, WHITE);
+        DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + (height - fontSize) / 2},
+                   fontSize, 1.0f, WHITE);
 
-        if (curr == cars->head || (curr->car->ghost && curr->car->pos.x == -1000)) {
+        if (idx == 0 || (idx == 0 && curr->next == NULL)) {
             strcpy(strBuffer, "-:--.---");
         } else {
             stringifyTime(strBuffer, (prev->car->refFrame - curr->car->refFrame) / 60.0f, 1);
         }
 
-        drawCenteredText(strBuffer, x + hudPlayerListWidth - referenceSize.x, yx, referenceSize.x,
-                         20, 20, WHITE, FONTS[isOwn]);
+        drawTextCenteredInRect(
+            strBuffer,
+            (Rectangle) {rect.x + rect.width - lapTimeSize.x, yx, lapTimeSize.x + 1, rect.height},
+            fontSize, WHITE, FONTS[isOwn]);
 
         prev = curr;
         curr = curr->next;

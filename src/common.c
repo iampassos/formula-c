@@ -1,5 +1,6 @@
 #include "common.h"
 #include <math.h>
+#include <raylib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -34,11 +35,11 @@ float LerpAngle(float a, float b, float t) { // Interpolando angulo
 // Funções de desenho extras
 //----------------------------------------------------------------------------------
 
-void drawCenteredText(char *text, float x, float y, float width, float heigth, int size,
-                      Color color, Font font) {
-    Vector2 vec = MeasureTextEx(font, text, size, 1.0f);
-    DrawTextEx(font, text, (Vector2) {((x * 2) + width - vec.x) / 2.0f, ((y * 2) + heigth) / 2.0f},
-               size, 1.0f, color);
+void drawTextCenteredInRect(char *text, Rectangle rect, int fontSize, Color color, Font font) {
+    Vector2 textSize = MeasureTextEx(font, text, fontSize, 1.0f);
+    float   textX    = rect.x + (rect.width - textSize.x) / 2.0f;
+    float   textY    = rect.y + (rect.height - textSize.y) / 2.0f;
+    DrawTextEx(font, text, (Vector2) {textX, textY}, fontSize, 1.0f, color);
 }
 
 void drawTextWithShadow(char *text, float x, float y, int size, Color color, Font font) {

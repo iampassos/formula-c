@@ -67,6 +67,7 @@ extern Vector2 minimapPos;
 extern int hudPlayerListWidth;
 
 extern bool   flagBestLap;
+extern Car   *bestLapTimePlayer;
 extern double bestLapTime;
 
 #endif

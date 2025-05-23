@@ -1,11 +1,12 @@
+#include "car.h"
 #include "common.h"
 #include "game.h"
-#include "menu.h"
 #include "raylib.h"
 #include <stdio.h>
 #include <string.h>
 
 // --- Variáveis internas ---
+
 static Car *winner;
 
 static Sound  semaphoreSound;
@@ -15,6 +16,9 @@ static int    count;
 // --- Funções internas ---
 
 static void updateSemaphore();
+
+static void updateExtras(Car *player);
+static void updateBestLap(Car *player);
 static void updateWinner(Car *player);
 
 static void drawSemaphore(float x, float y, int size);
@@ -69,16 +73,37 @@ void updateSplitscreen() {
     Camera_updateTarget(camera2, p2);
     Car_move(p2, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT);
 
-    LinkedList_forEach(cars, updateWinner);
-    LinkedList_forEach(cars, Car_update);
+    LinkedList_forEach(cars, updateExtras);
 
-    if (winner && GetTime() - winner->startLapTime > 3.5f)
+    if (winner && GetTime() - winner->startLapTime > 3.5f) {
         state.status = ENDED;
+    }
 }
 
 //----------------------------------------------------------------------------------
 // Funções complementares para o update
 //----------------------------------------------------------------------------------
+
+static void updateExtras(Car *player) {
+    updateBestLap(player);
+    updateWinner(player);
+    Car_update(player);
+}
+
+static void updateBestLap(Car *player) {
+    if (player->lap < 1) {
+        return;
+    }
+
+    if (!bestLapTimePlayer || player->bestLapTime < bestLapTimePlayer->bestLapTime) {
+        bestLapTimePlayer = player;
+        flagBestLap       = 1;
+        bestLapTime       = GetTime();
+    } else if (GetTime() - bestLapTime >= 3.0f) {
+        bestLapTimePlayer = 0;
+        flagBestLap       = 0;
+    }
+}
 
 static void updateSemaphore() {
     if (count == 4) {
@@ -107,7 +132,6 @@ static void updateWinner(Car *player) {
 //----------------------------------------------------------------------------------
 
 void drawSplitscreen() {
-
     drawView(camera1, (Rectangle) {0, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
     drawView(camera2, (Rectangle) {SCREEN_WIDTH / 2.0f, 0, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT});
 

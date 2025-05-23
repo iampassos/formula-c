@@ -1,0 +1,4 @@
+-Wall
+-std=c99
+-Isrc/libs
+-Isrc
