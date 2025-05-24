@@ -72,9 +72,15 @@ No menu, você deve escolher:
   - `1 Jogador` — corra para bater seu próprio recorde.
   - `2 Jogadores` — corrida dividida para competir contra um amigo.
 
-- **Modo do Jogo:**
-  - `Normal` — modo padrão para jogar.
-  - `Debug` — modo para desenvolvedores, que exibe informações importantes para testes e depuração.
+- **Iniciando**
+  - `Play` — inicia o jogo.
+  - `Debug` — modo para desenvolvedores, que exibe informações importantes para testes e depuração.  
+    **Importante:** você deve deixar esta opção selecionada para depois clicar em `Play`.
+
+- **Mapas**
+  - `Interlagos` — Pista oficial para o jogo.
+  - `Secret` — Pista feita apenas para testa funcionalidade de multiplos mapas 
+  
 
 > ⚠️ O modo **Debug** é indicado apenas para desenvolvedores que queiram verificar detalhes técnicos do jogo.
 
