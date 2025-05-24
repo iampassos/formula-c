@@ -117,11 +117,9 @@ static void updateBestLapCar(Car *player) {
         return;
     }
 
-    if (player->changeLapFlag && player->bestLapTime <= bestLapTimePlayer->bestLapTime) {
+    if (player->changeLapFlag && player->lastLapTime <= bestLapTimePlayer->bestLapTime) {
         bestLapTimePlayer = player;
-        if (player->lastLapTime == player->bestLapTime) {
-            bestLapLastTick = GetTime() + 3;
-        }
+        bestLapLastTick = GetTime() + 3;
     }
 }
 
