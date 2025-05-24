@@ -16,7 +16,7 @@ int SCREEN_HEIGHT;
 // Funções extras das structs da raylib
 //----------------------------------------------------------------------------------
 
-bool Color_equals(Color a, Color b) { // Verifica se uma cor é igual a outra
+bool Color_equals(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 

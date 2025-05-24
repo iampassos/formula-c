@@ -47,8 +47,15 @@ Antes de seguir o guia oficial, tente o método mais simples:
 
 ```bash
 sudo apt update
+
+sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev 
+libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev 
+libxkbcommon-dev
+
+
 sudo apt install libraylib-dev
 ```
+
 
 Se precisar, aqui está o guia oficial:  
 👉 [Raylib no GNU/Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
@@ -70,7 +77,6 @@ Dentro da pasta do projeto:
 
 #### 🔸 macOS
 ```bash
-make run
 ```
 
 #### 🔸 Linux
