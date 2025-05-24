@@ -24,19 +24,10 @@ A tela é dividida em dois (**split screen**) e ambos os jogadores competem entr
 
 ## 🛠️ Compilando
 
+
 ### ✅ Instale a Raylib
 
-### 1. Clone o repositório do projeto
-
-```bash
-git clone https://github.com/iampassos/formula-c.git
-```
-
 #### 🔸 macOS
-Siga o guia oficial:  
-👉 [Raylib no macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
-
-**Dica para usúario MacOs**:
 
 Antes de seguir o guia oficial, tente o método mais simples:
 
@@ -44,22 +35,45 @@ Antes de seguir o guia oficial, tente o método mais simples:
 brew install raylib
 ```
 
-```bash
-make && ./game
-```
+Se não funcionar, siga o guia oficial:  
+👉 [Raylib no macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
+
+---
 
 #### 🔸 Linux
-Siga o guia oficial da Raylib:  
-👉 [Raylib no GNU/Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
 
 **Dica para usuários Ubuntu**:  
 Antes de seguir o guia oficial, tente o método mais simples:
+
 ```bash
 sudo apt update
 sudo apt install libraylib-dev
 ```
-Agora va para o repositorio do jogo e rode make 
 
+Se precisar, aqui está o guia oficial:  
+👉 [Raylib no GNU/Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
+
+---
+
+### 📥 Clone o repositório do projeto
+
+```bash
+git clone https://github.com/iampassos/formula-c.git
+cd formula-c
+```
+
+---
+
+### ▶️ Compile e execute o jogo
+
+Dentro da pasta do projeto:
+
+#### 🔸 macOS
+```bash
+make run
+```
+
+#### 🔸 Linux
 ```bash
 make && ./game
 ```
