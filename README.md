@@ -22,9 +22,41 @@ O jogador compete contra si mesmo tentando fazer a volta mais rápida. Um **ghos
 A tela é dividida em dois (**split screen**) e ambos os jogadores competem entre si. Vence quem completar **3 voltas** primeiro.
 
 
- ## 🛠️ Compilando
+## 🛠️ Compilando
 
- aaaaa
+### ✅ Instale a Raylib
+
+#### 🔸 macOS
+Siga o guia oficial:  
+👉 [Raylib no macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
+
+**Dica para usúario MacOs**:
+
+Antes de seguir o guia oficial, tente o método mais simples:
+
+```bash
+brew install raylib
+```
+
+```bash
+make && ./game
+```
+
+#### 🔸 Linux
+Siga o guia oficial da Raylib:  
+👉 [Raylib no GNU/Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
+
+**Dica para usuários Ubuntu**:  
+Antes de seguir o guia oficial, tente o método mais simples:
+```bash
+sudo apt update
+sudo apt install libraylib-dev
+```
+Agora va para o repositorio do jogo e rode make 
+
+```bash
+make && ./game
+```
 
 ## 🎛️ Menu de Seleção
 
@@ -100,7 +132,7 @@ Cada carro possui um **sensor invisível ao jogador**, que lê a cor da área po
 
 ## 📊 Slides de apresentação
 
-
+- [**Slides**](https://docs.google.com/presentation/d/1I73oBbLhpJ_45BVkZh4jfdOzE3cGd_-ptOJ7pIYKsCM/edit?usp=sharing)
 
 ## 🧐 Curiosidade
 

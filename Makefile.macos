@@ -1,0 +1,17 @@
+CC = gcc
+CFLAGS = -Wall -std=c99 -Isrc/libs -Isrc $(shell pkg-config --cflags raylib)
+LDFLAGS = $(shell pkg-config --libs raylib)
+
+SRC := $(wildcard src/*.c src/libs/*.c)
+OUT := game
+
+all: $(OUT)
+
+$(OUT): $(SRC)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+run: $(OUT)
+	./$(OUT)
+
+clean:
+	rm -f $(OUT)
