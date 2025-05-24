@@ -26,6 +26,12 @@ A tela é dividida em dois (**split screen**) e ambos os jogadores competem entr
 
 ### ✅ Instale a Raylib
 
+### 1. Clone o repositório do projeto
+
+```bash
+git clone https://github.com/iampassos/formula-c.git
+```
+
 #### 🔸 macOS
 Siga o guia oficial:  
 👉 [Raylib no macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
