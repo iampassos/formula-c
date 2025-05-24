@@ -2,6 +2,7 @@
 #include "common.h"
 #include "game.h"
 #include "raylib.h"
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -83,6 +84,7 @@ static void updateGhostCar(Car *player) {
         }
         ArrayList_clear(currentLap);
     }
+
     if (player->lap >= 0) {
         showReplayBestLap();
         recordLap(player);
@@ -101,6 +103,8 @@ static void showReplayBestLap() {
         CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
         ghost->pos         = frameData.pos;
         ghost->angle       = frameData.angle;
+    } else {
+        ghost->pos = (Vector2) {-1000, -1000};
     }
 }
 
@@ -119,7 +123,8 @@ static void loadBestLapFile(Car *ghost) {
             ArrayList_push(bestLap, buffer);
         }
         fclose(file);
-        ghost->bestLapTime = ArrayList_getLast(bestLap).time;
+        ghost->bestLapTime =
+            ArrayList_length(bestLap) > 0 ? ArrayList_getLast(bestLap).time : INFINITY;
     }
 }
 
@@ -159,10 +164,10 @@ void drawHudSingleplayer() {
 
 static void drawGhostCarDebug() {
     sprintf(strBuffer,
-            "Ghost car debug\nRecording i: %u\nPlayback i: %u\n\nCurrent lap debug\nRecording i: "
-            "%u\nLastLapTime: %.2f\n",
-            ArrayList_length(bestLap), replayFrameIdx, ArrayList_length(currentLap),
-            ArrayList_getLast(bestLap).time);
+            "Ghost car debug\nRecording i: %u\nPlayback i: %u\nTotalLapTime: %.2f\n\nCurrent lap "
+            "debug\nRecording i: %u",
+            ArrayList_length(bestLap), replayFrameIdx, ArrayList_getLast(bestLap).time,
+            ArrayList_length(currentLap));
 
     Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(SCREEN_WIDTH - size.x - 10, 500, size.x + 10, size.y + 10,

@@ -17,7 +17,8 @@ Camera2D *camera2;
 int hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
-Car    *bestLapTimePlayer;
+
+Car *bestLapTimePlayer;
 
 // --- Variáveis internas ---
 
@@ -112,12 +113,15 @@ void Game_update() {
 //----------------------------------------------------------------------------------
 
 static void updateBestLapCar(Car *player) {
-    if (player->lap < 1)
+    if (player->lap < 1) {
         return;
+    }
+
     if (player->changeLapFlag && player->bestLapTime <= bestLapTimePlayer->bestLapTime) {
         bestLapTimePlayer = player;
-        if (player->lastLapTime == player->bestLapTime)
+        if (player->lastLapTime == player->bestLapTime) {
             bestLapLastTick = GetTime() + 3;
+        }
     }
 }
 
@@ -265,8 +269,11 @@ void drawHud() {
 
 void drawBestLapMessage(float x, float y) {
     float actualTime = GetTime();
-    if (bestLapLastTick < actualTime)
+
+    if (bestLapLastTick < actualTime) {
         return;
+    }
+
     if (actualTime - msgStart >= 0.3f) {
         msgActive = !msgActive;
         msgStart  = actualTime;
@@ -319,8 +326,7 @@ void drawGameLogo(float x, float y) {
 void drawLapTime(Car *player, float x, float y) {
     Color color = WHITE;
 
-    double actualTime = GetTime();
-    if (actualTime < bestLapLastTick) {
+    if (GetTime() < bestLapLastTick) {
         stringifyTime(strBuffer, bestLapTimePlayer->bestLapTime, 0);
         color = PURPLE;
     } else {
@@ -466,15 +472,15 @@ void drawPlayerDebug(Car *player, int x, int y) {
              "Drag Force: %.3f\n"
              "Reverse Force: %.2f\n"
              "Reference Frame i: %d\n"
-             "BestLapTime: %.2f\n"
              "Lap Flag: %d\n"
-             "Last Lap Time: %.2f\n",
+             "Last Lap Time: %.2f\n"
+             "GameBestLapTime: %.2f",
              player->id, player->lap, player->startLapTime, GetTime() - player->startLapTime,
              player->bestLapTime, player->checkpoint, player->pos.x, player->pos.y, player->vel,
              player->maxVelocity, player->acc, player->width, player->height,
              fmod(player->angle, 2 * PI), player->angularSpeed, player->minTurnSpeed,
              player->breakForce, player->dragForce, player->reverseForce, player->refFrame,
-             bestLapTimePlayer->bestLapTime, player->changeLapFlag, player->lastLapTime);
+             player->changeLapFlag, player->lastLapTime, bestLapTimePlayer->bestLapTime);
 
     Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(x, y, size.x + 10, size.y + 10, (Color) {196, 196, 196, 200});

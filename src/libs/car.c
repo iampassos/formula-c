@@ -167,7 +167,8 @@ void Car_move(Car *car, int up, int down, int right, int left) {
 //----------------------------------------------------------------------------------
 
 void Car_draw(Car *car) {
-    if (car->ghost && !car->ghostActive) return;
+    if (car->ghost && !car->ghostActive)
+        return;
     // Retangulo da imagem do carro
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height};
 
