@@ -13,13 +13,13 @@ O jogo foi desenvolvido em **C** utilizando a biblioteca gráfica **Raylib**
 - [**João Passos**](https://github.com/iampassos)
 - [**Mircio Ferreira**](https://github.com/Mircio-Ferreira)
 
-## 🎮 Modos de Jogo
+## 🎬 Vídeo demostrativo
 
-### 🧍‍♂️ Modo 1 Jogador  
-O jogador compete contra si mesmo tentando fazer a volta mais rápida. Um **ghost car** (carro fantasma) representa o melhor tempo já feito, servindo como referência durante a corrida.
+- [**Link para o video no youtube**](https://www.youtube.com/watch?v=fjHUECffkyQ)
 
-### 👥 Modo 2 Jogadores  
-A tela é dividida em dois (**split screen**) e ambos os jogadores competem entre si. Vence quem completar **3 voltas** primeiro.
+## 📊 Slides de apresentação
+
+- [**Slides**](https://docs.google.com/presentation/d/1I73oBbLhpJ_45BVkZh4jfdOzE3cGd_-ptOJ7pIYKsCM/edit?usp=sharing)
 
 
 ## 🛠️ Compilando
@@ -80,6 +80,16 @@ Dentro da pasta do projeto: (formua-c)
 make && ./game
 ```
 
+## 🎮 Modos de Jogo
+
+### 🧍‍♂️ Modo 1 Jogador  
+O jogador compete contra si mesmo tentando fazer a volta mais rápida. Um **ghost car** (carro fantasma) representa o melhor tempo já feito, servindo como referência durante a corrida.
+
+### 👥 Modo 2 Jogadores  
+A tela é dividida em dois (**split screen**) e ambos os jogadores competem entre si. Vence quem completar **3 voltas** primeiro.
+
+
+
 ## 🎛️ Menu de Seleção
 
 No menu, você deve escolher:
@@ -126,14 +136,6 @@ No menu, você deve escolher:
 - Caso saia da pista e entre na área de escape, seu carro será penalizado, perdendo muita velocidade.
 > ⚠️ Caso saia desmaciadamente da pista o carro sera teleportado para o ultimo checkpoint.
 
-
-
-
-## 🎬 Vídeo demostrativo
-
-- [**Link para o video no youtube**](https://www.youtube.com/watch?v=fjHUECffkyQ)
-
-
 ## 🧠 Detalhes Extras da Jogabilidade
 
 A colisão é baseada em **detecção de cores**. Se você selecionar a opção de **modo debug**, poderá visualizar a **malha de cores da pista** e entender exatamente onde estão localizadas as diferentes zonas do jogo.
@@ -161,10 +163,6 @@ Cada carro possui um **sensor invisível ao jogador**, que lê a cor da área po
 - Indicam **checkpoints** na pista de corrida.
 - Sempre que o carro cruza um checkpoint, esse ponto é **salvo**.
 - Se o carro sair demasiadamente da pista, ele é **reposicionado no último checkpoint cruzado**.
-
-## 📊 Slides de apresentação
-
-- [**Slides**](https://docs.google.com/presentation/d/1I73oBbLhpJ_45BVkZh4jfdOzE3cGd_-ptOJ7pIYKsCM/edit?usp=sharing)
 
 ## 🧐 Curiosidade
 
