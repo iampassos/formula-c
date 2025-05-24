@@ -34,6 +34,7 @@ Antes de seguir o guia oficial, tente o método mais simples:
 ```bash
 brew install raylib
 ```
+> ⚠️ **O jogo não foi testado no sistema Mac, por tanto pode existir problemas de compilação**
 
 Se não funcionar, siga o guia oficial:  
 👉 [Raylib no macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
@@ -129,6 +130,8 @@ No menu, você deve escolher:
 
 
 ## 🎬 Vídeo demostrativo
+
+- [**Link para o video no youtube**](https://www.youtube.com/watch?v=fjHUECffkyQ)
 
 
 ## 🧠 Detalhes Extras da Jogabilidade
