@@ -37,7 +37,6 @@ void drawBestLapMessage(float x, float y);
 //----------------------------------------------------------------------------------
 
 void loadSingleplayer(Map map);
-void updateBestLapFile();
 void updateSingleplayer();
 void drawSingleplayer();
 void drawHudSingleplayer();
@@ -68,8 +67,6 @@ extern Vector2 minimapPos;
 
 extern int hudPlayerListWidth;
 
-extern Car   *bestLapTimePlayer;
-extern double bestLapTime;
-extern double bestLapLastTick;
+extern Car* bestLapTimePlayer;
 
 #endif

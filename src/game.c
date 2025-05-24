@@ -17,12 +17,11 @@ Camera2D *camera2;
 int hudPlayerListWidth = 330;
 
 Vector2 minimapPos;
-
-Car   *bestLapTimePlayer = NULL;
-double bestLapTime       = INFINITY;
-double bestLapLastTick   = 0;
+Car    *bestLapTimePlayer;
 
 // --- Variáveis internas ---
+
+static double bestLapLastTick = 0;
 
 static Texture2D  trackBackground;
 static Texture2D  SPEEDOMETER;
@@ -39,7 +38,7 @@ static int    msgCount;
 static void drawHud();
 static void loadMap(Map map);
 static void mapCleanup();
-static void updateBestLap();
+static void updateBestLapCar(Car *player);
 static void updateCarRanking();
 static void updateCarReference(Car *car);
 
@@ -61,11 +60,9 @@ void Game_load() {
     Map map      = MAPS[state.map];
     loadMap(map);
 
-    bestLapTime       = INFINITY;
-    bestLapTimePlayer = NULL;
-    msgStart          = 0;
-    msgActive         = 0;
-    msgCount          = 0;
+    msgStart  = 0;
+    msgActive = 0;
+    msgCount  = 0;
 
     switch (state.mode) {
     case SINGLEPLAYER:
@@ -97,8 +94,8 @@ void Game_update() {
         return;
     }
 
-    updateBestLap();
     updateCarRanking();
+    LinkedList_forEach(cars, updateBestLapCar);
 
     switch (state.mode) {
     case SINGLEPLAYER:
@@ -114,29 +111,14 @@ void Game_update() {
 // Funções complementares para o update
 //----------------------------------------------------------------------------------
 
-static void checkBestLap(Car *player) {
-    if (player->lap < 1 || !player->changeLapFlag) {
+static void updateBestLapCar(Car *player) {
+    if (player->lap < 1)
         return;
-    }
-
-    if (player->bestLapTime < bestLapTime) {
+    if (player->changeLapFlag && player->bestLapTime <= bestLapTimePlayer->bestLapTime) {
         bestLapTimePlayer = player;
-        bestLapLastTick   = GetTime();
-        bestLapTime       = player->bestLapTime;
-
-        if (state.mode == SINGLEPLAYER) {
-            updateBestLapFile();
-        }
+        if (player->lastLapTime == player->bestLapTime)
+            bestLapLastTick = GetTime() + 3;
     }
-}
-
-static void updateBestLap() {
-    if (bestLapTimePlayer && GetTime() - bestLapLastTick >= 3.0f) {
-        bestLapTimePlayer->changeLapFlag = false;
-        bestLapTimePlayer                = NULL;
-    }
-
-    LinkedList_forEach(cars, checkBestLap);
 }
 
 static float cmp(Car *a, Car *b) {
@@ -282,32 +264,32 @@ void drawHud() {
 //----------------------------------------------------------------------------------
 
 void drawBestLapMessage(float x, float y) {
-    if (bestLapTimePlayer) {
-        float actualTime = GetTime();
-        if (actualTime - msgStart >= 0.3f) {
-            msgActive = !msgActive;
-            msgStart  = actualTime;
-
-            if (msgActive) {
-                msgCount++;
-            }
-
-            if (msgCount > 10) {
-                msgActive = 0;
-                msgCount  = 0;
-            }
-        }
+    float actualTime = GetTime();
+    if (bestLapLastTick < actualTime)
+        return;
+    if (actualTime - msgStart >= 0.3f) {
+        msgActive = !msgActive;
+        msgStart  = actualTime;
 
         if (msgActive) {
-            Rectangle rect = {x, y, SCREEN_WIDTH, 0};
-
-            if (state.mode == SPLITSCREEN) {
-                rect.width  = SCREEN_WIDTH / 2.0f;
-                rect.height = SCREEN_HEIGHT / 4.0f;
-            }
-
-            drawTextCenteredInRect("Melhor Volta", rect, 64, PURPLE, FONTS[1]);
+            msgCount++;
         }
+
+        if (msgCount > 10) {
+            msgActive = 0;
+            msgCount  = 0;
+        }
+    }
+
+    if (msgActive) {
+        Rectangle rect = {x, y, SCREEN_WIDTH, 0};
+
+        if (state.mode == SPLITSCREEN) {
+            rect.width  = SCREEN_WIDTH / 2.0f;
+            rect.height = SCREEN_HEIGHT / 4.0f;
+        }
+
+        drawTextCenteredInRect("Melhor Volta", rect, 64, PURPLE, FONTS[1]);
     }
 }
 
@@ -337,7 +319,8 @@ void drawGameLogo(float x, float y) {
 void drawLapTime(Car *player, float x, float y) {
     Color color = WHITE;
 
-    if (player == bestLapTimePlayer) {
+    double actualTime = GetTime();
+    if (actualTime < bestLapLastTick) {
         stringifyTime(strBuffer, bestLapTimePlayer->bestLapTime, 0);
         color = PURPLE;
     } else {
@@ -411,6 +394,8 @@ void drawPlayerList(Car *player, float x, float y) {
     Node *prev = cars->head;
     Node *curr = cars->head;
 
+    double actualTime = GetTime();
+
     while (curr != NULL) {
         if (curr->car->ghost && !curr->car->ghostActive) {
             prev = curr;
@@ -421,8 +406,10 @@ void drawPlayerList(Car *player, float x, float y) {
         bool  isOwn = curr->car->id == player->id;
         float yx    = y + idx * height;
 
-        Color bgColor = bestLapTimePlayer == curr->car ? PURPLE : (Color) {51, 51, 51, HUD_OPACITY};
-        Rectangle rect = {x, yx, hudPlayerListWidth, height};
+        Color     bgColor = bestLapTimePlayer == curr->car && bestLapLastTick > actualTime
+                                ? PURPLE
+                                : (Color) {51, 51, 51, HUD_OPACITY};
+        Rectangle rect    = {x, yx, hudPlayerListWidth, height};
         DrawRectangle(rect.x, rect.y, rect.width, rect.height, bgColor);
 
         float fontSize = 20;
@@ -479,13 +466,15 @@ void drawPlayerDebug(Car *player, int x, int y) {
              "Drag Force: %.3f\n"
              "Reverse Force: %.2f\n"
              "Reference Frame i: %d\n"
-             "Game best lap: %.3f",
+             "BestLapTime: %.2f\n"
+             "Lap Flag: %d\n"
+             "Last Lap Time: %.2f\n",
              player->id, player->lap, player->startLapTime, GetTime() - player->startLapTime,
              player->bestLapTime, player->checkpoint, player->pos.x, player->pos.y, player->vel,
              player->maxVelocity, player->acc, player->width, player->height,
              fmod(player->angle, 2 * PI), player->angularSpeed, player->minTurnSpeed,
              player->breakForce, player->dragForce, player->reverseForce, player->refFrame,
-             bestLapTime);
+             bestLapTimePlayer->bestLapTime, player->changeLapFlag, player->lastLapTime);
 
     Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(x, y, size.x + 10, size.y + 10, (Color) {196, 196, 196, 200});

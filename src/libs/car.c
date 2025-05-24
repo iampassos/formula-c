@@ -104,6 +104,7 @@ Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *textureP
     car->vel             = 0;
     car->startLapTime    = GetTime();
     car->bestLapTime     = INFINITY;
+    car->lastLapTime     = INFINITY;
     car->checkpoint      = CHECKPOINTS_SIZE - 1; // COmeca no ultimo check point
     car->sound           = LoadMusicStream(CAR_SOUND_PATH);
     car->refFrame        = 0;
@@ -166,7 +167,7 @@ void Car_move(Car *car, int up, int down, int right, int left) {
 //----------------------------------------------------------------------------------
 
 void Car_draw(Car *car) {
-
+    if (car->ghost && !car->ghostActive) return;
     // Retangulo da imagem do carro
     Rectangle sourceRec = {0, 0, car->texture.width, car->texture.height};
 
@@ -223,7 +224,8 @@ static void returnIfIsOutside(Car *car) {
 
 // Verifica se passou por um checkpoint e atualiza tempos do carro
 static void updateLapStatus(Car *car) {
-    int nextExpected = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
+    car->changeLapFlag = false;
+    int nextExpected   = (car->checkpoint + 1) % CHECKPOINTS_SIZE;
 
     if (!isValidCheckpoint(car, nextExpected, car->floorColor))
         return;
@@ -234,11 +236,13 @@ static void updateLapStatus(Car *car) {
         car->changeLapFlag = true;
         car->lap++;
 
-        double now     = GetTime();
-        double lapTime = now - car->startLapTime;
+        double now = GetTime();
+        if (car->lap > 0) {
+            car->lastLapTime = now - car->startLapTime;
 
-        if (lapTime < car->bestLapTime && car->lap > 0) {
-            car->bestLapTime = lapTime;
+            if (car->lastLapTime < car->bestLapTime) {
+                car->bestLapTime = car->lastLapTime;
+            }
         }
 
         car->startLapTime = now;

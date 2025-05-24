@@ -45,6 +45,8 @@ void loadSplitscreen(Map map) {
     LinkedList_addCar(cars, p1);
     LinkedList_addCar(cars, p2);
 
+    bestLapTimePlayer = p1;
+
     Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
 
     camera1 =

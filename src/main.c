@@ -9,7 +9,7 @@
 // 🎮 Estado e Configurações do Jogo
 State     state              = {SINGLEPLAYER, MENU, false, INTERLAGOS, FIRST_PERSON, 0};
 float     CAMERA_SMOOTHNESS  = 0.05;
-int       HUD_OPACITY        = 255;
+int       HUD_OPACITY        = 200;
 CarConfig DEFAULT_CAR_CONFIG = {
     0.1,   // Aceleração
     0.2,   // Força da macha ré

@@ -8,6 +8,7 @@ typedef struct {
     int       id;
     int       lap;
     double    startLapTime;
+    double    lastLapTime;
     double    bestLapTime;
     int       checkpoint;
     Vector2   pos;

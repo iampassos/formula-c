@@ -20,7 +20,8 @@ static void updateGhostCar(Car *player);
 static void recordLap(Car *player);
 static void showReplayBestLap();
 
-static void loadBestLapFile();
+static void loadBestLapFile(Car *ghost);
+static void saveBestLapFile();
 
 static void drawGhostCarDebug();
 
@@ -40,16 +41,14 @@ void loadSingleplayer(Map map) {
     replayFrameIdx = 0;
     currentLap     = ArrayList_create();
     bestLap        = ArrayList_create();
-    loadBestLapFile();
-
-    if (ArrayList_length(bestLap) > 0) {
-        bestLapTime = ArrayList_getLast(bestLap).time;
-    }
 
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
                                WHITE, true, 99, "Melhor Volta");
     Car *player   = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG,
                                CAR_IMAGES_PATH[0], WHITE, false, 1, "Player 1");
+
+    bestLapTimePlayer = ghostCar;
+    loadBestLapFile(ghostCar);
 
     LinkedList_addCar(cars, ghostCar);
     LinkedList_addCar(cars, player);
@@ -78,11 +77,12 @@ void updateSingleplayer() {
 
 static void updateGhostCar(Car *player) {
     if (player->changeLapFlag) {
-        player->changeLapFlag = false;
-        replayFrameIdx        = 0;
+        replayFrameIdx = 0;
+        if (player->lastLapTime <= bestLapTimePlayer->bestLapTime && player->lap > 0) {
+            saveBestLapFile();
+        }
         ArrayList_clear(currentLap);
     }
-
     if (player->lap >= 0) {
         showReplayBestLap();
         recordLap(player);
@@ -95,20 +95,21 @@ static void recordLap(Car *player) {
 }
 
 static void showReplayBestLap() {
-    Car *ghost = LinkedList_getCarById(cars, 99);
-    if (replayFrameIdx < ArrayList_length(bestLap)) {
+    Car *ghost         = LinkedList_getCarById(cars, 99);
+    ghost->ghostActive = replayFrameIdx < ArrayList_length(bestLap);
+    if (ghost->ghostActive) {
         CarFrame frameData = ArrayList_get(bestLap, replayFrameIdx++);
         ghost->pos         = frameData.pos;
         ghost->angle       = frameData.angle;
-        ghost->ghostActive = true;
     }
 }
 
-static void loadBestLapFile() {
+static void loadBestLapFile(Car *ghost) {
     FILE *file = fopen(ghostCarPath, "rb");
 
     if (!file) {
         file = fopen(ghostCarPath, "wb");
+        return;
     }
 
     file = fopen(ghostCarPath, "rb");
@@ -118,10 +119,11 @@ static void loadBestLapFile() {
             ArrayList_push(bestLap, buffer);
         }
         fclose(file);
+        ghost->bestLapTime = ArrayList_getLast(bestLap).time;
     }
 }
 
-void updateBestLapFile() {
+static void saveBestLapFile() {
     FILE *file = fopen(ghostCarPath, "wb");
     if (file != NULL) {
         ArrayList_copy(bestLap, currentLap);
@@ -156,10 +158,11 @@ void drawHudSingleplayer() {
 //----------------------------------------------------------------------------------
 
 static void drawGhostCarDebug() {
-    sprintf(
-        strBuffer,
-        "Ghost car debug\nRecording i: %u\nPlayback i: %u\n\nCurrent lap debug\nRecording i: %u",
-        ArrayList_length(bestLap), replayFrameIdx, ArrayList_length(currentLap));
+    sprintf(strBuffer,
+            "Ghost car debug\nRecording i: %u\nPlayback i: %u\n\nCurrent lap debug\nRecording i: "
+            "%u\nLastLapTime: %.2f\n",
+            ArrayList_length(bestLap), replayFrameIdx, ArrayList_length(currentLap),
+            ArrayList_getLast(bestLap).time);
 
     Vector2 size = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
     DrawRectangle(SCREEN_WIDTH - size.x - 10, 500, size.x + 10, size.y + 10,
