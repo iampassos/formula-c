@@ -73,13 +73,8 @@ cd formula-c
 
 ### ▶️ Compile e execute o jogo
 
-Dentro da pasta do projeto:
+Dentro da pasta do projeto: (formua-c)
 
-#### 🔸 macOS
-```bash
-```
-
-#### 🔸 Linux
 ```bash
 make && ./game
 ```
@@ -96,6 +91,8 @@ No menu, você deve escolher:
   - `Play` — inicia o jogo.
   - `Debug` — modo para desenvolvedores, que exibe informações importantes para testes e depuração.  
     **Importante:** você deve deixar esta opção selecionada para depois clicar em `Play`.
+  - `Comando q` — ao estar dentro de um mapa, ao clicar na telca **q** o jogo ira retorna para o menu de opções. 
+
 
 - **Mapas**
   - `Interlagos` — Pista oficial para o jogo.
