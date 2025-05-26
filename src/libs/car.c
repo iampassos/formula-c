@@ -1,4 +1,5 @@
 #include "car.h"
+#include "controller.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdlib.h>
@@ -28,9 +29,6 @@ void Car_free(Car *car); // Libera a memória de um carro
 void Car_update(Car *car); // Atualizar a posição do carro a cada frame
 void Car_draw(Car *car);   // Desenhar o carro na tela
 
-void Car_move(Car *car, int up, int down, int right,
-              int left); // Atualiza o carro de acordo com os inputs do usuário
-
 // --- Funções internas ---
 static void updateFloorColor(Car *car);
 
@@ -46,9 +44,9 @@ static bool canTurn(Car *car);
 static void turn(Car *car, float angle);
 static void turnLeft(Car *car);
 static void turnRight(Car *car);
-static void breakSpeed(Car *car);
+static void breakSpeed(Car *car, float force);
 static void reverse(Car *car);
-static void accelerate(Car *car);
+static void accelerate(Car *car, float force);
 
 //----------------------------------------------------------------------------------
 // Carregamento da pista e checkpoints
@@ -138,26 +136,35 @@ void Car_update(Car *car) {
 }
 
 // Atualiza as propriedades do carro de acordo com o input do player
-void Car_move(Car *car, int up, int down, int right, int left) {
+void Car_move(Car *car, int up, int down, int right, int left, SDL_GameController *controller) {
     if (car == NULL)
         return;
-    if (IsKeyDown(up)) {
-        accelerate(car);
+
+    SDL_GameControllerUpdate();
+    ControllerInput input = Controller_input(controller);
+
+    if (IsKeyDown(up) || fabs(input.rt) > 0.10f) {
+        accelerate(car, controller ? input.rt : 1.0f);
     }
+
     if (canTurn(car)) {
-        if (IsKeyDown(left)) {
-            turnLeft(car);
-        }
-        if (IsKeyDown(right)) {
-            turnRight(car);
+        if (controller && fabs(input.leftAxis.x) > 0.1f) {
+            turn(car, input.leftAxis.x * car->angularSpeed);
+        } else {
+            if (IsKeyDown(left)) {
+                turnLeft(car);
+            }
+            if (IsKeyDown(right)) {
+                turnRight(car);
+            }
         }
     }
 
-    if (IsKeyDown(down)) {
+    if (IsKeyDown(down) || fabs(input.lt) > 0.10f) {
         if (car->vel < car->minTurnSpeed) {
             reverse(car);
         } else {
-            breakSpeed(car);
+            breakSpeed(car, controller ? input.lt : 1.0f);
         }
     }
 }
@@ -274,8 +281,12 @@ static void applyMovementPhysics(Car *car) {
 // Funções de alteração das propriedades físicas do carro
 //----------------------------------------------------------------------------------
 
-static void accelerate(Car *car) { // Acelera o carro
-    car->vel += car->acc;
+static void accelerate(Car *car, float force) { // Acelera o carro
+    car->vel += car->acc * force;
+}
+
+static void breakSpeed(Car *car, float force) { // Freiar
+    car->vel *= 1.0f - (1.0f - car->breakForce) * force;
 }
 
 // Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
@@ -301,10 +312,6 @@ static void turnLeft(Car *car) { // Virar para a esquerda
 
 static void turnRight(Car *car) { // Virar para a direita
     turn(car, car->angularSpeed);
-}
-
-static void breakSpeed(Car *car) { // Freiar
-    car->vel *= car->breakForce;
 }
 
 static void reverse(Car *car) { // Marcha ré

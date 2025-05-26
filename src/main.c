@@ -1,4 +1,5 @@
 #include "common.h"
+#include "controller.h"
 #include "game.h"
 #include "menu.h"
 
@@ -18,6 +19,9 @@ CarConfig DEFAULT_CAR_CONFIG = {
     150,   // Largura carro
     75     // Comprimento do carro
 };
+
+SDL_GameController *controllers[2];
+int                 controllers_n = 0;
 
 //----------------------------------------------------------------------------------
 // 🔊 ÁUDIO
@@ -150,6 +154,8 @@ int main() {
 
     Menu_setup(Game_load);
     Game_setup();
+
+    Controllers_init(controllers, &controllers_n);
 
     while (!WindowShouldClose()) {
         switch (state.screen) {

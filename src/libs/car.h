@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "raylib.h"
+#include <SDL2/SDL.h>
 
 typedef struct {
     int       id;
@@ -56,7 +57,6 @@ void Car_free(Car *car); // Libera a memória de um carro
 void Car_update(Car *car); // Atualizar a posição do carro a cada frame
 void Car_draw(Car *car);   // Desenhar o carro na tela
 
-void Car_move(Car *car, int up, int down, int right,
-              int left); // Atualiza o carro de acordo com os inputs do usuário
+void Car_move(Car *car, int up, int down, int right, int left, SDL_GameController *controller);
 
 #endif

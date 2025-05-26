@@ -11,7 +11,7 @@ else ifeq ($(UNAME_S),Linux)
     CC = gcc
     CFLAGS = -Wall -std=c99 -Isrc/libs -Isrc
     RAYLIB_CFLAGS =
-    RAYLIB_LDFLAGS = -lraylib -lm -lpthread -ldl -lX11
+    RAYLIB_LDFLAGS = -lSDL2 -lraylib -lm -ldl -lpthread -lX11
 endif
 
 CFLAGS += $(RAYLIB_CFLAGS)
