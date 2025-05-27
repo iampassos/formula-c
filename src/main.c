@@ -115,8 +115,6 @@ char *CAR_IMAGES_PATH[] = {
 char *SPEEDOMETER_PATH = "resources/cars/velocimetro.png";
 
 // 🧠 Modos de Jogo
-char GAME_MODES[][100] = {"1 Jogador", "2 Jogadores"};
-int  TOTAL_GAME_MODES  = sizeof(GAME_MODES) / sizeof(GAME_MODES[0]);
 
 // 🅰️ Interface e Imagens
 

@@ -1,5 +1,6 @@
 #include "game.h"
 #include "common.h"
+#include "controller.h"
 #include "linked_list.h"
 #include "raylib.h"
 #include <float.h>
@@ -89,7 +90,15 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
-    if (IsKeyDown(KEY_Q) || state.status == ENDED) {
+    SDL_GameControllerUpdate();
+
+    int flag = 0;
+
+    for (int i = 0; i < controllers_n; i++) {
+        flag = Controller_input(controllers[i]).b;
+    }
+
+    if (IsKeyPressed(KEY_Q) || state.status == ENDED || flag) {
         state.screen = MENU;
         mapCleanup();
         return;

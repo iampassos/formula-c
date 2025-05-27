@@ -3,12 +3,15 @@
 
 #include "raylib.h"
 
+typedef enum MenuStep {
+    CHOOSE_MODE,
+    CHOOSE_MAP,
+} MenuStep;
+
 typedef struct {
     char    text[100];
     Vector2 pos;
-    bool    hovered;
     bool    selected;
-    void (*action)();
 } Button;
 
 //----------------------------------------------------------------------------------

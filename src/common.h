@@ -77,9 +77,7 @@ extern int                 controllers_n;
 extern CarConfig DEFAULT_CAR_CONFIG;
 
 // Modos de jogo
-extern char GAME_MODES[][100];
-extern int  TOTAL_GAME_MODES;
-extern int  MAX_LAPS;
+extern int MAX_LAPS;
 
 // 📁 Arquivos de Dados
 extern char *GHOST_CAR_DATA_PATH;
