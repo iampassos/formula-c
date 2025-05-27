@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include "raylib.h"
+#include <SDL2/SDL.h>
 
 //----------------------------------------------------------------------------------
 // 📦 TIPOS PERSONALIZADOS
@@ -68,6 +69,9 @@ extern int MAP_HEIGHT;
 // Estado do jogo e câmera
 extern State state;
 extern float CAMERA_SMOOTHNESS;
+
+extern SDL_GameController *controllers[2];
+extern int                 controllers_n;
 
 // Configurações de carro
 extern CarConfig DEFAULT_CAR_CONFIG;

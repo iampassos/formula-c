@@ -68,7 +68,7 @@ void updateSingleplayer() {
 
     updateGhostCar(p1);
     Camera_updateTarget(camera1, p1);
-    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A, controllers[0]);
     Car_update(p1);
 }
 

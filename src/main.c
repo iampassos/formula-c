@@ -1,4 +1,5 @@
 #include "common.h"
+#include "controller.h"
 #include "game.h"
 #include "menu.h"
 
@@ -18,6 +19,9 @@ CarConfig DEFAULT_CAR_CONFIG = {
     150,   // Largura carro
     75     // Comprimento do carro
 };
+
+SDL_GameController *controllers[2];
+int                 controllers_n = 0;
 
 //----------------------------------------------------------------------------------
 // 🔊 ÁUDIO
@@ -60,19 +64,27 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                    {{14136, 3216}, -1.87f},
                    {{9357, 341}, -3.57f},
                }},
-              {"Secret",
-               "resources/masks/secret_mask.png",
-               "resources/masks/secret_mask.png",
-               "resources/masks/secret_mask.png",
-               {{7329, 1358}, {7329, 1358}},
-               3.21f,
-               1,
-               4,
+              {"Monaco",
+               "resources/maps/monaco_map.png",
+               "resources/masks/monaco_mask.png",
+               "resources/minimaps/monaco_minimap.png",
+               {{2507, 3150}, {2360, 3158}},
+               -0.90f,
+               5,
+               12,
                {
-                   {{7329, 1358}, 3.21f},
-                   {{2520, 4478}, 8.59f},
-                   {{6169, 5707}, 14.13f},
-                   {{10700, 4978}, 9.07f},
+                   {{2617, 3104}, -0.90f},
+                   {{5077, 2004}, 0.71f},
+                   {{8014, 3815}, 0.43f},
+                   {{10763, 3653}, -1.36f},
+                   {{13396, 3463}, 1.95f},
+                   {{14070, 3621}, 0.39f},
+                   {{12910, 5363}, 2.60f},
+                   {{8048, 4576}, 3.80f},
+                   {{5841, 3037}, 3.84f},
+                   {{2833, 4399}, 2.19f},
+                   {{1746, 5504}, 1.92f},
+                   {{1136, 5603}, 5.13f},
                }}};
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
@@ -114,10 +126,11 @@ char *LOGO_IMAGE_PATH    = "resources/logo/formula_c-logo.png";
 
 // 🔤 Fontes
 char FONTS_PATH[][100] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
-                          "resources/fonts/Formula-Black.ttf"};
+                          "resources/fonts/Formula-Black.ttf",
+                          "resources/fonts/Formula-Italic.ttf"};
 
 int  FONTS_N = sizeof(FONTS_PATH) / sizeof(FONTS_PATH[0]);
-Font FONTS[3];
+Font FONTS[4];
 
 //----------------------------------------------------------------------------------
 // 📁 Arquivos de Dados
@@ -130,8 +143,12 @@ char *REFERENCE_DATA_PATH = "./data/references/";
 //----------------------------------------------------------------------------------
 
 int main() {
-    SetConfigFlags(FLAG_FULLSCREEN_MODE);
-    InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
+    if (GetMonitorCount() > 0) {
+        SetConfigFlags(FLAG_FULLSCREEN_MODE);
+        InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
+    } else {
+        InitWindow(1920, 1080, "Formula C");
+    }
 
     SCREEN_WIDTH  = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
@@ -150,6 +167,8 @@ int main() {
 
     Menu_setup(Game_load);
     Game_setup();
+
+    Controllers_init(controllers, &controllers_n);
 
     while (!WindowShouldClose()) {
         switch (state.screen) {

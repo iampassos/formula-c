@@ -67,11 +67,11 @@ void updateSplitscreen() {
 
     Car *p1 = LinkedList_getCarById(cars, 1);
     Camera_updateTarget(camera1, p1);
-    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A);
+    Car_move(p1, KEY_W, KEY_S, KEY_D, KEY_A, controllers[0]);
 
     Car *p2 = LinkedList_getCarById(cars, 2);
     Camera_updateTarget(camera2, p2);
-    Car_move(p2, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT);
+    Car_move(p2, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, controllers[1]);
 
     LinkedList_forEach(cars, updateExtras);
 
