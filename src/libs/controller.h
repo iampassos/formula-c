@@ -9,6 +9,14 @@ typedef struct ControllerInput {
     Vector2 leftAxis;
     float   rt;
     float   lt;
+    bool    up;
+    bool    down;
+    bool    left;
+    bool    right;
+    bool    a;
+    bool    b;
+    bool    x;
+    bool    y;
 } ControllerInput;
 
 void            Controllers_init(SDL_GameController *controllers[], int *controllers_n);

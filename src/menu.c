@@ -1,6 +1,8 @@
 #include "menu.h"
 #include "common.h"
+#include "controller.h"
 #include "raylib.h"
+#include <SDL2/SDL_gamecontroller.h>
 #include <string.h>
 
 #define MAX_BUTTONS 10
@@ -33,8 +35,10 @@ static void loadMenuAssets();
 
 static void drawButton(Button btn);
 
-static bool pressedButton(Button *btn, Vector2 mousePos);
+static bool pressedButton(Button *btn, Vector2 mousePos, ControllerInput *input);
 static void unselectButtons(Button arr[]);
+
+static int btn_i = 0;
 
 //----------------------------------------------------------------------------------
 // Ações dos botões
@@ -88,11 +92,30 @@ void Menu_cleanup() {
 // Atualizar iteração do usuário com o menu
 //----------------------------------------------------------------------------------
 
+static double last = 0;
+
 void Menu_update() {
     Vector2 mouse = GetMousePosition();
+    SDL_GameControllerUpdate();
+
+    if (GetTime() - last >= 0.150f && controllers_n > 0) {
+        for (int i = 0; i < controllers_n; i++) {
+            ControllerInput input = Controller_input(controllers[i]);
+            if (input.down || input.up) {
+                BUTTONS[btn_i].selected = input.up && btn_i == 0 ? true : false;
+                btn_i                   = (btn_i + (input.down ? 1 : -1)) % TOTAL_GAME_MODES;
+                BUTTONS[btn_i].selected = true;
+            }
+
+            if (input.a) {
+                pressedButton(&BUTTONS[btn_i], mouse, &input);
+            }
+        }
+        last = GetTime();
+    }
 
     for (int i = 0; i < TOTAL_GAME_MODES; i++) {
-        if (pressedButton(BUTTONS + i, mouse)) {
+        if (pressedButton(BUTTONS + i, mouse, NULL)) {
             unselectButtons(BUTTONS);
             BUTTONS[i].selected = true;
             break;
@@ -100,15 +123,15 @@ void Menu_update() {
     }
 
     for (int i = 0; i < TOTAL_MAPS; i++) {
-        if (pressedButton(MAPS_BUTTONS + i, mouse)) {
+        if (pressedButton(MAPS_BUTTONS + i, mouse, NULL)) {
             unselectButtons(MAPS_BUTTONS);
             MAPS_BUTTONS[i].selected = true;
             break;
         }
     }
 
-    pressedButton(&debugButton, mouse);
-    pressedButton(&playButton, mouse);
+    pressedButton(&debugButton, mouse, NULL);
+    pressedButton(&playButton, mouse, NULL);
 
     SetMusicVolume(music, MENU_MUSIC_VOLUME);
     UpdateMusicStream(music);
@@ -149,7 +172,7 @@ static void setupGameModeButtons() {
     }
 
     BUTTONS[SINGLEPLAYER].action = singleplayerButtonAction;
-    BUTTONS[SPLITSCREEN].action = splitscreenButtonAction;
+    BUTTONS[SPLITSCREEN].action  = splitscreenButtonAction;
 }
 
 static void setupMapButtons() {
@@ -164,7 +187,7 @@ static void setupMapButtons() {
     }
 
     MAPS_BUTTONS[INTERLAGOS].action = interlagosMapButtonAction;
-    MAPS_BUTTONS[SECRET].action = secretMapButtonAction;
+    MAPS_BUTTONS[SECRET].action     = secretMapButtonAction;
 }
 
 static void setupMainButtons(void (*play)()) {
@@ -228,11 +251,11 @@ static void drawButton(Button btn) {
 // Atualizar estados dos botões
 //----------------------------------------------------------------------------------
 
-static bool pressedButton(Button *btn, Vector2 mousePos) {
+static bool pressedButton(Button *btn, Vector2 mousePos, ControllerInput *input) {
     btn->hovered =
         CheckCollisionPointRec(mousePos, (Rectangle) {btn->pos.x, btn->pos.y, width, height});
 
-    if (btn->hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if ((btn->hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
         PlaySound(clickSound);
         btn->action();
         return true;
