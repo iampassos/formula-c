@@ -118,10 +118,11 @@ char *LOGO_IMAGE_PATH    = "resources/logo/formula_c-logo.png";
 
 // 🔤 Fontes
 char FONTS_PATH[][100] = {"resources/fonts/Formula-Regular.ttf", "resources/fonts/Formula-Bold.ttf",
-                          "resources/fonts/Formula-Black.ttf"};
+                          "resources/fonts/Formula-Black.ttf",
+                          "resources/fonts/Formula-Italic.ttf"};
 
 int  FONTS_N = sizeof(FONTS_PATH) / sizeof(FONTS_PATH[0]);
-Font FONTS[3];
+Font FONTS[4];
 
 //----------------------------------------------------------------------------------
 // 📁 Arquivos de Dados
@@ -134,8 +135,12 @@ char *REFERENCE_DATA_PATH = "./data/references/";
 //----------------------------------------------------------------------------------
 
 int main() {
-    SetConfigFlags(FLAG_FULLSCREEN_MODE);
-    InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
+    if (GetMonitorCount() > 0) {
+        SetConfigFlags(FLAG_FULLSCREEN_MODE);
+        InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
+    } else {
+        InitWindow(1920, 1080, "Formula C");
+    }
 
     SCREEN_WIDTH  = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();

@@ -119,7 +119,7 @@ static void updateBestLapCar(Car *player) {
 
     if (player->changeLapFlag && player->lastLapTime <= bestLapTimePlayer->bestLapTime) {
         bestLapTimePlayer = player;
-        bestLapLastTick = GetTime() + 3;
+        bestLapLastTick   = GetTime() + 3;
     }
 }
 
@@ -339,7 +339,7 @@ void drawLapTime(Car *player, float x, float y) {
 
     drawTextCenteredInRect(
         strBuffer, (Rectangle) {x + hudPlayerListWidth / 2.0f, y, hudPlayerListWidth / 2.0f, 48},
-        24, color, FONTS[0]);
+        24, color, FONTS[3]);
 }
 
 void drawPlayerInMinimap(Car *player) {
@@ -384,12 +384,12 @@ void drawLaps(Car *player, float x, float y) {
     }
 
     drawTextCenteredInRect(strBuffer, (Rectangle) {x, y, hudPlayerListWidth / 2.0f, 48}, 24, WHITE,
-                           FONTS[0]);
+                           FONTS[3]);
 }
 
 void drawPlayerList(Car *player, float x, float y) {
     stringifyTime(strBuffer, 599.999f, 1);
-    Vector2 lapTimeSize = MeasureTextEx(FONTS[0], strBuffer, 20, 1.0f);
+    Vector2 lapTimeSize = MeasureTextEx(FONTS[3], strBuffer, 20, 1.0f);
 
     int height  = 36;
     int padding = 9;
@@ -407,8 +407,7 @@ void drawPlayerList(Car *player, float x, float y) {
             continue;
         }
 
-        bool  isOwn = curr->car->id == player->id;
-        float yx    = y + idx * height;
+        float yx = y + idx * height;
 
         Color     bgColor = bestLapTimePlayer == curr->car && bestLapLastTick > actualTime
                                 ? PURPLE
@@ -419,12 +418,13 @@ void drawPlayerList(Car *player, float x, float y) {
         float fontSize = 20;
 
         snprintf(strBuffer, sizeof(strBuffer), "%d", idx + 1);
-        DrawTextEx(FONTS[isOwn], strBuffer, (Vector2) {x + padding, yx + (height - fontSize) / 2},
-                   fontSize, 1.0f, WHITE);
+        DrawTextEx(FONTS[3], strBuffer,
+                   (Vector2) {x + padding, yx + (height - (fontSize - 2)) / 2.0f}, fontSize - 2,
+                   1.0f, WHITE);
 
         DrawRectangle(x + 36, yx + padding + 2.5f, 2, height / 2.5f, curr->car->color);
 
-        DrawTextEx(FONTS[isOwn], curr->car->name, (Vector2) {x + 44, yx + (height - fontSize) / 2},
+        DrawTextEx(FONTS[0], curr->car->name, (Vector2) {x + 44, yx + (height - fontSize) / 2},
                    fontSize, 1.0f, WHITE);
 
         if (idx == 0 || (idx == 0 && curr->next == NULL)) {
@@ -435,8 +435,8 @@ void drawPlayerList(Car *player, float x, float y) {
 
         drawTextCenteredInRect(
             strBuffer,
-            (Rectangle) {rect.x + rect.width - lapTimeSize.x, yx, lapTimeSize.x + 1, rect.height},
-            fontSize, WHITE, FONTS[isOwn]);
+            (Rectangle) {rect.x + rect.width - lapTimeSize.x, yx, lapTimeSize.x, rect.height},
+            fontSize - 2, WHITE, FONTS[3]);
 
         prev = curr;
         curr = curr->next;
