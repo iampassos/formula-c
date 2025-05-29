@@ -32,7 +32,7 @@ static void drawGhostCarDebug();
 
 void loadSingleplayer(Map map) {
     state.status = STARTED;
-    minimapPos.x = SCREEN_WIDTH - trackHud.width;
+    minimapPos.x = SCREEN_WIDTH - minimapTexture.width;
     minimapPos.y = 10;
 
     strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);

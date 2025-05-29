@@ -5,11 +5,25 @@
 #include "raylib.h"
 #include <float.h>
 #include <math.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 
 // --- Variáveis públicas ---
-Texture2D   trackHud;
+Image minimapImage;
+Image trackImage;
+Image debugMinimapImage;
+Image debugTrackImage;
+Image speedometerImage;
+Image logoNoBgImage;
+
+Texture2D minimapTexture;
+Texture2D trackTexture;
+Texture2D debugMinimapTexture;
+Texture2D debugTrackTexture;
+Texture2D speedometerTexture;
+Texture2D logoNoBgTexture;
+
 LinkedList *cars;
 
 Camera2D *camera1;
@@ -23,11 +37,11 @@ Car *bestLapTimePlayer;
 
 // --- Variáveis internas ---
 
+static bool done   = false;
+static bool loaded = false;
+
 static double bestLapLastTick = 0;
 
-static Texture2D  trackBackground;
-static Texture2D  SPEEDOMETER;
-static Texture2D  logoNoBg;
 static ArrayList *referenceLap = NULL;
 static double     last         = 0;
 
@@ -51,10 +65,6 @@ static void updateCarReference(Car *car);
 void Game_setup() {
     cars         = LinkedList_create();
     referenceLap = ArrayList_create();
-    Image temp   = LoadImage(LOGO_BG_IMAGE_PATH);
-    ImageResize(&temp, 256, 256);
-    logoNoBg = LoadTextureFromImage(temp);
-    UnloadImage(temp);
 }
 
 void Game_load() {
@@ -76,11 +86,90 @@ void Game_load() {
     }
 }
 
+static void loadTextures() {
+    trackTexture = LoadTextureFromImage(trackImage);
+    UnloadImage(trackImage);
+
+    debugTrackTexture = LoadTextureFromImage(debugTrackImage);
+    UnloadImage(debugTrackImage);
+
+    speedometerTexture = LoadTextureFromImage(speedometerImage);
+    UnloadImage(speedometerImage);
+
+    minimapTexture = LoadTextureFromImage(minimapImage);
+    UnloadImage(minimapImage);
+
+    debugMinimapTexture = LoadTextureFromImage(debugMinimapImage);
+    UnloadImage(debugMinimapImage);
+
+    logoNoBgTexture = LoadTextureFromImage(logoNoBgImage);
+    UnloadImage(logoNoBgImage);
+
+    done = true;
+}
+
+static void loadImages(Map map) {
+    trackImage = LoadImage(map.backgroundPath);
+    MAP_WIDTH  = trackImage.width;
+    MAP_HEIGHT = trackImage.height;
+
+    debugTrackImage = LoadImage(map.maskPath);
+
+    Image speedometerImage = LoadImage(SPEEDOMETER_PATH);
+    ImageResize(&speedometerImage, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
+
+    minimapImage = LoadImage(map.minimapPath);
+    ImageResize(&minimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+
+    debugMinimapImage = LoadImage(map.maskPath);
+    ImageResize(&debugMinimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+
+    logoNoBgImage = LoadImage(LOGO_BG_IMAGE_PATH);
+    ImageResize(&logoNoBgImage, 256, 256);
+
+    loaded = true;
+}
+
+static void loadMap(Map map) {
+    state.maxLaps  = map.maxLaps;
+    state.raceTime = GetTime();
+
+    loadImages(map);
+
+    Track_setMask(map.maskPath);
+    Track_setCheckpoints(map.checkpoints, map.checkpointSize);
+
+    char referencePath[200];
+    strcpy(referencePath, REFERENCE_DATA_PATH);
+    strcat(referencePath, map.name);
+    strcat(referencePath, "_reference.bin");
+
+    ArrayList_clear(referenceLap);
+    FILE *file = fopen(referencePath, "rb");
+    if (file != NULL) {
+        CarFrame buffer;
+        while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {
+            ArrayList_push(referenceLap, buffer);
+        }
+        fclose(file);
+    }
+}
+
+static void mapCleanup() {
+    Track_Unload();
+    LinkedList_clear(cars);
+    if (state.mode == SINGLEPLAYER) {
+        cleanUpSingleplayer();
+    } else {
+        cleanUpSplitscreen();
+    }
+    Camera_free(camera1);
+}
+
 void Game_cleanup() {
     if (state.screen != GAME) {
         mapCleanup();
     }
-    UnloadTexture(logoNoBg);
     ArrayList_free(referenceLap);
     LinkedList_free(cars);
 }
@@ -90,6 +179,10 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
+    if (loaded && !done) {
+        loadTextures();
+    }
+
     SDL_GameControllerUpdate();
 
     int flag = 0;
@@ -102,6 +195,10 @@ void Game_update() {
         state.screen = MENU;
         mapCleanup();
         return;
+    }
+
+    if (IsKeyPressed(KEY_F1)) {
+        state.debug = !state.debug;
     }
 
     updateCarRanking();
@@ -172,8 +269,9 @@ static void updateCarReference(Car *car) {
 //----------------------------------------------------------------------------------
 
 void Game_draw() {
-    if (state.screen != GAME)
+    if (state.screen != GAME) {
         return;
+    }
 
     switch (state.mode) {
     case SINGLEPLAYER:
@@ -190,65 +288,11 @@ void Game_draw() {
 }
 
 //----------------------------------------------------------------------------------
-// Carregamento e limpeza do mapa
-//----------------------------------------------------------------------------------
-
-static void loadMap(Map map) {
-    state.maxLaps   = map.maxLaps;
-    state.raceTime  = GetTime();
-    trackBackground = LoadTexture(state.debug ? map.maskPath : map.backgroundPath);
-    MAP_WIDTH       = trackBackground.width;
-    MAP_HEIGHT      = trackBackground.height;
-
-    Image temp = LoadImage(SPEEDOMETER_PATH);
-    ImageResize(&temp, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
-    SPEEDOMETER = LoadTextureFromImage(temp);
-    UnloadImage(temp);
-
-    temp = LoadImage(state.debug ? map.maskPath : map.minimapPath);
-    ImageResize(&temp, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
-    trackHud = LoadTextureFromImage(temp);
-    UnloadImage(temp);
-
-    Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints, map.checkpointSize);
-
-    char referencePath[200];
-    strcpy(referencePath, REFERENCE_DATA_PATH);
-    strcat(referencePath, map.name);
-    strcat(referencePath, "_reference.bin");
-
-    ArrayList_clear(referenceLap);
-    FILE *file = fopen(referencePath, "rb");
-    if (file != NULL) {
-        CarFrame buffer;
-        while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {
-            ArrayList_push(referenceLap, buffer);
-        }
-        fclose(file);
-    }
-}
-
-static void mapCleanup() {
-    Track_Unload();
-    LinkedList_clear(cars);
-    UnloadTexture(trackBackground);
-    UnloadTexture(SPEEDOMETER);
-    UnloadTexture(trackHud);
-    if (state.mode == SINGLEPLAYER) {
-        cleanUpSingleplayer();
-    } else {
-        cleanUpSplitscreen();
-    }
-    Camera_free(camera1);
-}
-
-//----------------------------------------------------------------------------------
 // Draw map
 //----------------------------------------------------------------------------------
 
 void drawMap() {
-    DrawTexture(trackBackground, 0, 0, WHITE);
+    DrawTexture(state.debug ? debugTrackTexture : trackTexture, 0, 0, WHITE);
     LinkedList_forEach(cars, Car_draw);
 }
 
@@ -266,7 +310,8 @@ void drawHud() {
         break;
     }
 
-    DrawTexture(trackHud, minimapPos.x, minimapPos.y, (Color) {255, 255, 255, HUD_OPACITY});
+    DrawTexture(state.debug ? debugMinimapTexture : minimapTexture, minimapPos.x, minimapPos.y,
+                (Color) {255, 255, 255, HUD_OPACITY});
     LinkedList_forEach(cars, drawPlayerInMinimap);
 }
 
@@ -326,7 +371,7 @@ void drawPlayerHud(Car *player, int x) {
 
 void drawGameLogo(float x, float y) {
     DrawRectangle(x, y, hudPlayerListWidth, 128, (Color) {51, 51, 51, HUD_OPACITY});
-    DrawTexture(logoNoBg, x + (hudPlayerListWidth - 256) / 2.0f, y - (252 - 128) / 2.0f,
+    DrawTexture(logoNoBgTexture, x + (hudPlayerListWidth - 256) / 2.0f, y - (252 - 128) / 2.0f,
                 (Color) {255, 255, 255, HUD_OPACITY});
 }
 
@@ -352,8 +397,8 @@ void drawLapTime(Car *player, float x, float y) {
 }
 
 void drawPlayerInMinimap(Car *player) {
-    float x = trackHud.width * player->pos.x / trackBackground.width + minimapPos.x;
-    float y = trackHud.height * player->pos.y / trackBackground.height + minimapPos.y;
+    float x = minimapTexture.width * player->pos.x / trackTexture.width + minimapPos.x;
+    float y = minimapTexture.height * player->pos.y / trackTexture.height + minimapPos.y;
 
     if (player->ghost) {
         DrawCircleLines(x, y, 3.5f, BLACK);
@@ -365,8 +410,8 @@ void drawPlayerInMinimap(Car *player) {
 }
 
 void drawSpeedometer(Car *player, float x, float y) {
-    DrawTexture(SPEEDOMETER, x - SPEEDOMETER.width / 2, y - SPEEDOMETER.height / 2,
-                (Color) {255, 255, 255, HUD_OPACITY});
+    DrawTexture(speedometerTexture, x - speedometerTexture.width / 2.0f,
+                y - speedometerTexture.height / 2.0f, (Color) {255, 255, 255, HUD_OPACITY});
 
     float   angle  = (fabs(player->vel) / player->maxVelocity) * (PI * 1.5) + (PI * 0.75);
     Vector2 endPos = {cosf(angle) * 100 + x, sinf(angle) * 100 + y};
@@ -375,7 +420,7 @@ void drawSpeedometer(Car *player, float x, float y) {
     DrawCircle(x, y, 3, RED);
 
     snprintf(strBuffer, sizeof(strBuffer), "%.0f",
-             3600 * 0.75f * fabs(player->vel) * 60 / trackBackground.width);
+             3600 * 0.75f * fabs(player->vel) * 60 / trackTexture.width);
     Color textColor = ColorLerp(GREEN, RED, player->vel / player->maxVelocity);
 
     drawTextWithShadow(strBuffer, x - MeasureTextEx(FONTS[1], strBuffer, 48, 1.0f).x / 2, y + 24,

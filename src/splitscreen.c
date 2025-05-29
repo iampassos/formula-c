@@ -4,7 +4,6 @@
 #include "game.h"
 #include "raylib.h"
 #include <stdio.h>
-#include <string.h>
 
 // --- Variáveis internas ---
 
@@ -31,7 +30,7 @@ void loadSplitscreen(Map map) {
     count         = 0;
     state.status  = COUNTDOWN;
     winner        = NULL;
-    minimapPos.x  = SCREEN_WIDTH - trackHud.width;
+    minimapPos.x  = SCREEN_WIDTH - minimapTexture.width;
     minimapPos.y  = 10;
 
     semaphoreSound = LoadSound(SMAPHORE_SOUND_PATH);

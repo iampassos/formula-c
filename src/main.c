@@ -2,6 +2,7 @@
 #include "controller.h"
 #include "game.h"
 #include "menu.h"
+#include <raylib.h>
 
 //----------------------------------------------------------------------------------
 // 🧠 VARIÁVEIS GLOBAIS

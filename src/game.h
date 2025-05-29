@@ -65,8 +65,13 @@ extern Camera2D *camera2;
 
 extern Vector2 minimapPos;
 
-extern int hudPlayerListWidth;
+extern Texture2D minimapTexture;
+extern Texture2D trackTexture;
+extern Texture2D debugMinimapTexture;
+extern Texture2D debugTrackTexture;
+extern Texture2D speedometerTexture;
+extern Texture2D logoNoBgTexture;
 
-extern Car* bestLapTimePlayer;
+extern Car *bestLapTimePlayer;
 
 #endif
