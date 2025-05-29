@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "raylib.h"
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_gamecontroller.h>
 
 typedef struct {
     int       id;

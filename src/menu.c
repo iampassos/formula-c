@@ -40,7 +40,6 @@ static int buttonFontSize;
 static void setupButtons();
 static void loadMenuAssets();
 static void drawButton(Button btn);
-static void unselectButtons(Button arr[], int length);
 
 //----------------------------------------------------------------------------------
 // Carregar o menu
@@ -67,7 +66,7 @@ void Menu_cleanup() {
 // Atualizar iteração do usuário com o menu
 //----------------------------------------------------------------------------------
 
-bool checkSelected(Button *btn, Vector2 mouse, ControllerInput input, int length, int *i, int j) {
+void checkSelected(Button *btn, Vector2 mouse, ControllerInput input, int length, int *i, int j) {
     if (CheckCollisionPointRec(mouse, (Rectangle) {btn->pos.x, btn->pos.y, width, height})) {
         *i = j;
     } else if (btn->selected && (input.down || input.up)) {
@@ -218,14 +217,4 @@ static void drawButton(Button btn) {
                        (rect.width - MeasureTextEx(FONTS[1], btn.text, buttonFontSize, 1.0f).x) / 2,
                    rect.y + (rect.height - buttonFontSize) / 2},
         buttonFontSize, 1.0f, BLACK);
-}
-
-//----------------------------------------------------------------------------------
-// Atualizar estados dos botões
-//----------------------------------------------------------------------------------
-
-static void unselectButtons(Button arr[], int length) {
-    for (int i = 0; i < length; i++) {
-        arr[i].selected = false;
-    }
 }

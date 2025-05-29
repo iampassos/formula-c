@@ -1,7 +1,5 @@
 #include "controller.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_gamecontroller.h>
-#include <raylib.h>
 
 void Controllers_init(SDL_GameController *controllers[], int *controllers_n) {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
