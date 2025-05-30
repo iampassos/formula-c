@@ -23,6 +23,7 @@ typedef struct {
     int        maxLaps;
     int        checkpointSize;
     Checkpoint checkpoints[100];
+    Color      backgroundColor;
 } Map;
 
 typedef struct {

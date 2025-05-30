@@ -64,7 +64,8 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                    {{12303, 4781}, 0.07f},
                    {{14136, 3216}, -1.87f},
                    {{9357, 341}, -3.57f},
-               }},
+               },
+               (Color) {92, 139, 90, 255}},
               {"Monaco",
                "resources/maps/monaco_map.png",
                "resources/masks/monaco_mask.png",
@@ -86,7 +87,8 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                    {{2833, 4399}, 2.19f},
                    {{1746, 5504}, 1.92f},
                    {{1136, 5603}, 5.13f},
-               }}};
+               },
+               (Color) {92, 139, 90, 255}}};
 
 int TOTAL_MAPS = sizeof(MAPS) / sizeof(Map);
 

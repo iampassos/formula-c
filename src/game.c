@@ -44,6 +44,8 @@ Car *bestLapTimePlayer;
 
 // --- Variáveis internas ---
 
+static Color backgroundImageColor;
+
 static double bestLapLastTick = 0;
 
 static ArrayList *referenceLap = NULL;
@@ -131,8 +133,9 @@ static void loadImages(Map *map) {
     strcpy(load_msg, "Carregando mapa...");
     trackImage = LoadImage(map->backgroundPath);
 
-    MAP_WIDTH  = trackImage.width;
-    MAP_HEIGHT = trackImage.height;
+    MAP_WIDTH            = trackImage.width;
+    MAP_HEIGHT           = trackImage.height;
+    backgroundImageColor = map->backgroundColor;
 
     strcpy(load_msg, "Carregando mapa debug...");
     debugTrackImage = LoadImage(map->maskPath);
@@ -314,6 +317,8 @@ void Game_draw() {
                                BLACK, FONTS[3]);
         return;
     }
+
+    ClearBackground(backgroundImageColor);
 
     switch (state.mode) {
     case SINGLEPLAYER:
