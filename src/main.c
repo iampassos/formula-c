@@ -141,8 +141,9 @@ char *REFERENCE_DATA_PATH = "data/references/";
 //----------------------------------------------------------------------------------
 
 int main() {
+    SetConfigFlags(FLAG_FULLSCREEN_MODE | FLAG_VSYNC_HINT);
+
     if (GetMonitorCount() > 0) {
-        SetConfigFlags(FLAG_FULLSCREEN_MODE);
         InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Formula C");
     } else {
         InitWindow(1920, 1080, "Formula C");
@@ -160,8 +161,6 @@ int main() {
     for (int i = 0; i < FONTS_N; i++) {
         FONTS[i] = LoadFontEx(FONTS_PATH[i], 256, 0, 0);
     }
-
-    SetTargetFPS(TARGET_FPS);
 
     Menu_setup(Game_load);
     Game_setup();

@@ -360,6 +360,10 @@ void drawHud() {
     DrawTexture(state.debug ? debugMinimapTexture : minimapTexture, minimapPos.x, minimapPos.y,
                 (Color) {255, 255, 255, HUD_OPACITY});
     LinkedList_forEach(cars, drawPlayerInMinimap);
+
+    if (state.debug) {
+        DrawFPS(0, 0);
+    }
 }
 
 //----------------------------------------------------------------------------------
