@@ -48,11 +48,11 @@ void  cleanUpSingleplayer();
 // Splitscreen
 //----------------------------------------------------------------------------------
 
-void loadSplitscreen(Map map);
-void updateSplitscreen();
-void drawSplitscreen();
-void drawHudSplitscreen();
-void cleanUpSplitscreen();
+void *loadSplitscreen(void *arg);
+void  updateSplitscreen();
+void  drawSplitscreen();
+void  drawHudSplitscreen();
+void  cleanUpSplitscreen();
 
 //----------------------------------------------------------------------------------
 // Variáveis internas
@@ -69,7 +69,7 @@ extern Camera2D *camera2;
 
 extern Vector2 minimapPos;
 
-extern Image carsImage[2];
+extern Image carsImage[3];
 
 extern Texture2D minimapTexture;
 extern Texture2D trackTexture;

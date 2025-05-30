@@ -22,7 +22,7 @@ Image debugMinimapImage;
 Image debugTrackImage;
 Image speedometerImage;
 Image logoNoBgImage;
-Image carsImage[2];
+Image carsImage[3];
 
 Texture2D minimapTexture;
 Texture2D trackTexture;
@@ -66,8 +66,7 @@ static void updateCarReference(Car *car);
 //----------------------------------------------------------------------------------
 
 void Game_setup() {
-    cars         = LinkedList_create();
-    referenceLap = ArrayList_create();
+    cars = LinkedList_create();
 }
 
 void Game_load() {
@@ -92,7 +91,7 @@ void Game_load() {
         pthread_create(&thread, NULL, &loadSingleplayer, map);
         break;
     case SPLITSCREEN:
-        loadSplitscreen(*map);
+        pthread_create(&thread, NULL, &loadSplitscreen, map);
         break;
     }
 }
@@ -154,8 +153,8 @@ static void loadImages(Map *map) {
     logoNoBgImage = LoadImage(LOGO_BG_IMAGE_PATH);
     ImageResize(&logoNoBgImage, 256, 256);
 
-    strcpy(load_msg, "Carregando carros...");
-    for (int i = 0; i < 2; i++) {
+    strcpy(load_msg, "Carregando imagem dos carros...");
+    for (int i = 0; i < 3; i++) {
         carsImage[i] = LoadImage(CAR_IMAGES_PATH[i]);
     }
 }
@@ -168,6 +167,7 @@ void loadAssets(Map *map) {
     Track_setCheckpoints(map->checkpoints, map->checkpointSize);
 
     strcpy(load_msg, "Carregando volta de referencia...");
+    referenceLap = ArrayList_create();
     ArrayList_clear(referenceLap);
     FILE *file = fopen(TextFormat("%s/%s_reference.bin", REFERENCE_DATA_PATH, map->name), "rb");
     if (file != NULL) {

@@ -36,7 +36,7 @@ void *loadSingleplayer(void *arg) {
 
     loadAssets(map);
 
-    strcpy(load_msg, "Carregando novos carros...");
+    strcpy(load_msg, "Carregando carros...");
     Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, &carsImage[0],
                                WHITE, true, 99, "Melhor Volta");
     LinkedList_addCar(cars, ghostCar);

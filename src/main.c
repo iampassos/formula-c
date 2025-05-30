@@ -181,8 +181,11 @@ int main() {
         }
     }
 
-    Game_cleanup();
-    Menu_cleanup();
+    if (state.screen == GAME) {
+        Game_cleanup();
+    } else if (state.screen == MENU) {
+        Menu_cleanup();
+    }
 
     for (int i = 0; i < FONTS_N; i++) {
         UnloadFont(FONTS[i]);
