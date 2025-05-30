@@ -1,4 +1,5 @@
 #include "game.h"
+#include "camera.h"
 #include "common.h"
 #include "controller.h"
 #include "linked_list.h"
@@ -146,7 +147,7 @@ static void loadImages(Map *map) {
     ImageResize(&debugMinimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
 
     strcpy(load_msg, "Carregando velocimetro...");
-    Image speedometerImage = LoadImage(SPEEDOMETER_PATH);
+    speedometerImage = LoadImage(SPEEDOMETER_PATH);
     ImageResize(&speedometerImage, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
 
     strcpy(load_msg, "Carregando logo...");
