@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "car.h"
 #include "common.h"
+#include <raylib.h>
 #include <stdlib.h>
 
 static int CAMERA_WIDTH;
@@ -50,10 +51,11 @@ void Camera_updateTarget(Camera2D *camera, Car *car) {
     camera->target = (Vector2) {x, y};
 
     float targetZoom = START_ZOOM - (car->vel / car->maxVelocity);
+    camera->zoom += (targetZoom - camera->zoom) * 0.1f * GetFrameTime() * 60.0f;
 
-    camera->zoom += (targetZoom - camera->zoom) * 0.1f;
     if (state.cameraView == FIRST_PERSON) {
         float targetRotation = -car->angle * RAD2DEG - 90.0f;
-        camera->rotation     = LerpAngle(camera->rotation, targetRotation, CAMERA_SMOOTHNESS);
+        camera->rotation =
+            LerpAngle(camera->rotation, targetRotation, CAMERA_SMOOTHNESS * GetFrameTime() * 60.0f);
     }
 }

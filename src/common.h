@@ -4,6 +4,9 @@
 #include "raylib.h"
 #include <SDL2/SDL_gamecontroller.h>
 
+#define TARGET_FPS 144
+extern float deltaTime;
+
 //----------------------------------------------------------------------------------
 // 📦 TIPOS PERSONALIZADOS
 //----------------------------------------------------------------------------------

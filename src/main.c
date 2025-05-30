@@ -4,6 +4,8 @@
 #include "menu.h"
 #include <raylib.h>
 
+float deltaTime = 0;
+
 //----------------------------------------------------------------------------------
 // 🧠 VARIÁVEIS GLOBAIS
 //----------------------------------------------------------------------------------
@@ -159,7 +161,7 @@ int main() {
         FONTS[i] = LoadFontEx(FONTS_PATH[i], 256, 0, 0);
     }
 
-    SetTargetFPS(60);
+    SetTargetFPS(TARGET_FPS);
 
     Menu_setup(Game_load);
     Game_setup();
@@ -167,6 +169,8 @@ int main() {
     Controllers_init(controllers, &controllers_n);
 
     while (!WindowShouldClose()) {
+        deltaTime = GetFrameTime();
+
         switch (state.screen) {
         case MENU:
             Menu_update();

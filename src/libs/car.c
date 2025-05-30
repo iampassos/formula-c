@@ -1,4 +1,5 @@
 #include "car.h"
+#include "common.h"
 #include "controller.h"
 #include "raylib.h"
 #include <math.h>
@@ -258,9 +259,9 @@ static void applyDragForce(Car *car) { // Atualiza a força de atrito
 
 // Atualiza a posição com base na velocidade e no ângulo
 static void applyMovementPhysics(Car *car) {
-    car->vel *= car->dragForce;
-    car->pos.x += cosf(car->angle) * car->vel;
-    car->pos.y += sinf(car->angle) * car->vel;
+    car->vel *= powf(car->dragForce, deltaTime * 60.0f);
+    car->pos.x += cosf(car->angle) * car->vel * deltaTime * 60.0f;
+    car->pos.y += sinf(car->angle) * car->vel * deltaTime * 60.0f;
 }
 
 //----------------------------------------------------------------------------------
@@ -268,11 +269,11 @@ static void applyMovementPhysics(Car *car) {
 //----------------------------------------------------------------------------------
 
 static void accelerate(Car *car, float force) { // Acelera o carro
-    car->vel += car->acc * force;
+    car->vel += car->acc * force * deltaTime * 60.0f;
 }
 
 static void breakSpeed(Car *car, float force) { // Freiar
-    car->vel *= 1.0f - (1.0f - car->breakForce) * force;
+    car->vel *= 1.0f - (1.0f - car->breakForce) * force * deltaTime * 60.0f;
 }
 
 // Verificar se está acima da velocidade mínima (em módulo) para fazer a curva
@@ -289,7 +290,7 @@ static void turn(Car *car, float angle) {
         car->maxAngularSpeed - (car->maxAngularSpeed - car->minAngularSpeed) * speedRatio;
 
     // Aplica o ângulo com sensibilidade ajustada
-    car->angle += angle * steeringSensitivity;
+    car->angle += angle * steeringSensitivity * deltaTime * 60.0f;
 }
 
 static void turnLeft(Car *car) { // Virar para a esquerda
@@ -301,5 +302,5 @@ static void turnRight(Car *car) { // Virar para a direita
 }
 
 static void reverse(Car *car) { // Marcha ré
-    car->vel -= car->acc * car->reverseForce;
+    car->vel -= car->acc * car->reverseForce * deltaTime * 60.0f;
 }
