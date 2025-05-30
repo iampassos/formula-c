@@ -37,8 +37,11 @@ Car *bestLapTimePlayer;
 
 // --- Variáveis internas ---
 
-static bool done   = false;
-static bool loaded = false;
+static bool done         = false;
+static bool loaded       = false;
+static int  total_assets = 6;
+static int  total_loaded = 0;
+static char total_msg[100];
 
 static double bestLapLastTick = 0;
 
@@ -68,6 +71,9 @@ void Game_setup() {
 }
 
 void Game_load() {
+    done         = false;
+    loaded       = false;
+    total_loaded = 0;
     state.screen = GAME;
     Map map      = MAPS[state.map];
     loadMap(map);
@@ -108,24 +114,39 @@ static void loadTextures() {
     done = true;
 }
 
-static void loadImages(Map map) {
-    trackImage = LoadImage(map.backgroundPath);
+static void *loadImages(void *arg) {
+    Map *map = (Map *) arg;
+
+    strcpy(total_msg, "Carregando mapa...");
+    trackImage = LoadImage(map->backgroundPath);
+    total_loaded++;
+
     MAP_WIDTH  = trackImage.width;
     MAP_HEIGHT = trackImage.height;
 
-    debugTrackImage = LoadImage(map.maskPath);
+    strcpy(total_msg, "Carregando mapa debug...");
+    debugTrackImage = LoadImage(map->maskPath);
+    total_loaded++;
 
+    strcpy(total_msg, "Carregando velocimetro...");
     Image speedometerImage = LoadImage(SPEEDOMETER_PATH);
     ImageResize(&speedometerImage, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
+    total_loaded++;
 
-    minimapImage = LoadImage(map.minimapPath);
+    strcpy(total_msg, "Carregando minimapa...");
+    minimapImage = LoadImage(map->minimapPath);
     ImageResize(&minimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+    total_loaded++;
 
-    debugMinimapImage = LoadImage(map.maskPath);
+    strcpy(total_msg, "Carregando minimapa de debug...");
+    debugMinimapImage = LoadImage(map->maskPath);
     ImageResize(&debugMinimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+    total_loaded++;
 
+    strcpy(total_msg, "Carregando logo...");
     logoNoBgImage = LoadImage(LOGO_BG_IMAGE_PATH);
     ImageResize(&logoNoBgImage, 256, 256);
+    total_loaded++;
 
     loaded = true;
 }
@@ -134,7 +155,8 @@ static void loadMap(Map map) {
     state.maxLaps  = map.maxLaps;
     state.raceTime = GetTime();
 
-    loadImages(map);
+    pthread_t thread;
+    pthread_create(&thread, NULL, &loadImages, &map);
 
     Track_setMask(map.maskPath);
     Track_setCheckpoints(map.checkpoints, map.checkpointSize);
@@ -270,6 +292,19 @@ static void updateCarReference(Car *car) {
 
 void Game_draw() {
     if (state.screen != GAME) {
+        return;
+    }
+
+    if (!done) {
+        ClearBackground(WHITE);
+
+        drawTextCenteredInRect("CARREGANDO MAPA",
+                               (Rectangle) {0, SCREEN_HEIGHT / 3.0f, SCREEN_WIDTH, 128}, 64, BLACK,
+                               FONTS[1]);
+
+        drawTextCenteredInRect(
+            (char *) TextFormat("%d/%d %s", total_loaded, total_assets, total_msg),
+            (Rectangle) {0, SCREEN_HEIGHT / 3.0f + 96, SCREEN_WIDTH, 64}, 32, BLACK, FONTS[3]);
         return;
     }
 
