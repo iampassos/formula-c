@@ -35,23 +35,27 @@ void loadSplitscreen(Map map) {
 
     semaphoreSound = LoadSound(SMAPHORE_SOUND_PATH);
 
-    Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[1],
-                         BLUE, false, 1, "Player 1");
-
-    Car *p2 = Car_create(map.startCarPos[1], map.startAngle, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[2],
-                         ORANGE, false, 2, "Player 2");
-
-    LinkedList_addCar(cars, p1);
-    LinkedList_addCar(cars, p2);
-
-    bestLapTimePlayer = p1;
-
-    Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-
-    camera1 =
-        Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f, 0.5f);
-    camera2 = Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT / 2.0f},
-                            0.0f, 0.5f);
+    // Car *p1 = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG,
+    // CAR_IMAGES_PATH[1],
+    //                      BLUE, false, 1, "Player 1");
+    //
+    // Car *p2 = Car_create(map.startCarPos[1], map.startAngle, DEFAULT_CAR_CONFIG,
+    // CAR_IMAGES_PATH[2],
+    //                      ORANGE, false, 2, "Player 2");
+    //
+    // LinkedList_addCar(cars, p1);
+    // LinkedList_addCar(cars, p2);
+    //
+    // bestLapTimePlayer = p1;
+    //
+    // Camera_setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+    //
+    // camera1 =
+    //     Camera_create(p1->pos, (Vector2) {SCREEN_WIDTH / 4.0f, SCREEN_HEIGHT / 2.0f}, 0.0f,
+    //     0.5f);
+    // camera2 = Camera_create(p2->pos, (Vector2) {SCREEN_WIDTH * 3.0f / 4.0f, SCREEN_HEIGHT
+    // / 2.0f},
+    //                         0.0f, 0.5f);
 }
 
 //----------------------------------------------------------------------------------

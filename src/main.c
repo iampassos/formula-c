@@ -107,15 +107,10 @@ Color CHECKPOINTS_COLOR   = {0, 255, 0};
 //----------------------------------------------------------------------------------
 
 // 🏎️ Carros
-char *CAR_IMAGES_PATH[] = {
-    "resources/cars/branco.png", // Carro branco
-    "resources/cars/azul.png",   // Carro azul
-    "resources/cars/laranja.png" // Carro laranja
-};
+char *CAR_IMAGES_PATH[] = {"resources/cars/branco.png", "resources/cars/azul.png",
+                           "resources/cars/laranja.png"};
 
 char *SPEEDOMETER_PATH = "resources/cars/velocimetro.png";
-
-// 🧠 Modos de Jogo
 
 // 🅰️ Interface e Imagens
 
@@ -134,8 +129,8 @@ Font FONTS[4];
 //----------------------------------------------------------------------------------
 // 📁 Arquivos de Dados
 //----------------------------------------------------------------------------------
-char *GHOST_CAR_DATA_PATH = "./data/best_laps/";
-char *REFERENCE_DATA_PATH = "./data/references/";
+char *GHOST_CAR_DATA_PATH = "data/best_laps/";
+char *REFERENCE_DATA_PATH = "data/references/";
 
 //----------------------------------------------------------------------------------
 // Início do jogo

@@ -10,12 +10,18 @@
 #include <string.h>
 
 // --- Variáveis públicas ---
+
+bool done   = false;
+bool loaded = false;
+char load_msg[100];
+
 Image minimapImage;
 Image trackImage;
 Image debugMinimapImage;
 Image debugTrackImage;
 Image speedometerImage;
 Image logoNoBgImage;
+Image carsImage[2];
 
 Texture2D minimapTexture;
 Texture2D trackTexture;
@@ -37,12 +43,6 @@ Car *bestLapTimePlayer;
 
 // --- Variáveis internas ---
 
-static bool done         = false;
-static bool loaded       = false;
-static int  total_assets = 6;
-static int  total_loaded = 0;
-static char total_msg[100];
-
 static double bestLapLastTick = 0;
 
 static ArrayList *referenceLap = NULL;
@@ -55,7 +55,6 @@ static int    msgCount;
 // --- Funções internas ---
 
 static void drawHud();
-static void loadMap(Map map);
 static void mapCleanup();
 static void updateBestLapCar(Car *player);
 static void updateCarRanking();
@@ -71,25 +70,34 @@ void Game_setup() {
 }
 
 void Game_load() {
-    done         = false;
-    loaded       = false;
-    total_loaded = 0;
-    state.screen = GAME;
-    Map map      = MAPS[state.map];
-    loadMap(map);
+    done   = false;
+    loaded = false;
+    strcpy(load_msg, "");
+
+    state.screen   = GAME;
+    Map *map       = malloc(sizeof(Map));
+    *map           = MAPS[state.map];
+    state.maxLaps  = map->maxLaps;
+    state.raceTime = GetTime();
 
     msgStart  = 0;
     msgActive = 0;
     msgCount  = 0;
 
+    pthread_t thread;
+
     switch (state.mode) {
     case SINGLEPLAYER:
-        loadSingleplayer(map);
+        pthread_create(&thread, NULL, &loadSingleplayer, map);
         break;
     case SPLITSCREEN:
-        loadSplitscreen(map);
+        loadSplitscreen(*map);
         break;
     }
+}
+
+static void loadCarTexture(Car *car) {
+    car->texture = LoadTextureFromImage(car->image);
 }
 
 static void loadTextures() {
@@ -99,75 +107,68 @@ static void loadTextures() {
     debugTrackTexture = LoadTextureFromImage(debugTrackImage);
     UnloadImage(debugTrackImage);
 
-    speedometerTexture = LoadTextureFromImage(speedometerImage);
-    UnloadImage(speedometerImage);
-
     minimapTexture = LoadTextureFromImage(minimapImage);
     UnloadImage(minimapImage);
+
+    minimapPos.x = SCREEN_WIDTH - minimapTexture.width;
+    minimapPos.y = 10;
 
     debugMinimapTexture = LoadTextureFromImage(debugMinimapImage);
     UnloadImage(debugMinimapImage);
 
+    speedometerTexture = LoadTextureFromImage(speedometerImage);
+    UnloadImage(speedometerImage);
+
     logoNoBgTexture = LoadTextureFromImage(logoNoBgImage);
     UnloadImage(logoNoBgImage);
+
+    LinkedList_forEach(cars, &loadCarTexture);
 
     done = true;
 }
 
-static void *loadImages(void *arg) {
-    Map *map = (Map *) arg;
-
-    strcpy(total_msg, "Carregando mapa...");
+static void loadImages(Map *map) {
+    strcpy(load_msg, "Carregando mapa...");
     trackImage = LoadImage(map->backgroundPath);
-    total_loaded++;
 
     MAP_WIDTH  = trackImage.width;
     MAP_HEIGHT = trackImage.height;
 
-    strcpy(total_msg, "Carregando mapa debug...");
+    strcpy(load_msg, "Carregando mapa debug...");
     debugTrackImage = LoadImage(map->maskPath);
-    total_loaded++;
 
-    strcpy(total_msg, "Carregando velocimetro...");
-    Image speedometerImage = LoadImage(SPEEDOMETER_PATH);
-    ImageResize(&speedometerImage, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
-    total_loaded++;
-
-    strcpy(total_msg, "Carregando minimapa...");
+    strcpy(load_msg, "Carregando minimapa...");
     minimapImage = LoadImage(map->minimapPath);
     ImageResize(&minimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
-    total_loaded++;
 
-    strcpy(total_msg, "Carregando minimapa de debug...");
+    strcpy(load_msg, "Carregando minimapa de debug...");
     debugMinimapImage = LoadImage(map->maskPath);
     ImageResize(&debugMinimapImage, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
-    total_loaded++;
 
-    strcpy(total_msg, "Carregando logo...");
+    strcpy(load_msg, "Carregando velocimetro...");
+    Image speedometerImage = LoadImage(SPEEDOMETER_PATH);
+    ImageResize(&speedometerImage, SCREEN_WIDTH / 6, SCREEN_WIDTH / 6);
+
+    strcpy(load_msg, "Carregando logo...");
     logoNoBgImage = LoadImage(LOGO_BG_IMAGE_PATH);
     ImageResize(&logoNoBgImage, 256, 256);
-    total_loaded++;
 
-    loaded = true;
+    strcpy(load_msg, "Carregando carros...");
+    for (int i = 0; i < 2; i++) {
+        carsImage[i] = LoadImage(CAR_IMAGES_PATH[i]);
+    }
 }
 
-static void loadMap(Map map) {
-    state.maxLaps  = map.maxLaps;
-    state.raceTime = GetTime();
+void loadAssets(Map *map) {
+    loadImages(map);
 
-    pthread_t thread;
-    pthread_create(&thread, NULL, &loadImages, &map);
+    strcpy(load_msg, "Carregando checkpoints...");
+    Track_setMask(&debugTrackImage);
+    Track_setCheckpoints(map->checkpoints, map->checkpointSize);
 
-    Track_setMask(map.maskPath);
-    Track_setCheckpoints(map.checkpoints, map.checkpointSize);
-
-    char referencePath[200];
-    strcpy(referencePath, REFERENCE_DATA_PATH);
-    strcat(referencePath, map.name);
-    strcat(referencePath, "_reference.bin");
-
+    strcpy(load_msg, "Carregando volta de referencia...");
     ArrayList_clear(referenceLap);
-    FILE *file = fopen(referencePath, "rb");
+    FILE *file = fopen(TextFormat("%s/%s_reference.bin", REFERENCE_DATA_PATH, map->name), "rb");
     if (file != NULL) {
         CarFrame buffer;
         while (fread(&buffer, sizeof(CarFrame), 1, file) == 1) {
@@ -179,6 +180,12 @@ static void loadMap(Map map) {
 
 static void mapCleanup() {
     Track_Unload();
+    UnloadTexture(minimapTexture);
+    UnloadTexture(trackTexture);
+    UnloadTexture(debugMinimapTexture);
+    UnloadTexture(debugTrackTexture);
+    UnloadTexture(speedometerTexture);
+    UnloadTexture(logoNoBgTexture);
     LinkedList_clear(cars);
     if (state.mode == SINGLEPLAYER) {
         cleanUpSingleplayer();
@@ -201,8 +208,12 @@ void Game_cleanup() {
 //----------------------------------------------------------------------------------
 
 void Game_update() {
-    if (loaded && !done) {
-        loadTextures();
+    if (!done) {
+        if (loaded) {
+            loadTextures();
+            state.status = STARTED;
+        }
+        return;
     }
 
     SDL_GameControllerUpdate();
@@ -302,9 +313,9 @@ void Game_draw() {
                                (Rectangle) {0, SCREEN_HEIGHT / 3.0f, SCREEN_WIDTH, 128}, 64, BLACK,
                                FONTS[1]);
 
-        drawTextCenteredInRect(
-            (char *) TextFormat("%d/%d %s", total_loaded, total_assets, total_msg),
-            (Rectangle) {0, SCREEN_HEIGHT / 3.0f + 96, SCREEN_WIDTH, 64}, 32, BLACK, FONTS[3]);
+        drawTextCenteredInRect(load_msg,
+                               (Rectangle) {0, SCREEN_HEIGHT / 3.0f + 96, SCREEN_WIDTH, 64}, 32,
+                               BLACK, FONTS[3]);
         return;
     }
 

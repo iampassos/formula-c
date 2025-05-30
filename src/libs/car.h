@@ -16,6 +16,7 @@ typedef struct {
     float     vel;
     float     acc;
     Texture2D texture;
+    Image     image;
     Music     sound;
     Color     color;
     Color     floorColor;
@@ -37,18 +38,15 @@ typedef struct {
     int       refFrame;
 } Car;
 
-void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
+void Track_setMask(Image *mask_image);
 
 void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
 
 void Track_Unload(); // Libera a memória de recursos da mascara de pixels
 
-Car *Car_create(Vector2 pos,   // posição inicial
-                float   angle, // orientação inicial
-
-                CarConfig   config,
-                const char *texturePath, // path da textura
-                Color color, bool ghost,
+Car *Car_create(Vector2   pos,   // posição inicial
+                float     angle, // orientação inicial
+                CarConfig config, Image *image, Color color, bool ghost,
                 int   id, // identificador único
                 char *name);
 

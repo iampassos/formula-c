@@ -3,6 +3,7 @@
 #include "game.h"
 #include "raylib.h"
 #include <math.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -30,33 +31,35 @@ static void drawGhostCarDebug();
 // Carregando modo de jogo
 //----------------------------------------------------------------------------------
 
-void loadSingleplayer(Map map) {
-    state.status = STARTED;
-    minimapPos.x = SCREEN_WIDTH - minimapTexture.width;
-    minimapPos.y = 10;
+void *loadSingleplayer(void *arg) {
+    Map *map = (Map *) arg;
 
-    strcpy(ghostCarPath, GHOST_CAR_DATA_PATH);
-    strcat(ghostCarPath, map.name);
-    strcat(ghostCarPath, ".bin");
+    loadAssets(map);
 
-    replayFrameIdx = 0;
-    currentLap     = ArrayList_create();
-    bestLap        = ArrayList_create();
-
-    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, CAR_IMAGES_PATH[0],
+    strcpy(load_msg, "Carregando novos carros...");
+    Car *ghostCar = Car_create((Vector2) {-1000, -1000}, 0, DEFAULT_CAR_CONFIG, &carsImage[0],
                                WHITE, true, 99, "Melhor Volta");
-    Car *player   = Car_create(map.startCarPos[0], map.startAngle, DEFAULT_CAR_CONFIG,
-                               CAR_IMAGES_PATH[0], WHITE, false, 1, "Player 1");
+    LinkedList_addCar(cars, ghostCar);
 
+    Car *player = Car_create(map->startCarPos[0], map->startAngle, DEFAULT_CAR_CONFIG,
+                             &carsImage[0], WHITE, false, 1, "Player 1");
+    LinkedList_addCar(cars, player);
+
+    strcpy(load_msg, "Carregando melhor volta...");
+    strcpy(ghostCarPath, TextFormat("%s/%s.bin", GHOST_CAR_DATA_PATH, map->name));
+    replayFrameIdx    = 0;
+    currentLap        = ArrayList_create();
+    bestLap           = ArrayList_create();
     bestLapTimePlayer = ghostCar;
     loadBestLapFile(ghostCar);
 
-    LinkedList_addCar(cars, ghostCar);
-    LinkedList_addCar(cars, player);
-
+    strcpy(load_msg, "Carregando camera...");
     Camera_setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
                             0.0f, 0.5f);
+
+    loaded = true;
+    pthread_exit(NULL);
 }
 
 //----------------------------------------------------------------------------------

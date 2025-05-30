@@ -14,21 +14,6 @@ static Color *TRACK_PIXELS;
 
 static float MIN_DIST_TO_DETECT;
 
-// --- Funções públicas ---
-void Track_setMask(char *track_mask_path); // Definindo a mascara de pixel para carros lerem
-
-void Track_setCheckpoints(Checkpoint checkpoints[], int size); // Define as cores dos checkpoints
-
-void Track_Unload(); // Libera a memória de recursos da mascara de pixels
-
-Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
-                bool ghost, int id, char *name);
-
-void Car_free(Car *car); // Libera a memória de um carro
-
-void Car_update(Car *car); // Atualizar a posição do carro a cada frame
-void Car_draw(Car *car);   // Desenhar o carro na tela
-
 // --- Funções internas ---
 static void updateFloorColor(Car *car);
 
@@ -52,10 +37,9 @@ static void accelerate(Car *car, float force);
 // Carregamento da pista e checkpoints
 //----------------------------------------------------------------------------------
 
-void Track_setMask(char *track_mask_path) { // Definindo a imagem da máscara de pixels
-    Image trackMask = LoadImage(track_mask_path);
-    TRACK_PIXELS    = LoadImageColors(trackMask);
-    UnloadImage(trackMask);
+// Definindo a imagem da máscara de pixels
+void Track_setMask(Image *mask_image) {
+    TRACK_PIXELS       = LoadImageColors(*mask_image);
     MIN_DIST_TO_DETECT = MAP_WIDTH / 30;
 }
 
@@ -75,13 +59,15 @@ void Track_Unload() { // Função para descarregar as variáveis associadas a pi
 // Criar / liberar memória do carro
 //----------------------------------------------------------------------------------
 
-Car *Car_create(Vector2 pos, float angle, CarConfig config, const char *texturePath, Color color,
-                bool ghost, int id, char *name) {
+Car *Car_create(Vector2 pos, float angle, CarConfig config, Image *image, Color color, bool ghost,
+                int id, char *name) {
     Car *car = (Car *) malloc(sizeof(Car));
-    if (car == NULL)
+    if (car == NULL) {
         return NULL;
+    }
+
     car->pos             = pos;
-    car->texture         = LoadTexture(texturePath);
+    car->image           = *image;
     car->angle           = angle;
     car->acc             = config.acc;
     car->width           = config.width;

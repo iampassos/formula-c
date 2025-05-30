@@ -17,6 +17,8 @@ void Game_load();
 void Game_update();
 void Game_draw();
 
+void loadAssets(Map *map);
+
 //----------------------------------------------------------------------------------
 // Funções de uso interno
 //----------------------------------------------------------------------------------
@@ -36,11 +38,11 @@ void drawBestLapMessage(float x, float y);
 // Singleplayer
 //----------------------------------------------------------------------------------
 
-void loadSingleplayer(Map map);
-void updateSingleplayer();
-void drawSingleplayer();
-void drawHudSingleplayer();
-void cleanUpSingleplayer();
+void *loadSingleplayer(void *arg);
+void  updateSingleplayer();
+void  drawSingleplayer();
+void  drawHudSingleplayer();
+void  cleanUpSingleplayer();
 
 //----------------------------------------------------------------------------------
 // Splitscreen
@@ -56,7 +58,9 @@ void cleanUpSplitscreen();
 // Variáveis internas
 //----------------------------------------------------------------------------------
 
-extern Texture2D trackHud;
+extern bool done;
+extern bool loaded;
+extern char load_msg[100];
 
 extern LinkedList *cars;
 
@@ -64,6 +68,8 @@ extern Camera2D *camera1;
 extern Camera2D *camera2;
 
 extern Vector2 minimapPos;
+
+extern Image carsImage[2];
 
 extern Texture2D minimapTexture;
 extern Texture2D trackTexture;
