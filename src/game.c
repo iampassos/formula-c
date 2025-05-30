@@ -219,13 +219,8 @@ void Game_update() {
 
     SDL_GameControllerUpdate();
 
-    int flag = 0;
-
-    for (int i = 0; i < controllers_n; i++) {
-        flag = Controller_input(controllers[i]).b;
-    }
-
-    if (IsKeyPressed(KEY_Q) || state.status == ENDED || flag) {
+    if (IsKeyPressed(KEY_Q) || state.status == ENDED ||
+        Controller_allButtonInputs(controllers, controllers_n).menu) {
         state.screen = MENU;
         mapCleanup();
         return;

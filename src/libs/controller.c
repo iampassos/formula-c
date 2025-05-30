@@ -1,5 +1,6 @@
 #include "controller.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_gamecontroller.h>
 
 void Controllers_init(SDL_GameController *controllers[], int *controllers_n) {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
@@ -46,6 +47,29 @@ ControllerInput Controller_input(SDL_GameController *controller) {
     bool x = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X);
     bool y = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y);
 
+    bool menu = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START);
+
     return (ControllerInput) {
-        {rightX, rightY}, {leftX, leftY}, rt, lt, up, down, left, right, a, b, x, y};
+        {rightX, rightY}, {leftX, leftY}, rt, lt, up, down, left, right, a, b, x, y, menu};
+}
+
+ControllerInput Controller_allButtonInputs(SDL_GameController *controllers[], int controller_n) {
+    ControllerInput temp = {0};
+
+    for (int i = 0; i < controller_n; i++) {
+        ControllerInput input = Controller_input(controllers[i]);
+        temp.up |= input.up;
+        temp.down |= input.down;
+        temp.left |= input.left;
+        temp.right |= input.right;
+
+        temp.a |= input.a;
+        temp.b |= input.b;
+        temp.x |= input.x;
+        temp.y |= input.y;
+
+        temp.menu |= input.menu;
+    }
+
+    return temp;
 }

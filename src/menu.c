@@ -81,7 +81,7 @@ void Menu_update() {
     Vector2 mouse = GetMousePosition();
     SDL_GameControllerUpdate();
 
-    ControllerInput input = Controller_input(controllers_n > 0 ? controllers[0] : NULL);
+    ControllerInput input = Controller_allButtonInputs(controllers, controllers_n);
 
     if (IsKeyPressed(KEY_Q) || input.b) {
         menu_step = menu_step == 0 ? 0 : menu_step - 1;
