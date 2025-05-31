@@ -72,9 +72,9 @@ Map MAPS[] = {{"Interlagos",                                // Nome da pista
                "resources/maps/monaco_map.png",
                "resources/masks/monaco_mask.png",
                "resources/minimaps/monaco_minimap.png",
-               {{2507, 3150}, {2360, 3158}},
+               {{2600, 3259}, {2416, 3228}},
                -0.90f,
-               5,
+               3,
                12,
                {
                    {{2617, 3104}, -0.90f},

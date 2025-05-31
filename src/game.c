@@ -215,7 +215,6 @@ void Game_update() {
     if (!done) {
         if (loaded) {
             loadTextures();
-            state.status = STARTED;
         }
         return;
     }

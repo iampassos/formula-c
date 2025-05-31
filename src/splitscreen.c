@@ -52,11 +52,11 @@ void *loadSplitscreen(void *arg) {
 
     lastSoundTime     = GetTime() - 0.5;
     count             = 0;
-    state.status      = COUNTDOWN;
     winner            = NULL;
     bestLapTimePlayer = p1;
 
-    loaded = true;
+    state.status = COUNTDOWN;
+    loaded       = true;
     pthread_exit(NULL);
 }
 

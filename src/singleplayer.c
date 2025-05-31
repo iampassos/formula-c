@@ -58,7 +58,8 @@ void *loadSingleplayer(void *arg) {
     camera1 = Camera_create(player->pos, (Vector2) {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
                             0.0f, 0.5f);
 
-    loaded = true;
+    state.status = STARTED;
+    loaded       = true;
     pthread_exit(NULL);
 }
 
