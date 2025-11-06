@@ -1,21 +1,36 @@
-# Compilador e flags
+# Compilador
 CC = gcc
-CFLAGS = -Wall -std=c99 -Iraylib-5.5_win64_mingw-w64/include -Isrc/libs -Isrc
-LDFLAGS = -Lraylib-5.5_win64_mingw-w64/lib -lraylib -lopengl32 -lgdi32 -lwinmm -mconsole
 
-# Arquivos-fonte e destino
-SRC = $(wildcard src/*.c src/libs/*.c)
-OUT = game.exe
+# Nome do executável
+TARGET = main.exe
 
-# Alvo padrão
-all: $(OUT)
+# Caminhos padrão de include e lib do MSYS2 (UCRT)
+INCLUDE_PATH = C:/msys64/ucrt64/include
+LIB_PATH = C:/msys64/ucrt64/lib
 
-# Como gerar o executável
-$(OUT): $(SRC)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+# Flags de compilação
+CFLAGS = -Wall -std=c99 -Isrc -I$(INCLUDE_PATH) -Isrc/libs
+LIBS = -L$(LIB_PATH) -lraylib -lSDL2main -lSDL2 -lopengl32 -lgdi32 -lwinmm
 
-# Limpeza
+# Todos os arquivos fonte em src/ e subpastas (Windows)
+SRC = $(shell dir /b /s src\*.c)
+
+# Regra padrão: compilar tudo direto
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(LIBS)
+
+# Rodar o programa
+run: $(TARGET)
+	./$(TARGET)
+
+# Limpar arquivos gerados
 clean:
-	del /Q $(OUT)
+	del $(TARGET) 2>nul
 
-# mingw32-make -f MakeFileWindows && game.exe
+# Comando para rodar:
+# mingw32-make -f MakeFileWindows
+#comando power shell para make e run
+# mingw32-make -f MakeFileWindows && main.exe && mingw32-make -f MakeFileWindows clean
+
